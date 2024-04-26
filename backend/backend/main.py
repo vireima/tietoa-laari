@@ -1,9 +1,11 @@
 from typing import Any, Callable, Coroutine, Literal
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute, APIRouter
 from loguru import logger
 from pydantic import BaseModel
+from pydantic.error_wrappers import RequestValidationError, ValidationError
 from starlette.background import BackgroundTask
 from starlette.responses import Response
 
@@ -98,5 +100,17 @@ async def url_verification(
 
     logger.info(f"Got an events! {body}")
 
+
+async def http422_error_handler(
+    _: Request, exc: RequestValidationError | ValidationError
+) -> JSONResponse:
+    logger.error(_.json())
+    return JSONResponse(
+        {"errors": exc.errors()}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+    )
+
+
+app.add_exception_handler(ValidationError, http422_error_handler)
+app.add_exception_handler(RequestValidationError, http422_error_handler)
 
 app.include_router(router)
