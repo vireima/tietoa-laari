@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # mongo_url: MongoDsn
-    # mongo_db: str
-    # mongo_collection: str
+    mongo_url: MongoDsn
+    mongo_db: str
+    mongo_collection: str
     # api_url: AnyHttpUrl
     # grist_api_url: AnyHttpUrl
     # grist_api_key: str
