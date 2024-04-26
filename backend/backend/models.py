@@ -10,7 +10,7 @@ TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
 
 
-def validate_utc_datetime(dt: datetime.datetime | str) -> datetime:
+def validate_utc_datetime(dt: datetime | str) -> datetime:
     """
     Validate a datetime and force naive datetimes to be tz aware. Naive datetimes default to utc.
     """
@@ -19,7 +19,7 @@ def validate_utc_datetime(dt: datetime.datetime | str) -> datetime:
     return TZ_UTC.localize(dt) if dt.tzinfo is None else dt
 
 
-def validate_local_datetime(dt: datetime.datetime | str) -> datetime:
+def validate_local_datetime(dt: datetime | str) -> datetime:
     """
     Validate a datetime and force naive datetimes to be tz aware. Naive datetimes default to local tz.
     """
@@ -28,8 +28,8 @@ def validate_local_datetime(dt: datetime.datetime | str) -> datetime:
     return TZ_LOCAL.localize(dt) if dt.tzinfo is None else dt
 
 
-DatetimeUTC = Annotated[datetime.datetime, BeforeValidator(validate_utc_datetime)]
-DatetimeLocal = Annotated[datetime.datetime, BeforeValidator(validate_local_datetime)]
+DatetimeUTC = Annotated[datetime, BeforeValidator(validate_utc_datetime)]
+DatetimeLocal = Annotated[datetime, BeforeValidator(validate_local_datetime)]
 
 
 # Slack input models
