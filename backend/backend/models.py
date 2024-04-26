@@ -3,8 +3,8 @@ from typing import Literal
 
 import arrow
 import pytz
-from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, Field
-from typing_extensions import Annotated
+from pydantic import BaseModel, BeforeValidator
+from typing import Annotated
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")

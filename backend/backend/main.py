@@ -1,22 +1,18 @@
+# pyright: reportRedeclaration=false
+
 import random
 import string
 import sys
 import time
-from typing import Any, Callable, Coroutine, Literal
 
 import orjson
-from fastapi import FastAPI, Request, status
-from fastapi.exceptions import RequestValidationError, ValidationException
-from fastapi.responses import JSONResponse, ORJSONResponse
-from fastapi.routing import APIRoute, APIRouter
+from fastapi import FastAPI, Request
+from fastapi.responses import ORJSONResponse
 from loguru import logger
 from multimethod import multimethod
-from pydantic import BaseModel
-from starlette.background import BackgroundTask
 from starlette.responses import Response
 
 from backend import database, models
-from backend.config import settings
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
@@ -50,9 +46,12 @@ def serialize_logging(record) -> str:
 
 
 def sink(message):
+    WARNING_LEVEL = 30
+
     serialized = serialize_logging(message.record)
     print(
-        serialized, file=sys.stderr if message.record["level"].no >= 30 else sys.stdout
+        serialized,
+        file=sys.stderr if message.record["level"].no >= WARNING_LEVEL else sys.stdout,
     )
 
 
@@ -66,17 +65,23 @@ async def add_process_time_header(request: Request, call_next):
 
     start_time = time.monotonic()
 
-    with logger.contextualize(source=idem, request_host=request.client.host):
+    host, port = (
+        (request.client.host, request.client.port)
+        if request.client is not None
+        else ("", "")
+    )
+
+    with logger.contextualize(source=idem, request_host=host, request_port=port):
         body = await request.body()
 
         try:
             json_body = orjson.loads(body)
-        except orjson.JSONDecodeError as err:
+        except orjson.JSONDecodeError:
             json_body = body.decode()
 
         with logger.contextualize(request_payload=json_body):
             logger.info(
-                f"Incoming request: {request.method} {request.url.path} (query: {request.query_params}) from {request.client.host}:{request.client.port}."
+                f"Incoming request: {request.method} {request.url.path} (query: {request.query_params}) from {host}:{port}."
             )
 
         response: Response = await call_next(request)
@@ -137,18 +142,18 @@ async def process(event: models.VerificationModel) -> str:
 
 
 @multimethod
-async def process(event: models.MentionEventModel) -> None:
+async def process(event: models.MentionEventModel) -> None:  # noqa: F811
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
 @multimethod
-async def process(event: models.ReactionEventModel) -> None:
+async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
     logger.success(
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
 
 
 @multimethod
-async def process(event: models.MessageEventModel) -> None:
+async def process(event: models.MessageEventModel) -> None:  # noqa: F811
     await database.insert_task(event)
     logger.success("Inserted a task.")

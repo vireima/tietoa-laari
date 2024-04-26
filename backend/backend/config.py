@@ -1,4 +1,4 @@
-from pydantic import AnyHttpUrl, Field, MongoDsn
+from pydantic import Field, MongoDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,4 +18,4 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+settings = Settings()  # pyright: ignore [reportCallIssue]
