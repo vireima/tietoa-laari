@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError, ValidationException
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute, APIRouter
 from loguru import logger
+from multimethod import multimethod
 from pydantic import BaseModel
 from starlette.background import BackgroundTask
 from starlette.responses import Response
@@ -23,7 +24,9 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.monotonic() - start_time
     response.headers["X-Process-Time"] = str(process_time)
 
-    logger.info(f"{request.method} {request.url} {json_body}")
+    logger.info(
+        f"{request.client.host} > {request.method} {request.url} ({process_time:.2f}s) {json_body}"
+    )
     return response
 
 
@@ -41,7 +44,7 @@ class EventsWrapper(BaseModel):
     api_app_id: str
 
 
-class InnerMessageEvent(EventsWrapper):
+class InnerMessageEvent(BaseModel):
     type: Literal["message"]
     channel: str
     user: str
@@ -49,6 +52,17 @@ class InnerMessageEvent(EventsWrapper):
     ts: str
     event_ts: str
     channel_type: str
+
+
+class InnerMentionEvent(BaseModel):
+    type: Literal["app_mention"]
+    channel: str
+    user: str
+    text: str
+    event_ts: str
+    channel_type: str
+    team: str
+    ts: str
 
 
 class InnerReactionEvent(BaseModel):
@@ -67,6 +81,10 @@ class ReactionEventModel(EventsWrapper):
     event: InnerReactionEvent
 
 
+class MentionEventModel(EventsWrapper):
+    event: InnerMentionEvent
+
+
 class VerificationModel(BaseModel):
     token: str
     challenge: str
@@ -75,15 +93,40 @@ class VerificationModel(BaseModel):
 
 @app.post("/verification")
 async def url_verification(
-    body: VerificationModel | ReactionEventModel | MessageEventModel,
+    body: (
+        VerificationModel | ReactionEventModel | MessageEventModel | MentionEventModel
+    ),
 ):
+    """
+    Respond to an incoming Slack Events API event.
+    """
+    logger.info(f"Got an event! {body}")
+    return process(body)
+
+
+@multimethod
+def process(event: VerificationModel) -> str:
     """
     Respond to the Slack verification request with plaintext.
     """
-    if isinstance(body, VerificationModel):
-        return body.challenge
+    return event.challenge
 
-    logger.info(f"Got an events! {body}")
+
+@multimethod
+def process(event: MentionEventModel) -> None:
+    logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
+
+
+@multimethod
+def process(event: ReactionEventModel) -> None:
+    logger.success(
+        f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
+    )
+
+
+@multimethod
+def process(event: MessageEventModel) -> None:
+    logger.success(f"Message! '{event.event.text}' by {event.event.user}")
 
 
 async def http422_error_handler(
