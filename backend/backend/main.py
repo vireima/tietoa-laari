@@ -1,10 +1,10 @@
-import json
 import random
 import string
 import sys
 import time
 from typing import Any, Callable, Coroutine, Literal
 
+import orjson
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError, ValidationException
 from fastapi.responses import JSONResponse
@@ -46,7 +46,7 @@ def serialize_logging(record):
 
     subset.update(**record["extra"])
 
-    return json.dumps(subset)
+    return orjson.dumps(subset)
 
 
 def sink(message):
@@ -67,13 +67,20 @@ async def add_process_time_header(request: Request, call_next):
     start_time = time.monotonic()
 
     with logger.contextualize(source=idem, request_host=request.client.host):
-        json_body = await request.json()
+        body = await request.body()
+
+        try:
+            json_body = orjson.loads(body)
+        except orjson.JSONDecodeError as err:
+            json_body = body
+
         with logger.contextualize(request_payload=json_body):
             logger.info(
                 f"Incoming request: {request.method} {request.url.path} (query: {request.query_params}) from {request.client.host}:{request.client.port}."
             )
 
         response: Response = await call_next(request)
+
         process_time = time.monotonic() - start_time
         response.headers["X-Process-Time"] = str(process_time)
         logger.info(f"{response.status_code} ({process_time:.2f}s)")
