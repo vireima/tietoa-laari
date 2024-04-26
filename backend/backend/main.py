@@ -97,3 +97,6 @@ async def url_verification(
         return body.challenge
 
     logger.info(f"Got an events! {body}")
+
+
+app.include_router(router)
