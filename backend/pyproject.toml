@@ -21,6 +21,7 @@ motor = "^3.4.0"
 black = "^24.4.2"
 ruff = "^0.4.2"
 jupyterlab = "^4.1.6"
+pyright = "^1.1.360"
 
 [build-system]
 requires = ["poetry-core"]
