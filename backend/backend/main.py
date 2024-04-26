@@ -34,7 +34,7 @@ def serialize_logging(record):
     subset = {
         # Required by Railway
         "msg": record["message"],
-        "level": level_name_mapping[record["level"].name],
+        "level": level_name_mapping.get(record["level"].name.lower(), "info"),
         # Custom attributes
         "original_level": record["level"].name,
         "timestamp": record["time"].timestamp(),
