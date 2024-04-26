@@ -98,11 +98,11 @@ async def url_verification(
     """
     Respond to an incoming Slack Events API event.
     """
-    return process(body)
+    return await process(body)
 
 
 @multimethod
-def process(event: models.VerificationModel) -> str:
+async def process(event: models.VerificationModel) -> str:
     """
     Respond to the Slack verification request with plaintext.
     """
@@ -110,18 +110,18 @@ def process(event: models.VerificationModel) -> str:
 
 
 @multimethod
-def process(event: models.MentionEventModel) -> None:
+async def process(event: models.MentionEventModel) -> None:
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
 @multimethod
-def process(event: models.ReactionEventModel) -> None:
+async def process(event: models.ReactionEventModel) -> None:
     logger.success(
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
 
 
 @multimethod
-def process(event: models.MessageEventModel) -> None:
-    database.insert_task(event)
+async def process(event: models.MessageEventModel) -> None:
+    await database.insert_task(event)
     logger.success("Inserted a task.")
