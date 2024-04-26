@@ -7,7 +7,7 @@ from typing import Any, Callable, Coroutine, Literal
 import orjson
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError, ValidationException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, ORJSONResponse
 from fastapi.routing import APIRoute, APIRouter
 from loguru import logger
 from multimethod import multimethod
@@ -18,7 +18,7 @@ from starlette.responses import Response
 from backend import database, models
 from backend.config import settings
 
-app = FastAPI(debug=True)
+app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
 
 def serialize_logging(record):
@@ -88,26 +88,31 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+@logger.catch
 @app.get("/")
 async def root():
     return {"details": "Root!"}
 
 
+@logger.catch
 @app.get("/tasks")
 async def get_tasks():
     return await database.query()
 
 
+@logger.catch
 @app.get("/tasks/{task_id}")
 async def get_task(task_id: str):
     return await database.query(task_id)
 
 
+@logger.catch
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
     return await database.delete(task_id)
 
 
+@logger.catch
 @app.post("/verification")
 async def url_verification(
     body: (
@@ -123,6 +128,7 @@ async def url_verification(
     return await process(body)
 
 
+@logger.catch
 @multimethod
 async def process(event: models.VerificationModel) -> str:
     """
@@ -131,11 +137,13 @@ async def process(event: models.VerificationModel) -> str:
     return event.challenge
 
 
+@logger.catch
 @multimethod
 async def process(event: models.MentionEventModel) -> None:
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
+@logger.catch
 @multimethod
 async def process(event: models.ReactionEventModel) -> None:
     logger.success(
@@ -143,6 +151,7 @@ async def process(event: models.ReactionEventModel) -> None:
     )
 
 
+@logger.catch
 @multimethod
 async def process(event: models.MessageEventModel) -> None:
     await database.insert_task(event)
