@@ -86,6 +86,21 @@ async def root():
     return {"details": "Root!"}
 
 
+@app.get("/tasks")
+async def get_tasks():
+    return await database.query()
+
+
+@app.get("/tasks/{task_id}")
+async def get_task(task_id: str):
+    return await database.query(task_id)
+
+
+@app.delete("/tasks/{task_id}")
+async def delete_task(task_id: str):
+    return await database.delete(task_id)
+
+
 @app.post("/verification")
 async def url_verification(
     body: (
