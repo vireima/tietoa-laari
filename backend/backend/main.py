@@ -1,48 +1,32 @@
+import time
 from typing import Any, Callable, Coroutine, Literal
 
 from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError, ValidationException
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute, APIRouter
 from loguru import logger
 from pydantic import BaseModel
-from pydantic.error_wrappers import RequestValidationError, ValidationError
 from starlette.background import BackgroundTask
 from starlette.responses import Response
 
 from backend.config import settings
 
-
-def log_request(req_body, res_body):
-    logger.debug(req_body)
-
-
-class LogRoute(APIRoute):
-    def get_route_handler(self) -> Callable[[Request], Coroutine[Any, Any, Response]]:
-        original_route_handler = super().get_route_handler()
-
-        async def custom_route_handler(request: Request) -> Response:
-            req_body = await request.body()
-            response = await original_route_handler(request)
-            tasks = response.background
-
-            task = BackgroundTask(log_request, req_body, response.body)
-
-            if tasks:
-                tasks.add_task(task)
-                response.background = tasks
-            else:
-                response.background = task
-
-            return response
-
-        return custom_route_handler
-
-
 app = FastAPI(debug=True)
-router = APIRouter(route_class=LogRoute)
 
 
-@router.get("/")
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.monotonic()
+    response = await call_next(request)
+    process_time = time.monotonic() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+
+    logger.log(request.url)
+    return response
+
+
+@app.get("/")
 async def root():
     return {"details": "Root!"}
 
@@ -88,7 +72,7 @@ class VerificationModel(BaseModel):
     type: Literal["url_verification"]
 
 
-@router.post("/verification")
+@app.post("/verification")
 async def url_verification(
     body: VerificationModel | ReactionEventModel | MessageEventModel,
 ):
@@ -102,7 +86,7 @@ async def url_verification(
 
 
 async def http422_error_handler(
-    _: Request, exc: RequestValidationError | ValidationError
+    _: Request, exc: RequestValidationError
 ) -> JSONResponse:
     logger.error(_.json())
     return JSONResponse(
@@ -110,7 +94,4 @@ async def http422_error_handler(
     )
 
 
-app.add_exception_handler(ValidationError, http422_error_handler)
 app.add_exception_handler(RequestValidationError, http422_error_handler)
-
-app.include_router(router)
