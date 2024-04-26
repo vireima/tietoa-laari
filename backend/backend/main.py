@@ -21,34 +21,42 @@ app = FastAPI(debug=True)
 
 
 def serialize_logging(record):
+    level_name_mapping = {
+        "trace": "debug",
+        "debug": "debug",
+        "info": "info",
+        "success": "info",
+        "warning": "warn",
+        "error": "error",
+        "critical": "error",
+    }
+
     subset = {
         # Required by Railway
         "msg": record["message"],
-        "level": record["level"].name,
+        "level": level_name_mapping[record["level"].name],
         # Custom attributes
+        "original_level": record["level"].name,
         "timestamp": record["time"].timestamp(),
-        "file": record["file"],
+        "file": record["file"].name,
         "function": record["function"],
         "line": record["line"],
-        "source": record["extra"]["source"],
     }
+
+    subset.update(**record["extra"])
 
     return json.dumps(subset)
 
 
-def patch_logging(record):
-    record["extra"]["serialized"] = serialize_logging(record)
+def sink(message):
+    serialized = serialize_logging(message.record)
+    print(
+        serialized, file=sys.stderr if message.record["level"].no >= 30 else sys.stdout
+    )
 
 
 logger.remove()
-logger = logger.patch(patch_logging)
-logger.add(
-    sys.stderr,
-    format="{level.icon} {level: <8} | "
-    "{name}:{function}:{line} [{extra[source]}] - <level>{message}</level>",
-    level="TRACE",
-    serialize=True,
-)
+logger.add(sink, level="TRACE")
 
 
 @app.middleware("http")
