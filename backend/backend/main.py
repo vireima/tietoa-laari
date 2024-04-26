@@ -18,11 +18,12 @@ app = FastAPI(debug=True)
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.monotonic()
+    json_body = await request.json()
     response = await call_next(request)
     process_time = time.monotonic() - start_time
     response.headers["X-Process-Time"] = str(process_time)
 
-    logger.log(request.url)
+    logger.info(f"{request.method} {request.url} {json_body}")
     return response
 
 
