@@ -128,7 +128,6 @@ async def url_verification(
     return await process(body)
 
 
-@logger.catch
 @multimethod
 async def process(event: models.VerificationModel) -> str:
     """
@@ -137,13 +136,11 @@ async def process(event: models.VerificationModel) -> str:
     return event.challenge
 
 
-@logger.catch
 @multimethod
 async def process(event: models.MentionEventModel) -> None:
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
-@logger.catch
 @multimethod
 async def process(event: models.ReactionEventModel) -> None:
     logger.success(
@@ -151,7 +148,6 @@ async def process(event: models.ReactionEventModel) -> None:
     )
 
 
-@logger.catch
 @multimethod
 async def process(event: models.MessageEventModel) -> None:
     await database.insert_task(event)
