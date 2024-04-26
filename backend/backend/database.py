@@ -8,6 +8,7 @@ from backend.config import settings
 
 client = AsyncIOMotorClient(str(settings.mongo_url))
 
+
 database = client[settings.mongo_db]
 collection = database[settings.mongo_collection]
 

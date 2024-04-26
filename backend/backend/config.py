@@ -1,11 +1,11 @@
-from pydantic import AnyHttpUrl, MongoDsn
+from pydantic import AnyHttpUrl, Field, MongoDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     mongo_url: MongoDsn
-    mongo_db: str
-    mongo_collection: str
+    mongo_db: str = Field(min_length=3)
+    mongo_collection: str = Field(min_length=3)
     # api_url: AnyHttpUrl
     # grist_api_url: AnyHttpUrl
     # grist_api_key: str
