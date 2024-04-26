@@ -56,5 +56,8 @@ async def query(id: str | None = None) -> list[models.TaskModel]:
 
 
 async def delete(id: str):
+    """
+    Delete a single task from the database by task id.
+    """
     logger.debug(f"Deleting task {id}.")
     await collection.delete_one({"_id": ObjectId(id)})

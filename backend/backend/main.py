@@ -46,7 +46,7 @@ def serialize_logging(record):
 
     subset.update(**record["extra"])
 
-    return orjson.dumps(subset)
+    return orjson.dumps(subset).decode("utf-8")
 
 
 def sink(message):

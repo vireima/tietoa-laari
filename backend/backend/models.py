@@ -1,7 +1,35 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel
+import arrow
+import pytz
+from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, Field
+from typing_extensions import Annotated
+
+TZ_UTC = pytz.timezone("UTC")
+TZ_LOCAL = pytz.timezone("Europe/Helsinki")
+
+
+def validate_utc_datetime(dt: datetime.datetime | str) -> datetime:
+    """
+    Validate a datetime and force naive datetimes to be tz aware. Naive datetimes default to utc.
+    """
+    if isinstance(dt, str):
+        dt = arrow.get(dt).datetime
+    return TZ_UTC.localize(dt) if dt.tzinfo is None else dt
+
+
+def validate_local_datetime(dt: datetime.datetime | str) -> datetime:
+    """
+    Validate a datetime and force naive datetimes to be tz aware. Naive datetimes default to local tz.
+    """
+    if isinstance(dt, str):
+        dt = arrow.get(dt).datetime
+    return TZ_LOCAL.localize(dt) if dt.tzinfo is None else dt
+
+
+DatetimeUTC = Annotated[datetime.datetime, BeforeValidator(validate_utc_datetime)]
+DatetimeLocal = Annotated[datetime.datetime, BeforeValidator(validate_local_datetime)]
 
 
 # Slack input models
@@ -75,5 +103,5 @@ class TaskModel(BaseModel):
     ts: str
     description: str
     priority: int = 0
-    created: datetime | None = None
-    modified: datetime | None = None
+    created: DatetimeUTC | None = None
+    modified: DatetimeUTC | None = None
