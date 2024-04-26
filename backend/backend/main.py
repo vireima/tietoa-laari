@@ -21,7 +21,7 @@ from backend.config import settings
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
 
-def serialize_logging(record):
+def serialize_logging(record) -> str:
     level_name_mapping = {
         "trace": "debug",
         "debug": "debug",
@@ -72,7 +72,7 @@ async def add_process_time_header(request: Request, call_next):
         try:
             json_body = orjson.loads(body)
         except orjson.JSONDecodeError as err:
-            json_body = body
+            json_body = body.decode()
 
         with logger.contextualize(request_payload=json_body):
             logger.info(
