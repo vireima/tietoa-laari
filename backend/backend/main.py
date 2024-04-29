@@ -12,7 +12,8 @@ from loguru import logger
 from multimethod import multimethod
 from starlette.responses import Response
 
-from backend import database, models
+from backend import models
+from backend.database import db
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
@@ -152,8 +153,27 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
 
+    vote = models.Reaction(reaction=event.event.reaction, user=event.event.user)
+
+    match event.event.type:
+        case "reaction_added":
+            db.add_task_votes(vote, event.event.item.channel, event.event.item.ts)
+        case "reaction_removed":
+            db.remove_task_votes(vote, event.event.item.channel, event.event.item.ts)
+
 
 @multimethod
 async def process(event: models.MessageEventModel) -> None:  # noqa: F811
-    await database.insert_task(event)
-    logger.success("Inserted a task.")
+    if event.event.thread_ts is not None:
+        logger.debug("This is a thread reply.")
+        parent_tasks = await db.query(
+            ts=event.event.thread_ts, channel=event.event.channel
+        )
+
+        if parent_tasks:
+            logger.debug(f"Parent task: '{parent_tasks[0].description}'.")
+        else:
+            logger.warning("A reply to a thread that cannot be found.")
+    else:
+        await db.insert_task(event)
+        logger.success("Inserted a task.")

@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
 import arrow
 import pytz
-from pydantic import BaseModel, BeforeValidator
-from typing import Annotated
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+
+from backend.database import Database
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
@@ -52,6 +53,8 @@ class InnerMessageEvent(BaseModel):
     event_ts: str
     channel_type: str
     subtype: str | None = None
+    thread_ts: str | None = None
+    parent_user_id: str | None = None
     # blocks: [{ ... }]
 
 
@@ -68,13 +71,19 @@ class InnerMentionEvent(BaseModel):
     # blocks: [{ ... }]
 
 
+class ReactionItem(BaseModel):
+    channel: str
+    ts: str
+    type: str  # most likely "message"
+
+
 class InnerReactionEvent(BaseModel):
     type: Literal["reaction_added", "reaction_removed"]
     user: str
     reaction: str
     item_user: str
     event_ts: str
-    # item { type: "message", ... }
+    item: ReactionItem
 
 
 class MessageEventModel(EventsWrapper):
@@ -95,8 +104,14 @@ class VerificationModel(BaseModel):
     type: Literal["url_verification"]
 
 
+class Reaction(BaseModel):
+    reaction: str
+    user: str
+
+
 # Task models
 class TaskModel(BaseModel):
+    model = ConfigDict(extra="allow")
     author: str
     assignee: str | None = None
     channel: str
@@ -105,3 +120,16 @@ class TaskModel(BaseModel):
     priority: int = 0
     created: DatetimeUTC | None = None
     modified: DatetimeUTC | None = None
+    votes: list[Reaction] = Field(default_factory=list)
+
+
+# class Task:
+#     def __init__(self, task:TaskModel, db:Database):
+#         self.task = task
+#         self.db = db
+
+#     def add_vote(self, reaction: str, user: str) -> None:
+#         self.votes.append(Reaction(reaction=reaction, user=user))
+
+#     def remove_vote(self, reaction: str, user: str) -> None:
+#         self.votes.remove(Reaction(reaction=reaction, user=user))
