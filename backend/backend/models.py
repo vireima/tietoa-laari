@@ -5,8 +5,6 @@ import arrow
 import pytz
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
-from backend.database import Database
-
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
 

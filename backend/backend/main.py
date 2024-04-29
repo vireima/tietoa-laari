@@ -103,19 +103,19 @@ async def root():
 @logger.catch
 @app.get("/tasks")
 async def get_tasks():
-    return await database.query()
+    return await db.query()
 
 
 @logger.catch
 @app.get("/tasks/{task_id}")
 async def get_task(task_id: str):
-    return await database.query(task_id)
+    return await db.query(task_id)
 
 
 @logger.catch
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
-    return await database.delete(task_id)
+    return await db.delete(task_id)
 
 
 @logger.catch
@@ -157,9 +157,11 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
 
     match event.event.type:
         case "reaction_added":
-            db.add_task_votes(vote, event.event.item.channel, event.event.item.ts)
+            await db.add_task_votes(vote, event.event.item.channel, event.event.item.ts)
         case "reaction_removed":
-            db.remove_task_votes(vote, event.event.item.channel, event.event.item.ts)
+            await db.remove_task_votes(
+                vote, event.event.item.channel, event.event.item.ts
+            )
 
 
 @multimethod

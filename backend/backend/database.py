@@ -44,6 +44,9 @@ class Database:
         await self.collection.insert_one(task_dict)
 
     async def add_task_votes(self, vote: models.Reaction, channel: str, ts: str):
+        """
+        Add vote (an emoji reaction) to a task in the database.
+        """
         logger.debug(f"ADDING {vote}")
         result = await self.collection.find_one_and_update(
             {"channel": channel, "ts": ts},
@@ -57,6 +60,9 @@ class Database:
         logger.warning(result)
 
     async def remove_task_votes(self, vote: models.Reaction, channel: str, ts: str):
+        """
+        Remove a vote (an emoji reaction) from a task.
+        """
         logger.debug(f"REMOVING {vote}")
         result = await self.collection.find_one_and_update(
             {"channel": channel, "ts": ts},
