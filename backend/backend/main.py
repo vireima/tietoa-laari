@@ -4,6 +4,7 @@ import random
 import string
 import sys
 import time
+import traceback
 
 import orjson
 from fastapi import FastAPI, Request
@@ -39,7 +40,11 @@ def serialize_logging(record) -> str:
         "file": record["file"].name,
         "function": record["function"],
         "line": record["line"],
+        # "exception": record["exception"],
     }
+
+    if record["exception"] is not None:
+        subset["traceback"] = record["exception"]
 
     subset.update(**record["extra"])
 
@@ -62,6 +67,9 @@ logger.add(sink, level="TRACE")
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
+    """
+    Contextualize logging and send X-Process-Time headers.
+    """
     idem = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
     start_time = time.monotonic()
@@ -94,10 +102,16 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@logger.catch
 @app.get("/")
 async def root():
-    return {"details": "Root!"}
+    try:
+        # raise ValueError("Lol virhe tässä!")
+        return {"details": "Root!"}
+
+    except Exception as ex:
+
+        with logger.contextualize(exception=traceback.format_tb(ex.__traceback__)):
+            logger.error("Virhe")
 
 
 @logger.catch

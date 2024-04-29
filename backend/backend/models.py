@@ -108,7 +108,7 @@ class Reaction(BaseModel):
 
 
 # Task models
-class TaskModel(BaseModel, extra="allow"):
+class TaskModel(BaseModel):
     author: str
     assignee: str | None = None
     channel: str
