@@ -53,8 +53,8 @@ class Database:
             {
                 "$push": {
                     "votes": vote.model_dump(),
-                    "$set": {"modified": datetime.datetime.now(models.TZ_UTC)},
-                }
+                },
+                "$set": {"modified": datetime.datetime.now(models.TZ_UTC)},
             },
         )
         logger.warning(result)
