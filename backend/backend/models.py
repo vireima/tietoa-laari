@@ -108,8 +108,7 @@ class Reaction(BaseModel):
 
 
 # Task models
-class TaskModel(BaseModel):
-    model = ConfigDict(extra="allow")
+class TaskModel(BaseModel, extra="allow"):
     author: str
     assignee: str | None = None
     channel: str
