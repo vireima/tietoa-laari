@@ -20,16 +20,16 @@ class Database:
         self.collection = self.database[collection]
 
     @multimethod
-    async def insert_task(self, message: models.MessageEventModel):
+    async def insert_task(self, message: models.InnerMessageEvent):
         """
         Insert one task into the database. Use Slack message as a task prototype.
         """
         await self.insert_task(
             models.TaskInputModel(
-                author=message.event.user,
-                channel=message.event.channel,
-                ts=message.event.ts,
-                description=message.event.text,
+                author=message.user,
+                channel=message.channel,
+                ts=message.ts,
+                description=message.text,
                 created=datetime.datetime.now(models.TZ_UTC),
                 modified=datetime.datetime.now(models.TZ_UTC),
             )
@@ -131,6 +131,17 @@ class Database:
         ]
 
         await self.collection.bulk_write(lst)
+
+    async def update_task(self, message: models.InnerMessageChangedEvent):
+        await self.collection.find_one_and_update(
+            {"channel": message.channel, "ts": message.ts},
+            {
+                "$set": {
+                    "description": message.message.text,
+                    "modified": datetime.datetime.now(models.TZ_UTC),
+                }
+            },
+        )
 
 
 db = Database(str(settings.mongo_url), settings.mongo_db, settings.mongo_collection)

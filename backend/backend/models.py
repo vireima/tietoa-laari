@@ -65,6 +65,35 @@ class InnerMessageEvent(BaseModel):
     # blocks: [{ ... }]
 
 
+class ChangedMessage(BaseModel):
+    type: Literal["message"]
+    text: str
+    user: str
+    ts: str
+    thread_ts: str | None = None
+    parent_user_id: str | None = None
+    # edited: { ... }
+
+
+class InnerMessageChangedEvent(BaseModel):
+    type: Literal["message"]
+    channel: str
+    ts: str
+    event_ts: str
+    channel_type: str
+    subtype: Literal["message_changed"]
+    message: ChangedMessage
+
+
+class InnerMessageDeletedEvent(BaseModel):
+    type: Literal["message"]
+    channel: str
+    deleted_ts: str
+    event_ts: str
+    channel_type: str
+    subtype: Literal["message_deleted"]
+
+
 class InnerMentionEvent(BaseModel):
     type: Literal["app_mention"]
     channel: str
@@ -94,7 +123,7 @@ class InnerReactionEvent(BaseModel):
 
 
 class MessageEventModel(EventsWrapper):
-    event: InnerMessageEvent
+    event: InnerMessageEvent | InnerMessageChangedEvent | InnerMessageDeletedEvent
 
 
 class ReactionEventModel(EventsWrapper):

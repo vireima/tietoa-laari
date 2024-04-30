@@ -225,5 +225,21 @@ async def process(event: models.MessageEventModel) -> None:  # noqa: F811
         else:
             logger.warning("A reply to a thread that cannot be found.")
     else:
-        await db.insert_task(event)
-        logger.success("Inserted a task.")
+        await process_message_subtypes(event.event)
+
+
+@multimethod
+async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
+    await db.insert_task(msg)
+    logger.success("Inserted a task.")
+
+
+@multimethod
+async def process_message_subtypes(msg: models.InnerMessageChangedEvent) -> None:
+    await db.update_task(msg)
+    logger.success("Updated a task.")
+
+
+@multimethod
+async def process_message_subtypes(msg: models.InnerMessageDeletedEvent) -> None:
+    logger.warning(f"Message deleted in Slack ({msg.channel}/{msg.deleted_ts})")
