@@ -214,24 +214,22 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
 
 @multimethod
 async def process(event: models.MessageEventModel) -> None:  # noqa: F811
-    if event.event.thread_ts is not None:
+    await process_message_subtypes(event.event)
+
+
+@multimethod
+async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
+    if msg.thread_ts is not None:
         logger.debug("This is a thread reply.")
-        parent_tasks = await db.query(
-            ts=event.event.thread_ts, channel=event.event.channel
-        )
+        parent_tasks = await db.query(ts=msg.thread_ts, channel=msg.channel)
 
         if parent_tasks:
             logger.debug(f"Parent task: '{parent_tasks[0].description}'.")
         else:
             logger.warning("A reply to a thread that cannot be found.")
     else:
-        await process_message_subtypes(event.event)
-
-
-@multimethod
-async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
-    await db.insert_task(msg)
-    logger.success("Inserted a task.")
+        await db.insert_task(msg)
+        logger.success("Inserted a task.")
 
 
 @multimethod
