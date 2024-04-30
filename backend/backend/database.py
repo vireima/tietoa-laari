@@ -7,6 +7,7 @@ from bson import ObjectId
 from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 from multimethod import multimethod
+from pymongo import UpdateOne
 
 from backend import models
 from backend.config import settings
@@ -24,16 +25,18 @@ class Database:
         Insert one task into the database. Use Slack message as a task prototype.
         """
         await self.insert_task(
-            models.TaskModel(
+            models.TaskInputModel(
                 author=message.event.user,
                 channel=message.event.channel,
                 ts=message.event.ts,
                 description=message.event.text,
+                created=datetime.datetime.now(models.TZ_UTC),
+                modified=datetime.datetime.now(models.TZ_UTC),
             )
         )
 
     @multimethod
-    async def insert_task(self, task: models.TaskModel):  # noqa: F811
+    async def insert_task(self, task: models.TaskInputModel):  # noqa: F811
         """
         Insert one task into the database.
         """
@@ -78,7 +81,7 @@ class Database:
         task_id: str | None = None,
         ts: str | None = None,
         channel: str | None = None,
-    ) -> list[models.TaskModel]:
+    ) -> list[models.TaskOutputModel]:
         """
         Queries the database for (all the) tasks.
         """
@@ -95,14 +98,39 @@ class Database:
 
         cursor = self.collection.find(query)
         tasks = await cursor.to_list(None)
-        return [models.TaskModel(**task) for task in tasks]
 
+        return [models.TaskOutputModel(**task) for task in tasks]
+
+    @multimethod
     async def delete(self, task_id: str):
         """
         Delete a single task from the database by task id.
         """
         logger.debug(f"Deleting task {task_id}.")
         await self.collection.delete_one({"_id": ObjectId(task_id)})
+
+    @multimethod
+    async def delete(self, tasks: list[models.TaskUpdateModel]):  # noqa: F811
+        """
+        Delete multiple tasks from the database by task id.
+        """
+        await self.collection.delete_many(
+            {"_id": {"$in": [ObjectId(task.id) for task in tasks]}}
+        )
+
+    async def patch(self, tasks: list[models.TaskUpdateModel]):
+        lst = [
+            UpdateOne(
+                {"_id": ObjectId(task.id)},
+                {
+                    "$set": task.model_dump(exclude_none=True)
+                    | {"modified": datetime.datetime.now(models.TZ_UTC)}
+                },
+            )
+            for task in tasks
+        ]
+
+        await self.collection.bulk_write(lst)
 
 
 db = Database(str(settings.mongo_url), settings.mongo_db, settings.mongo_collection)

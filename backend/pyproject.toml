@@ -18,6 +18,8 @@ motor = "^3.4.0"
 multimethod = "^1.11.2"
 orjson = "^3.10.1"
 pytz = "^2024.1"
+aiohttp = "^3.9.5"
+async-cache = "^1.1.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -15,6 +15,7 @@ from starlette.responses import Response
 
 from backend import models
 from backend.database import db
+from backend.slack import slack_client
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
@@ -121,9 +122,21 @@ async def get_tasks():
 
 
 @logger.catch
-@app.get("/tasks/{task_id}")
-async def get_task(task_id: str):
-    return await db.query(task_id)
+@app.get("/tasks/{channel}")
+async def get_tasks_by_channel(channel: str):
+    return await db.query(channel=channel)
+
+
+@logger.catch
+@app.get("/tasks/{channel}/{ts}")
+async def get_task(channel: str, ts: str):
+    return await db.query(channel=channel, ts=ts)
+
+
+@logger.catch
+@app.get("/tasks/{channel}/{ts}/comments")
+async def get_task_comments(channel: str, ts: str):
+    return await slack_client.comments(channel, ts)
 
 
 @logger.catch
@@ -133,8 +146,26 @@ async def delete_task(task_id: str):
 
 
 @logger.catch
-@app.post("/verification")
-async def url_verification(
+@app.patch("/tasks")
+async def patch_tasks(tasks: list[models.TaskUpdateModel]):
+    return await db.patch(tasks)
+
+
+@logger.catch
+@app.delete("/tasks")
+async def delete_tasks(tasks: list[models.TaskUpdateModel]):
+    return await db.delete(tasks)
+
+
+@logger.catch
+@app.get("/users")
+async def get_users():
+    return await slack_client.users()
+
+
+@logger.catch
+@app.post("/event")
+async def events_api_endpoint(
     body: (
         models.VerificationModel
         | models.ReactionEventModel
@@ -146,6 +177,9 @@ async def url_verification(
     Respond to an incoming Slack Events API event.
     """
     return await process(body)
+
+
+### Events API ###
 
 
 @multimethod

@@ -1,12 +1,21 @@
 from datetime import datetime
+from enum import Enum
 from typing import Annotated, Literal
 
 import arrow
 import pytz
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from bson import ObjectId
+from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, Field
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
+
+
+def validate_object_id(value: ObjectId) -> str:
+    return str(value)
+
+
+PyObjectId = Annotated[str, BeforeValidator(validate_object_id)]
 
 
 def validate_utc_datetime(dt: datetime | str) -> datetime:
@@ -107,26 +116,56 @@ class Reaction(BaseModel):
     user: str
 
 
+class StatusEnum(str, Enum):
+    todo = "todo"
+    in_progress = "in progress"
+    done = "done"
+    closed = "closed"
+
+
 # Task models
-class TaskModel(BaseModel):
+class TaskInputModel(BaseModel):
     author: str
     assignee: str | None = None
     channel: str
     ts: str
-    description: str
+    description: str | None = None
     priority: int = 0
-    created: DatetimeUTC | None = None
-    modified: DatetimeUTC | None = None
+    created: DatetimeUTC
+    modified: DatetimeUTC
     votes: list[Reaction] = Field(default_factory=list)
+    status: StatusEnum = StatusEnum.todo
 
 
-# class Task:
-#     def __init__(self, task:TaskModel, db:Database):
-#         self.task = task
-#         self.db = db
+class TaskUpdateModel(BaseModel):
+    id: PyObjectId = Field(alias="_id")
+    assignee: str | None = None
+    description: str | None = None
+    priority: int | None = None
+    modified: DatetimeUTC | None = None
+    votes: list[Reaction] | None = None
+    status: StatusEnum | None = None
 
-#     def add_vote(self, reaction: str, user: str) -> None:
-#         self.votes.append(Reaction(reaction=reaction, user=user))
 
-#     def remove_vote(self, reaction: str, user: str) -> None:
-#         self.votes.remove(Reaction(reaction=reaction, user=user))
+class TaskOutputModel(TaskInputModel):
+    id: PyObjectId = Field(alias="_id")
+
+
+# User models
+class SlackProfileModel(BaseModel):
+    real_name: str
+    display_name: str
+    status_text: str
+    status_emoji: str
+    image_32: AnyHttpUrl
+    image_512: AnyHttpUrl
+
+
+class SlackUserModel(BaseModel):
+    id: str
+    color: str | None = None
+    deleted: bool
+    name: str
+    updated: int
+    profile: SlackProfileModel
+    is_bot: bool
