@@ -237,8 +237,10 @@ async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
 @multimethod
 async def process_message_subtypes(msg: models.InnerMessageChangedEvent) -> None:
     logger.trace("Processing an update message")
-    await db.update_task(msg)
-    logger.success("Updated a task.")
+    result = await db.update_task(msg)
+    logger.success(
+        f"Updated a task: description='{result.description}', mod={result.modified}"
+    )
 
 
 @multimethod
