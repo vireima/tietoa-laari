@@ -132,8 +132,13 @@ class Database:
 
         await self.collection.bulk_write(lst)
 
-    async def update_task(self, message: models.InnerMessageChangedEvent):
-        await self.collection.find_one_and_update(
+    async def update_task(
+        self, message: models.InnerMessageChangedEvent
+    ) -> models.TaskOutputModel | None:
+        logger.debug(
+            f"Updating description: {message.previous_message.text} -> {message.message.text}"
+        )
+        result = await self.collection.find_one_and_update(
             {"channel": message.channel, "ts": message.ts},
             {
                 "$set": {
@@ -141,7 +146,10 @@ class Database:
                     "modified": datetime.datetime.now(models.TZ_UTC),
                 }
             },
+            return_document=True,
         )
+
+        return models.TaskOutputModel(**result) if result else None
 
 
 db = Database(str(settings.mongo_url), settings.mongo_db, settings.mongo_collection)

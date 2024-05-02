@@ -73,6 +73,7 @@ class ChangedMessage(BaseModel):
     thread_ts: str | None = None
     parent_user_id: str | None = None
     # edited: { ... }
+    # blocks: [{ ... }]
 
 
 class InnerMessageChangedEvent(BaseModel):
@@ -83,6 +84,7 @@ class InnerMessageChangedEvent(BaseModel):
     channel_type: str
     subtype: Literal["message_changed"]
     message: ChangedMessage
+    previous_message: ChangedMessage
 
 
 class InnerMessageDeletedEvent(BaseModel):
