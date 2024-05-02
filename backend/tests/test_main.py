@@ -1,11 +1,10 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from fastapi import FastAPI, status
+from fastapi import status
 from fastapi.testclient import TestClient
 
 import backend.main
-from backend import models
 from backend.config import settings
 
 settings.mongo_db = "testing"
@@ -72,7 +71,7 @@ def message_changed_payload(outer_payload):
 
 def test_root():
     res = client.get("/")
-    assert res.status_code == 200
+    assert res.status_code == status.HTTP_200_OK
 
 
 def test_process():
@@ -83,12 +82,12 @@ def test_process():
 def test_message_event(mocker, message_payload):
     insert_task = mocker.patch("backend.database.db.insert_task", AsyncMock())
     res = client.post("/event", json=message_payload)
-    assert res.status_code == 200
+    assert res.status_code == status.HTTP_200_OK
     insert_task.assert_called_once()
 
 
 def test_message_changed_event(mocker, message_changed_payload):
     update_task = mocker.patch("backend.database.db.update_task", AsyncMock())
     res = client.post("/event", json=message_changed_payload)
-    assert res.status_code == 200
+    assert res.status_code == status.HTTP_200_OK
     update_task.assert_called_once()

@@ -139,7 +139,7 @@ class Database:
             f"Updating description: {message.previous_message.text} -> {message.message.text}"
         )
         result = await self.collection.find_one_and_update(
-            {"channel": message.channel, "ts": message.ts},
+            {"channel": message.channel, "ts": message.message.ts},
             {
                 "$set": {
                     "description": message.message.text,

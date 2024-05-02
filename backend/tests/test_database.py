@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import motor.motor_asyncio
 import pytest
 import pytest_asyncio
 
@@ -52,7 +51,6 @@ async def test_update_task(database: Database):
     await database.insert_task(task)
 
     update = models.InnerMessageChangedEvent(
-        user="user_id",
         channel="channel_id",
         ts="test_update_task",
         type="message",

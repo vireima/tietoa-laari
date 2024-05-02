@@ -130,6 +130,7 @@ async def get_tasks_by_channel(channel: str):
 @logger.catch
 @app.get("/tasks/{channel}/{ts}")
 async def get_task(channel: str, ts: str):
+
     return await db.query(channel=channel, ts=ts)
 
 
@@ -235,15 +236,22 @@ async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
 
 
 @multimethod
-async def process_message_subtypes(msg: models.InnerMessageChangedEvent) -> None:
+async def process_message_subtypes(  # noqa: F811
+    msg: models.InnerMessageChangedEvent,
+) -> None:
     logger.trace("Processing an update message")
     result = await db.update_task(msg)
-    logger.success(
-        f"Updated a task: description='{result.description}', mod={result.modified}"
-    )
+    if not result:
+        logger.error(f"Update failed: {msg.channel}/{msg.ts} '{msg.message.text}'")
+    else:
+        logger.success(
+            f"Updated a task: description='{result.description}', mod={result.modified}"
+        )
 
 
 @multimethod
-async def process_message_subtypes(msg: models.InnerMessageDeletedEvent) -> None:
+async def process_message_subtypes(  # noqa: F811
+    msg: models.InnerMessageDeletedEvent,
+) -> None:
     logger.trace("Processing a deletion")
     logger.warning(f"Message deleted in Slack ({msg.channel}/{msg.deleted_ts})")
