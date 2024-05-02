@@ -214,11 +214,13 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
 
 @multimethod
 async def process(event: models.MessageEventModel) -> None:  # noqa: F811
+    logger.trace("Processing a message")
     await process_message_subtypes(event.event)
 
 
 @multimethod
 async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
+    logger.trace("Processing a new message")
     if msg.thread_ts is not None:
         logger.debug("This is a thread reply.")
         parent_tasks = await db.query(ts=msg.thread_ts, channel=msg.channel)
@@ -234,10 +236,12 @@ async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
 
 @multimethod
 async def process_message_subtypes(msg: models.InnerMessageChangedEvent) -> None:
+    logger.trace("Processing an update message")
     await db.update_task(msg)
     logger.success("Updated a task.")
 
 
 @multimethod
 async def process_message_subtypes(msg: models.InnerMessageDeletedEvent) -> None:
+    logger.trace("Processing a deletion")
     logger.warning(f"Message deleted in Slack ({msg.channel}/{msg.deleted_ts})")
