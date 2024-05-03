@@ -42,6 +42,13 @@ class Slack:
 
         return channels
 
+    async def channel(self, channel: str):
+        """
+        Retrieves information about one channel or group.
+        """
+        async for page in await self.client.conversations_info(channel=channel):
+            return page.get("channel", None)
+
     async def comments(self, channel: str, ts: str):
         REPLY_PAGE_LIMIT = 150
 

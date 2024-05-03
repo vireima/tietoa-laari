@@ -17,6 +17,8 @@ export default function TaskWidget({
   const channel = channels.find((channel) => channel.id === task.channel);
   const created = DateTime.fromISO(task.created);
 
+  console.log(channels.find((c) => c.name.includes("tie")));
+
   return (
     <div className="task widget">
       <div className="task-description">{task.description}</div>

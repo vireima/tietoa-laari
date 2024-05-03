@@ -182,6 +182,12 @@ async def get_channels():
 
 
 @logger.catch
+@app.get("/channels/{channel_id}")
+async def get_channel(channel_id: str):
+    return await slack_client.channel(channel_id)
+
+
+@logger.catch
 @app.post("/event")
 async def events_api_endpoint(
     body: (

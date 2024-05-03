@@ -13,6 +13,7 @@ function Tasks() {
   };
 
   console.log(tasks);
+  console.log(channels);
 
   return (
     <>
