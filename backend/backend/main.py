@@ -8,6 +8,7 @@ import traceback
 
 import orjson
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
 from multimethod import multimethod
@@ -18,6 +19,16 @@ from backend.database import db
 from backend.slack import slack_client
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def serialize_logging(record) -> str:
