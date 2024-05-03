@@ -7,15 +7,18 @@ import axios from "axios";
 import Tasks from "./routes/Tasks";
 
 async function taskLoader() {
-  const [tasks, users] = await Promise.all([
+  const [tasks, users, channels] = await Promise.all([
     axios
       .get("https://laari.up.railway.app/tasks")
       .then((response) => response.data),
     axios
       .get("https://laari.up.railway.app/users")
       .then((response) => response.data),
+    axios
+      .get("https://laari.up.railway.app/channels")
+      .then((response) => response.data),
   ]);
-  return { tasks, users };
+  return { tasks, users, channels };
 }
 
 const router = createBrowserRouter([

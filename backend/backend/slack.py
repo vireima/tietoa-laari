@@ -33,8 +33,11 @@ class Slack:
         """
         Retrieves all channels in the team as a list. Cached for 5 mins.
         """
+        CHANNELS_PAGE_LIMIT = 150
         channels = []
-        async for page in await self.client.channels_list():
+        async for page in await self.client.conversations_list(
+            limit=CHANNELS_PAGE_LIMIT, exclude_archived=True
+        ):
             channels += page.get("channels", [])
 
         return channels
