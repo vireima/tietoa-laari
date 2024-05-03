@@ -176,6 +176,12 @@ async def get_users():
 
 
 @logger.catch
+@app.get("/channels")
+async def get_channels():
+    return await slack_client.channels()
+
+
+@logger.catch
 @app.post("/event")
 async def events_api_endpoint(
     body: (

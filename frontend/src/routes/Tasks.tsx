@@ -1,18 +1,21 @@
 import { useLoaderData } from "react-router-dom";
 import { Task } from "../types/Task";
+import TaskWidget from "../components/TaskWidget";
+import User from "../types/User";
+import "../styles/task.css";
 
 function Tasks() {
-  const tasks = useLoaderData() as Task[];
+  const { tasks, users } = useLoaderData() as { tasks: Task[]; users: User[] };
+
+  console.log(tasks);
 
   return (
     <>
       <div>List of tasks</div>
-      <div>
-        <ul>
-          {tasks.map((element) => (
-            <li>{element.user}</li>
-          ))}
-        </ul>
+      <div className="tasks">
+        {tasks.map((element) => (
+          <TaskWidget task={element} users={users} key={element._id} />
+        ))}
       </div>
     </>
   );

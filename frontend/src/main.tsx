@@ -4,15 +4,24 @@ import "./styles/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import axios from "axios";
+import Tasks from "./routes/Tasks";
 
-function taskLoader() {
-  return axios.get("https://laari.up.railway.app/tasks");
+async function taskLoader() {
+  const [tasks, users] = await Promise.all([
+    axios
+      .get("https://laari.up.railway.app/tasks")
+      .then((response) => response.data),
+    axios
+      .get("https://laari.up.railway.app/users")
+      .then((response) => response.data),
+  ]);
+  return { tasks, users };
 }
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Hello w!</div>,
+    element: <Tasks />,
     errorElement: <ErrorPage />,
     loader: taskLoader,
   },

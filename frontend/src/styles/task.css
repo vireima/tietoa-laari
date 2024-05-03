@@ -1,0 +1,59 @@
+.tasks {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  row-gap: 1em;
+}
+
+.task {
+  border: 1px solid gray;
+  width: 25em;
+}
+
+.task > div {
+  display: inline-block;
+  /* border: 1px solid red; */
+  border-radius: 5px;
+  margin: 0.1em 0.2em;
+  padding: 0.1em 0.3em;
+}
+
+.task > .task-description {
+  display: block;
+}
+
+.task > .task-priority,
+.task > .task-votes {
+  border-radius: 50%;
+  width: 1.6em;
+  height: 1.6em;
+  padding: 0;
+  text-align: center;
+  border: 0;
+}
+
+.task > .task-priority {
+  background-color: gray;
+}
+
+.task > .task-votes {
+  background-color: goldenrod;
+}
+.task > .task-slack {
+  padding: 0.2em;
+  width: 1.6em;
+  height: 1.6em;
+  background-color: dimgray;
+  border: 0;
+}
+
+.task img {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+.task > .task-created {
+  background-color: dimgray;
+}
