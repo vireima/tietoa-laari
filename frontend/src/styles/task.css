@@ -1,59 +1,160 @@
+:root {
+  --color01: 235, 235, 235;
+  --color02: 45, 66, 99;
+  --color03: 200, 75, 49;
+  --color04: 236, 219, 186;
+  --background-color: rgb(230, 230, 230);
+  --text-color: rgb(30, 30, 30);
+  --task-background-color: rgba(var(--color01), 1);
+  --task-background-color-hover: rgba(220, 220, 220, 0.1);
+  --task-gap: 1em;
+  --task-border-radius: 10px;
+  --task-width: 30em;
+  --vote-background-color: rgb(var(--color04));
+  --priority-background-color: rgb(var(--color03));
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+
+  font-weight: 500;
+}
+
+input[disabled],
+textarea[disabled],
+select[disabled] {
+  pointer-events: none;
+}
+
 .tasks {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
   align-items: flex-start;
-  row-gap: 1em;
+  row-gap: var(--task-gap);
+  column-gap: var(--task-gap);
 }
 
 .task {
-  border: 1px solid gray;
-  width: 25em;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--task-border-radius);
+  width: var(--task-width);
+  box-shadow: 0.2em 0.2em 0.8em 0.4em rgba(0, 0, 0, 0.1);
+  background-color: var(--task-background-color);
+  overflow: hidden;
 }
 
-.task > div {
+.task:hover {
+  background-color: var(--task-background-color-hover);
+}
+
+.task .task-settings-line {
+  border: 2px solid transparent;
+  margin: 0.1em 0.2em;
+  height: 2em;
+  line-height: calc(2em - 4px);
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  vertical-align: middle;
   display: inline-block;
-  /* border: 1px solid red; */
   border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.task .task-settings-line:hover {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.task .task-author::before,
+.task .task-assignee::before {
+  content: "@";
+}
+
+.task .task-description {
   margin: 0.1em 0.2em;
   padding: 0.1em 0.3em;
-}
-
-.task > .task-description {
   display: block;
 }
 
-.task > .task-priority,
-.task > .task-votes {
+.task .task-priority,
+.task .task-votes {
   border-radius: 50%;
-  width: 1.6em;
-  height: 1.6em;
+  width: 2em;
   padding: 0;
   text-align: center;
+  border: 2px solid transparent;
+}
+
+.task .task-priority {
+  background-color: var(--priority-background-color);
+}
+
+.task .task-votes {
+  background-color: var(--vote-background-color);
+}
+
+.task .task-created {
+  background-color: var(--priority-background-color);
+}
+
+.task select,
+.task textarea {
   border: 0;
+  color: var(--text-color);
+  font-weight: inherit;
+  font-family: inherit;
 }
 
-.task > .task-priority {
-  background-color: gray;
+.task textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5em;
+  resize: none;
+  background-color: transparent;
+  color: var(--text-color);
 }
 
-.task > .task-votes {
-  background-color: goldenrod;
-}
-.task > .task-slack {
-  padding: 0.2em;
-  width: 1.6em;
-  height: 1.6em;
-  background-color: dimgray;
-  border: 0;
+.task textarea:enabled {
+  /* background-color: rgba(0, 0, 0, 0.2); */
+  resize: vertical;
 }
 
-.task img {
-  width: 1.6em;
-  height: 1.6em;
+*:disabled {
+  color: inherit;
 }
 
-.task > .task-created {
-  background-color: dimgray;
+.task select {
+  border-radius: 1px;
 }
+
+.task select[value="todo"] {
+  color: red;
+}
+
+.task option {
+  background-color: var(--background-color);
+}
+
+.task select:disabled {
+  appearance: none;
+  background-color: transparent;
+}
+
+.task select {
+  height: 100%;
+  background-color: transparent;
+}
+
+.task button {
+  margin: 0;
+  width: 100%;
+  border: 0px solid black;
+  font-weight: inherit;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: block;
+  margin: 0;
+}
+
+/* .task > form > div {
+  border: 1px dashed red;
+} */
