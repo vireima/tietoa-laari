@@ -1,4 +1,4 @@
-import "../styles/icon.css";
+// import "../styles/icon.css";
 import InProgressIcon from "../assets/InProgressIcon";
 import ClosedIcon from "../assets/ClosedIcon";
 import TodoIcon from "../assets/TodoIcon";

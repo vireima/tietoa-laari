@@ -1,15 +1,13 @@
+import { DateInput } from "@mantine/dates";
 import { DateTime } from "ts-luxon";
+import { IconCalendarUp } from "@tabler/icons-react";
 
-export default function StatusWidget({
-  date,
-  title,
-}: {
-  date: DateTime;
-  title: string;
-}) {
+export default function StatusWidget({ date }: { date: DateTime }) {
   return (
-    <div className="task-created task-settings-line" title={title}>
-      {date.toLocaleString()}
-    </div>
+    <DateInput
+      value={date.toJSDate()}
+      disabled
+      leftSection={<IconCalendarUp size={"1rem"} />}
+    />
   );
 }

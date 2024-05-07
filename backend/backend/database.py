@@ -8,6 +8,7 @@ from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 from multimethod import multimethod
 from pymongo import UpdateOne
+from pymongo.results import BulkWriteResult
 
 from backend import models
 from backend.config import settings
@@ -76,6 +77,7 @@ class Database:
         )
         logger.warning(result)
 
+    @multimethod
     async def query(
         self,
         task_id: str | None = None,
@@ -102,6 +104,18 @@ class Database:
         return [models.TaskOutputModel(**task) for task in tasks]
 
     @multimethod
+    async def query(self, task_ids: list[str]):  # noqa: F811
+        """
+        Queries the database for all the tasks by _id.
+        """
+        query = {"_id": {"$in": [ObjectId(task_id) for task_id in task_ids]}}
+
+        cursor = self.collection.find(query)
+        tasks = await cursor.to_list(None)
+
+        return [models.TaskOutputModel(**task) for task in tasks]
+
+    @multimethod
     async def delete(self, task_id: str):
         """
         Delete a single task from the database by task id.
@@ -118,7 +132,7 @@ class Database:
             {"_id": {"$in": [ObjectId(task.id) for task in tasks]}}
         )
 
-    async def patch(self, tasks: list[models.TaskUpdateModel]):
+    async def patch(self, tasks: list[models.TaskUpdateModel]) -> BulkWriteResult:
         lst = [
             UpdateOne(
                 {"_id": ObjectId(task.id)},
@@ -130,7 +144,7 @@ class Database:
             for task in tasks
         ]
 
-        await self.collection.bulk_write(lst)
+        return await self.collection.bulk_write(lst)
 
     async def update_task(
         self, message: models.InnerMessageChangedEvent

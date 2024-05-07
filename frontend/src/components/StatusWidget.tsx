@@ -1,28 +1,18 @@
-import { Task } from "../types/Task";
-import StatusIcon from "./StatusIcon";
+import { Select } from "@mantine/core";
+import { Status } from "../types/Status";
 
 export default function StatusWidget({
-  task,
-  editing,
+  status,
+  setStatus,
 }: {
-  task: Task;
-  editing: boolean;
+  status: Status;
+  setStatus: (val: string | null) => void;
 }) {
   return (
-    <div className="task-status task-settings-line" title="Status">
-      <StatusIcon status={task.status} />
-      <select
-        name="status"
-        id="status"
-        defaultValue={task.status}
-        disabled={!editing}
-      >
-        {["todo", "in progress", "done", "closed"].map((status) => (
-          <option value={status} key={status}>
-            {status}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      value={status}
+      onChange={setStatus}
+      data={["todo", "in progress", "done", "closed"]}
+    />
   );
 }

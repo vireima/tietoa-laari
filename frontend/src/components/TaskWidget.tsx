@@ -1,109 +1,110 @@
-import { Form } from "react-router-dom";
 import Channel from "../types/Channel";
 import { Task } from "../types/Task";
 import User from "../types/User";
 import { DateTime } from "ts-luxon";
-import { useState } from "react";
-import StatusIcon from "./StatusIcon";
 import StatusWidget from "./StatusWidget";
-import DateWidget from "./DateWidget";
+import {
+  Paper,
+  Text,
+  Stack,
+  Group,
+  Button,
+  Badge,
+  Loader,
+  Skeleton,
+} from "@mantine/core";
+import {
+  IconCalendarUp,
+  IconCalendarDot,
+  IconBrandSlack,
+  IconUserFilled,
+  IconUserCheck,
+} from "@tabler/icons-react";
+import { useSetState } from "@mantine/hooks";
+import { Status } from "../types/Status";
+import { useAsyncFn } from "react-use";
+import axios from "axios";
 
 export default function TaskWidget({
-  task,
+  initialTask,
   users,
   channels,
+  onTaskChange,
 }: {
-  task: Task;
-  users: User[];
-  channels: Channel[];
+  initialTask: Task;
+  users: User[] | null;
+  channels: Channel[] | null;
+  onTaskChange: (task: Task) => void;
 }) {
-  const [editing, setEditing] = useState(false);
-  const author = users.find((user) => user.id === task.author);
-  const assignee = users.find((user) => user.id === task.assignee);
-  const channel = channels.find((channel) => channel.id === task.channel);
-  const created = DateTime.fromISO(task.created);
+  const [task, setTask] = useSetState(initialTask);
+  const [state, updateTask] = useAsyncFn(async () => {
+    console.log(
+      `Sending request to ${task._id} with payload ${JSON.stringify(task)}`
+    );
+    try {
+      const response = await axios.patch("https://laari.up.railway.app/tasks", [
+        task,
+      ]);
+      console.log("Calling onTaskChange", task._id);
+      onTaskChange(task);
+      return response.data;
+    } catch (error) {
+      console.error("Error patching a task:", error);
+    }
+  }, [task]);
+
+  const author = users?.find((user) => user.id === task.author);
+  const assignee = users?.find((user) => user.id === task.assignee);
+  const channel = channels?.find((channel) => channel.id === task.channel);
+  const created = DateTime.fromISO(task.created).setLocale("fi-FI");
+  const modified = DateTime.fromISO(task.modified).setLocale("fi-FI");
 
   return (
-    <div
-      className="task widget"
-      onClick={() => {
-        setEditing(true);
-      }}
-    >
-      <Form method="patch" onSubmit={() => setEditing(false)}>
-        <input type="hidden" id="_id" name="_id" value={task._id} />
-        <div className="task-description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={task.description}
-            disabled={!editing}
-            onChange={(e) => {
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
+    <Paper shadow="lg" withBorder p="1rem">
+      <Stack>
+        <Text>{task.description}</Text>
+        <Group>
+          <Skeleton visible={!users}>
+            <Badge variant="light" leftSection={<IconUserFilled size="1rem" />}>
+              @{author?.profile.display_name || author?.name || task.author}
+            </Badge>
+          </Skeleton>
+          <Skeleton visible={!users}>
+            <Badge variant="light" leftSection={<IconUserCheck size="1rem" />}>
+              @{assignee?.profile.display_name || undefined}
+            </Badge>
+          </Skeleton>
+          <Skeleton visible={!channel}>
+            <Badge variant="light" leftSection={<IconBrandSlack size="1rem" />}>
+              {channel?.name}
+            </Badge>
+          </Skeleton>
+          <Badge variant="light" leftSection={<IconCalendarUp size="1rem" />}>
+            {created.toLocaleString(DateTime.DATE_SHORT)}
+          </Badge>
+          <Badge variant="light" leftSection={<IconCalendarDot size="1rem" />}>
+            {modified.toLocaleString(DateTime.DATE_SHORT)}
+          </Badge>
+          <Badge variant="light" leftSection={<IconCalendarDot size="1rem" />}>
+            {modified.toLocaleString(DateTime.TIME_24_WITH_SECONDS)}
+          </Badge>
+          <StatusWidget
+            status={task.status}
+            setStatus={(val: string | null) =>
+              setTask({ status: val as Status })
+            }
           />
-        </div>
-        <div
-          className="task-author task-settings-line"
-          style={{ color: `#${author?.color}` }}
-          title="Ehdottanut"
-        >
-          {author?.profile.display_name || author?.name || task.author}
-        </div>
-        <div
-          className="task-assignee task-settings-line"
-          style={assignee ? { color: `#${assignee?.color}` } : undefined}
-          title="Vastuullinen"
-        >
-          <select
-            name="assignee"
-            id="assignee"
-            defaultValue={task.assignee || undefined}
-            disabled={!editing}
-            style={assignee ? { color: `#${assignee?.color}` } : undefined}
+          <Button
+            variant="filled"
+            onClick={() => {
+              console.log("click", task);
+              updateTask();
+            }}
           >
-            <option value={undefined}>--</option>
-            {users.map((user) => (
-              <option
-                value={user.id}
-                style={{ color: `#${user?.color}` }}
-                key={user.id}
-              >
-                {user.profile.display_name || user.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <StatusWidget task={task} editing={editing} />
-        <DateWidget date={created} title="Ehdotettu" />
-
-        <div className="task-priority task-settings-line" title="Prioriteetti">
-          {task.priority}
-        </div>
-        <div className="task-votes task-settings-line" title="Ääniä">
-          {task.votes.length}
-        </div>
-        <div className="task-channel task-settings-line" title="Slack-kanava">
-          {channel !== undefined && (channel.is_channel || channel.is_group) ? (
-            <a
-              href={`https://tietoa.slack.com/archives/${task.channel}/p${task.ts}`}
-            >
-              {`#${channel.name}`}
-            </a>
-          ) : (
-            channel?.user
-          )}
-        </div>
-        <div>
-          {editing ? (
-            <button type="submit" disabled={!editing}>
-              Save
-            </button>
-          ) : (
-            <></>
-          )}
-        </div>
-      </Form>
-    </div>
+            {state.loading ? <Loader type="dots" /> : "Tallenna"}
+          </Button>
+        </Group>
+      </Stack>
+    </Paper>
   );
 }
