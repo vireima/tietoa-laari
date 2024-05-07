@@ -45,8 +45,13 @@ export default function TaskWidget({
       const response = await axios.patch("https://laari.up.railway.app/tasks", [
         task,
       ]);
-      console.log("Calling onTaskChange", task._id);
-      onTaskChange(task);
+      console.log(
+        "Calling onTaskChange",
+        task._id,
+        `, got ${JSON.stringify(response.data)}`
+      );
+      onTaskChange(response.data[0]);
+      setTask(response.data[0]);
       return response.data;
     } catch (error) {
       console.error("Error patching a task:", error);

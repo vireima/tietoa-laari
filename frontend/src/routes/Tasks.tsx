@@ -39,7 +39,7 @@ function Tasks() {
   const { channels } = useChannels(tasks);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const channel = searchParams.get("channel");
   const author = searchParams.get("author");
