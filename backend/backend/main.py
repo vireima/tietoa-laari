@@ -161,7 +161,7 @@ async def delete_task(task_id: str):
 @app.patch("/tasks")
 async def patch_tasks(tasks: list[models.TaskUpdateModel]):
     result = await db.patch(tasks)
-    return await db.query(result.upserted_ids.values()) if result.upserted_ids else None
+    return await db.query([str(task.id) for task in tasks])
 
 
 @logger.catch
