@@ -9,6 +9,7 @@ import {
 import User from "../types/User";
 import { useState } from "react";
 import EmojiConvertor from "emoji-js";
+import { IconAt } from "@tabler/icons-react";
 
 const emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
@@ -58,6 +59,7 @@ export default function UsersMultiSelect({
       label={label}
       description={description}
       value={selectedUsers}
+      leftSection={<IconAt stroke={1.2} size="1.2rem" />}
       onChange={(userIDs: string[]) => {
         setSelectedUsers(userIDs);
         onChange(userIDs);

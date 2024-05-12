@@ -1,31 +1,27 @@
-import { MultiSelect } from "@mantine/core";
+import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import Channel from "../types/Channel";
 import { useState } from "react";
+import { IconHash } from "@tabler/icons-react";
+
+interface ChannelsMultiSelectProps extends MultiSelectProps {
+  channels: Channel[] | undefined;
+}
 
 export default function ChannelsMultiSelect({
   channels,
-  onChange,
-  value,
-  label,
-  description,
-}: {
-  channels: Channel[] | undefined;
-  onChange: (channelIDs: string[]) => void;
-  value: string[] | undefined;
-  label: string;
-  description: string;
-}) {
+  ...others
+}: ChannelsMultiSelectProps) {
   const [selectedChannels, setSelectedChannels] = useState<
     string[] | undefined
-  >(value);
+  >(others.value);
   return (
     <MultiSelect
-      label={label}
-      description={description}
+      {...others}
       value={selectedChannels}
+      leftSection={<IconHash stroke={1.2} size="1.2rem" />}
       onChange={(channelIDs: string[]) => {
         setSelectedChannels(channelIDs);
-        onChange(channelIDs);
+        others.onChange && others.onChange(channelIDs);
       }}
       data={channels?.map((channel) => ({
         label: channel.name || channel.id,

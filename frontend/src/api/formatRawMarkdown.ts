@@ -2,13 +2,48 @@ import Channel from "../types/Channel";
 import User from "../types/User";
 import { userDisplayName } from "./getUsers";
 
+export function stripRawMarkdown(
+  markdown: string,
+  usersMap: Map<string, User>,
+  channelsMap: Map<string, Channel>
+) {
+  const userMentions = markdown.replaceAll(
+    /<@(\w+)>/g,
+    (match, p1) => "@" + userDisplayName(usersMap.get(p1))
+  );
+  const channelMentions = userMentions.replaceAll(
+    /<#(\w+)\|>/g,
+    (match, p1) => `#${channelsMap.get(p1)?.name || p1}`
+  );
+
+  const bold = channelMentions.replaceAll(
+    /\*([^\n*]+)\*/g,
+    (match, p1) => `${p1}`
+  );
+
+  const italic = bold.replaceAll(/_([^\n_]+)_/g, (match, p1) => `${p1}`);
+
+  const strikethrough = italic.replaceAll(
+    /~([^\n~]+)~/g,
+    (match, p1) => `${p1}`
+  );
+
+  const code = strikethrough.replaceAll(/`([^\n`]+)`/g, (match, p1) => `${p1}`);
+
+  const codeblock = code.replaceAll(/```(.+)```/gs, (match, p1) => `${p1}`);
+
+  const x = codeblock;
+
+  // const newlines = x.replaceAll(/\n(?=((?!<\/pre).)*?(<pre|$))/gs, () => ``);
+
+  return x;
+}
+
 export default function formatRawMarkdown(
   markdown: string,
   usersMap: Map<string, User>,
   channelsMap: Map<string, Channel>
 ) {
-  console.log(markdown);
-
   const userMentions = markdown.replaceAll(
     /<@(\w+)>/g,
     (match, p1) => "@" + userDisplayName(usersMap.get(p1))

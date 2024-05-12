@@ -1,12 +1,16 @@
-import { Text, Drawer, Stack, Center, Title } from "@mantine/core";
+import {
+  Text,
+  Drawer,
+  Stack,
+  Center,
+  Title,
+  NumberInput,
+  Divider,
+} from "@mantine/core";
 import { DatePicker, DatesProvider } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import "dayjs/locale/fi";
-import {
-  createSearchParams,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { createSearchParams, useSearchParams } from "react-router-dom";
 import EmojiConvertor from "emoji-js";
 import { useQuery } from "@tanstack/react-query";
 import getUsers from "../api/getUsers";
@@ -14,6 +18,8 @@ import getTasks from "../api/getTasks";
 import getChannels from "../api/getChannels";
 import UsersMultiSelect from "./UsersMultiSelect";
 import ChannelsMultiSelect from "./ChannelsMultiSelect";
+import { IconUrgent } from "@tabler/icons-react";
+import SortOptionsMultiSelect from "./SortOptionsMultiSelect";
 
 const emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
@@ -33,7 +39,7 @@ export default function DrawerSettings({
     enabled: !!usersQuery.data,
   });
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const afterString = searchParams.get("after");
 
@@ -49,7 +55,10 @@ export default function DrawerSettings({
   const [channels, setChannels] = useState<string[] | undefined>(
     searchParams.getAll("channel")
   );
-  const navigate = useNavigate();
+  const [priority, setPriority] = useState<number | string | undefined>(
+    Number(searchParams.get("priority"))
+  );
+  const [sort, setSort] = useState<string[]>(searchParams.getAll("sort"));
 
   useEffect(() => {
     const query: Record<string, string | string[]> = {};
@@ -57,14 +66,24 @@ export default function DrawerSettings({
     if (authors && authors.length) query.author = authors;
     if (assignees && assignees.length) query.assignee = assignees;
     if (channels && channels?.length) query.channel = channels;
+    if (priority) query.priority = priority.toString();
+    if (sort && sort.length) query.sort = sort;
 
     const params = createSearchParams(query);
-    navigate(`/?${params.toString()}`);
-  }, [navigate, authors, assignees, channels, afterDate]);
+    setSearchParams(params);
+  }, [
+    authors,
+    assignees,
+    channels,
+    afterDate,
+    priority,
+    sort,
+    setSearchParams,
+  ]);
 
   return (
     <>
-      <Drawer opened={opened} onClose={onClose} size="xs">
+      <Drawer opened={opened} onClose={onClose} size="sm">
         <Stack>
           <Stack gap="xs">
             <Title order={6} lh="xs">
@@ -87,7 +106,7 @@ export default function DrawerSettings({
           </Center>
           <UsersMultiSelect
             label="Ehdotuksen tekijä"
-            description="Rajaa ehdotuksia tekijän mukaan"
+            description="Rajaa ehdotuksia alkuperäisen ehdottajan mukaan"
             onChange={setAuthors}
             value={authors}
             users={usersQuery.data}
@@ -105,6 +124,20 @@ export default function DrawerSettings({
             onChange={setChannels}
             value={channels}
             channels={channelsQuery.data}
+          />
+          <NumberInput
+            label="Prioriteetti"
+            description="Näytä vain tätä korkeammalle priorisoidut ehdotukset"
+            value={priority}
+            onChange={setPriority}
+            leftSection={<IconUrgent stroke={1.2} size="1.2rem" />}
+          />
+          <Divider />
+          <SortOptionsMultiSelect
+            label="Järjestely"
+            placeholder="Valitse..."
+            value={sort}
+            onChange={setSort}
           />
         </Stack>
       </Drawer>

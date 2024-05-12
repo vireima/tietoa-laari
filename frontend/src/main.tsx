@@ -9,6 +9,7 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import TaskAccordion from "./routes/TaskAccordion";
 
 const theme = createTheme({});
 const queryClient = new QueryClient();
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Tasks />,
+      },
+      {
+        path: "/list",
+        element: <TaskAccordion />,
       },
     ],
   },
