@@ -12,6 +12,7 @@ export default function StatusWidget({
     <Select
       value={status}
       onChange={setStatus}
+      variant="unstyled"
       data={["todo", "in progress", "done", "closed"]}
     />
   );

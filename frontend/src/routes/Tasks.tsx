@@ -3,85 +3,95 @@ import { Task } from "../types/Task";
 import TaskWidget from "../components/TaskWidget";
 import { DateTime } from "ts-luxon";
 import { Loader, SimpleGrid } from "@mantine/core";
-import useTasks from "../hooks/useTasks";
-import useUsers from "../hooks/useUsers";
-import useChannels from "../hooks/useChannels";
+import { useQuery } from "@tanstack/react-query";
+import getChannels from "../api/getChannels";
+import getTasks from "../api/getTasks";
+import getUsers from "../api/getUsers";
 
-function filterTasksByChannel(tasks: Task[] | null, channel: string | null) {
-  if (!tasks) return null;
-  return channel ? tasks.filter((task) => task.channel === channel) : tasks;
+function filterTasksByChannel(
+  tasks: Task[] | undefined,
+  channels: string[] | null
+) {
+  if (!tasks) return undefined;
+  return channels && channels.length > 0
+    ? tasks.filter((task) => channels.includes(task.channel))
+    : tasks;
 }
 
-function filterTasksByAuthor(tasks: Task[] | null, author: string | null) {
-  if (!tasks) return null;
-  return author ? tasks.filter((task) => task.author === author) : tasks;
+function filterTasksByAuthor(
+  tasks: Task[] | undefined,
+  authors: string[] | null
+) {
+  if (!tasks) return undefined;
+  return authors && authors.length > 0
+    ? tasks.filter((task) => authors.includes(task.author))
+    : tasks;
 }
 
-function filterTasksByAssignee(tasks: Task[] | null, assignee: string | null) {
-  if (!tasks) return null;
-  return assignee ? tasks.filter((task) => task.assignee === assignee) : tasks;
+function filterTasksByAssignee(
+  tasks: Task[] | undefined,
+  assignees: string[] | null
+) {
+  if (!tasks) return undefined;
+  return assignees && assignees.length > 0
+    ? tasks.filter((task) => task.assignee && assignees.includes(task.assignee))
+    : tasks;
 }
 
-function filterTasksByDate(tasks: Task[] | null, after: string | null) {
+function filterTasksByDate(tasks: Task[] | undefined, after: string | null) {
   if (after === null) return tasks;
   const afterDate = DateTime.fromISO(after, { zone: "Europe/Helsinki" });
-  // console.log("afterDate", afterDate, afterDate.isValid);
   return afterDate.isValid
     ? tasks?.filter((task) => DateTime.fromISO(task.created) >= afterDate)
     : tasks;
 }
 
 function Tasks() {
-  // const { tasks, users, channels } = useLoaderData() as TasksLoaderResponse;
+  // const { tasks, users, channels } = useOutletContext<TaskDataOutletContext>();
 
-  const { tasks, refetch: refetchTasks } = useTasks();
-  const { users } = useUsers();
-  const { channels } = useChannels(tasks);
+  const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
+  const usersQuery = useQuery({ queryKey: ["users"], queryFn: getUsers });
+  const channelsQuery = useQuery({
+    queryKey: ["channels", tasksQuery.data],
+    queryFn: () => getChannels(tasksQuery.data),
+    enabled: !!usersQuery.data,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams] = useSearchParams();
 
-  const channel = searchParams.get("channel");
-  const author = searchParams.get("author");
-  const assignee = searchParams.get("assignee");
+  const channels = searchParams.getAll("channel");
+  const authors = searchParams.getAll("author");
+  const assignees = searchParams.getAll("assignee");
   const after = searchParams.get("after");
-
-  console.log("tasks", tasks);
-  // console.log("xUsers", xUsers.users);
-  // console.log("xChannels", xChannels.channels);
 
   const filteredTasks = filterTasksByDate(
     filterTasksByAssignee(
-      filterTasksByAuthor(filterTasksByChannel(tasks, channel), author),
-      assignee
+      filterTasksByAuthor(
+        filterTasksByChannel(tasksQuery.data, channels),
+        authors
+      ),
+      assignees
     ),
     after
   );
-
-  // console.log(
-  //   "Filtered",
-  //   filteredTasks.length,
-  //   "out of",
-  //   tasks.length,
-  //   "tasks"
-  // );
 
   return (
     <>
       {!filteredTasks ? (
         <Loader />
       ) : (
-        <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4, xl: 5 }} p={"2rem"}>
-          {filteredTasks.map((element) => (
+        <SimpleGrid
+          cols={{ base: 1, xs: 2, md: 3, lg: 4, xl: 5 }}
+          p={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
+          pt="4rem"
+        >
+          {filteredTasks.map((task) => (
             <TaskWidget
-              initialTask={element}
-              users={users}
-              channels={channels}
-              key={element._id}
-              onTaskChange={(task) => {
-                console.log("refetch!", task._id);
-                return refetchTasks();
-              }}
+              initialTask={task}
+              users={usersQuery.data}
+              channels={channelsQuery.data}
+              key={task._id}
             />
           ))}
         </SimpleGrid>
