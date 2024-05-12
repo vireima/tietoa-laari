@@ -76,6 +76,14 @@ function Tasks() {
     after
   );
 
+  // if (filteredTasks) {
+  //   filteredTasks.sort(
+  //     (a: Task, b: Task) =>
+  //       DateTime.fromISO(b.modified).toSeconds() -
+  //       DateTime.fromISO(a.modified).toSeconds()
+  //   );
+  // }
+
   return (
     <>
       {!filteredTasks ? (

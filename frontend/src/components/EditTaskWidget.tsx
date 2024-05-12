@@ -1,16 +1,19 @@
 import { useSetState } from "@mantine/hooks";
 import { Task } from "../types/Task";
-import { Button, Group, Select, Stack, Textarea } from "@mantine/core";
-import { Status } from "../types/Status";
+import { Button, Group, Stack, Textarea } from "@mantine/core";
+import StatusSelect from "./StatusSelect";
+import { UsersSingleSelect } from "./UsersMultiSelect";
+import User from "../types/User";
 
 export default function EditTaskWidget({
   initialTask,
   onSave,
-  onCancel,
+  users,
 }: {
   initialTask: Task;
   onSave: (task: Task) => void;
   onCancel: () => void;
+  users: User[] | undefined;
 }) {
   const [editedTask, editTask] = useSetState(initialTask);
 
@@ -19,21 +22,26 @@ export default function EditTaskWidget({
       <Textarea
         label="Kuvaus"
         value={editedTask.description}
+        minRows={5}
+        autosize
         onChange={(event) =>
           editTask({ description: event.currentTarget.value })
         }
       />
-      <Select
-        label="Status"
-        value={editedTask.status}
-        onChange={(status) => editTask({ status: status as Status })}
-        variant="unstyled"
-        data={["todo", "in progress", "done", "closed"]}
+      <UsersSingleSelect
+        label="Vastuullinen tekijä"
+        description="Rajaa ehdotuksia vastuullisen tekijän mukaan"
+        onChange={(userID) => editTask({ assignee: userID })}
+        value={editedTask.assignee}
+        users={users}
+      />
+      <StatusSelect
+        status={editedTask.status}
+        onChange={(status) => editTask({ status: status })}
       />
       <Group>
-        <Button onClick={() => onSave(editedTask)}>Tallenna</Button>
-        <Button color="red" onClick={() => onCancel()}>
-          X
+        <Button variant="light" onClick={() => onSave(editedTask)}>
+          Tallenna
         </Button>
       </Group>
     </Stack>

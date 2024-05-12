@@ -1,7 +1,7 @@
 import Channel from "../types/Channel";
 import { Task } from "../types/Task";
 import User from "../types/User";
-import { Paper, LoadingOverlay, Box, Container } from "@mantine/core";
+import { Paper, LoadingOverlay, Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import EditTaskWidget from "./EditTaskWidget";
 import DisplayTaskWidget from "./DisplayTaskWidget";
@@ -33,15 +33,12 @@ export default function TaskWidget({
     <Paper shadow="lg" withBorder p="1rem">
       <Box pos="relative">
         <LoadingOverlay visible={mutation.isPending} zIndex={1000} />
-        {!opened ? (
-          <Container onClick={() => handlers.open()}>
-            <DisplayTaskWidget
-              task={initialTask}
-              users={users}
-              channels={channels}
-            />
-          </Container>
-        ) : (
+        <Modal
+          opened={opened}
+          onClose={handlers.close}
+          title="Muokkaus"
+          size="lg"
+        >
           <EditTaskWidget
             initialTask={initialTask}
             onSave={async (task) => {
@@ -52,8 +49,15 @@ export default function TaskWidget({
             onCancel={() => {
               handlers.close();
             }}
+            users={users}
           />
-        )}
+        </Modal>
+        <DisplayTaskWidget
+          task={initialTask}
+          users={users}
+          channels={channels}
+          onEdit={handlers.open}
+        />
       </Box>
     </Paper>
   );

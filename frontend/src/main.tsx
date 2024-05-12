@@ -7,7 +7,6 @@ import Layout from "./routes/Layout";
 import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import { tasksLoader } from "./api/Tasks.loader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
