@@ -166,6 +166,7 @@ class TaskInputModel(BaseModel):
     modified: DatetimeUTC
     votes: list[Reaction] = Field(default_factory=list)
     status: StatusEnum = StatusEnum.todo
+    archived: bool = False
 
 
 class TaskUpdateModel(BaseModel):
@@ -176,6 +177,7 @@ class TaskUpdateModel(BaseModel):
     modified: DatetimeUTC | None = None
     votes: list[Reaction] | None = None
     status: StatusEnum | None = None
+    archived: bool | None = None
 
 
 class TaskOutputModel(TaskInputModel):
