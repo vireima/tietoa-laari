@@ -1,5 +1,5 @@
 import Channel from "../types/Channel";
-import { InputTask } from "../types/Task";
+import { ExtendedTask, InputTask } from "../types/Task";
 import User from "../types/User";
 import { Paper, LoadingOverlay, Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -13,7 +13,7 @@ export default function TaskWidget({
   users,
   channels,
 }: {
-  initialTask: InputTask;
+  initialTask: ExtendedTask;
   users: User[] | undefined;
   channels: Channel[] | undefined;
   onTaskChange?: (task: InputTask) => void;
