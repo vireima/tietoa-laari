@@ -98,7 +98,7 @@ class Database:
         if channel is not None:
             query.update({"channel": channel})
 
-        cursor = self.collection.find(query)
+        cursor = self.collection.find(query).sort("created", -1)
         tasks = await cursor.to_list(None)
 
         return [models.TaskOutputModel(**task) for task in tasks]
@@ -110,7 +110,7 @@ class Database:
         """
         query = {"_id": {"$in": [ObjectId(task_id) for task_id in task_ids]}}
 
-        cursor = self.collection.find(query)
+        cursor = self.collection.find(query).sort("created", -1)
         tasks = await cursor.to_list(None)
 
         return [models.TaskOutputModel(**task) for task in tasks]
