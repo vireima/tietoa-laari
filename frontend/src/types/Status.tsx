@@ -1,6 +1,4 @@
-import { DefaultMantineColor } from "@mantine/core";
 import {
-  IconBrandGithubCopilot,
   IconCheck,
   IconCircleDotted,
   IconCircleHalf2,
@@ -8,6 +6,15 @@ import {
 } from "@tabler/icons-react";
 
 export type Status = "todo" | "in progress" | "done" | "closed";
+
+export interface ExtendedStatus {
+  status: Status;
+  label: string;
+  description: string;
+  iconElement: typeof IconCheck;
+  bgcolor: string;
+  color: string;
+}
 
 export const statuses = [
   {
@@ -45,4 +52,4 @@ export const statuses = [
     bgcolor: "gray.2",
     color: "gray.6",
   },
-];
+] as ExtendedStatus[];

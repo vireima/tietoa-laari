@@ -11,7 +11,6 @@ import {
   HoverCard,
 } from "@mantine/core";
 import {
-  IconCircle,
   IconLock,
   IconAt,
   IconHash,
@@ -20,10 +19,7 @@ import {
   IconThumbUp,
 } from "@tabler/icons-react";
 import { userDisplayName } from "../api/getUsers";
-import Channel from "../types/Channel";
-import { Status, statuses } from "../types/Status";
-import { Task } from "../types/Task";
-import User from "../types/User";
+import { ExtendedTask } from "../types/Task";
 import classes from "../styles/DisplayTaskWidget.module.css";
 import EmojiConvertor from "emoji-js";
 
@@ -82,17 +78,15 @@ export function Infopill({
   );
 }
 
-export function StatusInfopill({ status }: { status: Status }) {
-  const statusVisualInfo = statuses.find((val) => val.status === status);
-
+export function StatusInfopill({ task }: { task: ExtendedTask }) {
   return (
     <Infopill
-      Icon={statusVisualInfo?.iconElement || IconCircle}
-      text={status}
+      Icon={task.status.iconElement}
+      text={task.status.label}
       tooltip="Status"
-      bg={statusVisualInfo?.bgcolor}
-      c={statusVisualInfo?.color}
-      color={statusVisualInfo?.color}
+      bg={task.status.bgcolor}
+      c={task.status.color}
+      color={task.status.color}
       pl="0.3rem"
       pr="1rem"
       style={{ borderRadius: "1rem" }}
@@ -100,31 +94,25 @@ export function StatusInfopill({ status }: { status: Status }) {
   );
 }
 
-export function ChannelInfopill({
-  channel,
-  task,
-}: {
-  channel: Channel | undefined;
-  task: Task;
-}) {
-  if (!channel) return undefined;
+export function ChannelInfopill({ task }: { task: ExtendedTask }) {
+  if (!task.channel) return undefined;
 
-  const icon = channel.is_private
+  const icon = task.channel.is_private
     ? IconLock
-    : channel.is_im
+    : task.channel.is_im
     ? IconAt
     : IconHash;
   return (
     <Infopill
       Icon={icon}
-      text={channel.name || channel.id}
+      text={task.channel.name || task.channel.id}
       tooltip="Slack-kanava"
-      href={`https://tietoa.slack.com/archives/${channel.id}/p${task.ts}`}
+      href={`https://tietoa.slack.com/archives/${task.channel.id}/p${task.ts}`}
     />
   );
 }
 
-export function PriorityInfopill({ task }: { task: Task }) {
+export function PriorityInfopill({ task }: { task: ExtendedTask }) {
   if (task.priority === 0) return undefined;
 
   return task.priority > 0 ? (
@@ -148,13 +136,7 @@ export function PriorityInfopill({ task }: { task: Task }) {
   );
 }
 
-export function VoteInfopill({
-  task,
-  usersMap,
-}: {
-  task: Task;
-  usersMap: Map<string, User>;
-}) {
+export function VoteInfopill({ task }: { task: ExtendedTask }) {
   if (task.votes.length < 1) return undefined;
 
   return (
@@ -171,8 +153,7 @@ export function VoteInfopill({
       <HoverCard.Dropdown>
         {task.votes.map((vote, index) => (
           <Text key={index}>
-            {emoji.replace_colons(`:${vote.reaction}:`)}{" "}
-            {userDisplayName(usersMap.get(vote.user))}
+            {vote.reaction} {userDisplayName(vote.user)}
           </Text>
         ))}
       </HoverCard.Dropdown>

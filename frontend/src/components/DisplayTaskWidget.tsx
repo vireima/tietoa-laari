@@ -13,7 +13,7 @@ import {
   IconEdit,
 } from "@tabler/icons-react";
 import { DateTime } from "ts-luxon";
-import { Task } from "../types/Task";
+import { InputTask } from "../types/Task";
 import User from "../types/User";
 import Channel from "../types/Channel";
 import { mapUserIDs } from "../api/getUsers";
@@ -36,7 +36,7 @@ export default function DisplayTaskWidget({
   channels,
   onEdit,
 }: {
-  task: Task;
+  task: InputTask;
   users: User[] | undefined;
   channels: Channel[] | undefined;
   onEdit?: () => void;

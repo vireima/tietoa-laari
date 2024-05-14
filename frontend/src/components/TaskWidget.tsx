@@ -1,5 +1,5 @@
 import Channel from "../types/Channel";
-import { Task } from "../types/Task";
+import { InputTask } from "../types/Task";
 import User from "../types/User";
 import { Paper, LoadingOverlay, Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -13,10 +13,10 @@ export default function TaskWidget({
   users,
   channels,
 }: {
-  initialTask: Task;
+  initialTask: InputTask;
   users: User[] | undefined;
   channels: Channel[] | undefined;
-  onTaskChange?: (task: Task) => void;
+  onTaskChange?: (task: InputTask) => void;
 }) {
   const [opened, handlers] = useDisclosure(false);
 

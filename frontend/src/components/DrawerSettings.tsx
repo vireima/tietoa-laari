@@ -12,14 +12,10 @@ import { useEffect, useState } from "react";
 import "dayjs/locale/fi";
 import { createSearchParams, useSearchParams } from "react-router-dom";
 import EmojiConvertor from "emoji-js";
-import { useQuery } from "@tanstack/react-query";
-import getUsers from "../api/getUsers";
-import getTasks from "../api/getTasks";
-import getChannels from "../api/getChannels";
 import UsersMultiSelect from "./UsersMultiSelect";
-import ChannelsMultiSelect from "./ChannelsMultiSelect";
 import { IconUrgent } from "@tabler/icons-react";
 import SortOptionsMultiSelect from "./SortOptionsMultiSelect";
+import useQueries from "../hooks/useQueries";
 
 const emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
@@ -31,13 +27,15 @@ export default function DrawerSettings({
   opened: boolean;
   onClose: () => void;
 }) {
-  const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
-  const usersQuery = useQuery({ queryKey: ["users"], queryFn: getUsers });
-  const channelsQuery = useQuery({
-    queryKey: ["channels", tasksQuery.data],
-    queryFn: () => getChannels(tasksQuery.data),
-    enabled: !!usersQuery.data,
-  });
+  // const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
+  // const usersQuery = useQuery({ queryKey: ["users"], queryFn: getUsers });
+  // const channelsQuery = useQuery({
+  //   queryKey: ["channels", tasksQuery.data],
+  //   queryFn: () => getChannels(tasksQuery.data),
+  //   enabled: !!usersQuery.data,
+  // });
+
+  const { usersQuery } = useQueries();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -52,9 +50,9 @@ export default function DrawerSettings({
   const [assignees, setAssignees] = useState<string[] | undefined>(
     searchParams.getAll("assignee")
   );
-  const [channels, setChannels] = useState<string[] | undefined>(
-    searchParams.getAll("channel")
-  );
+  // const [channels, setChannels] = useState<string[] | undefined>(
+  //   searchParams.getAll("channel")
+  // );
   const [priority, setPriority] = useState<number | string | undefined>(
     Number(searchParams.get("priority"))
   );
@@ -65,7 +63,7 @@ export default function DrawerSettings({
     if (afterDate) query.after = afterDate.toISOString();
     if (authors && authors.length) query.author = authors;
     if (assignees && assignees.length) query.assignee = assignees;
-    if (channels && channels?.length) query.channel = channels;
+    // if (channels && channels?.length) query.channel = channels;
     if (priority) query.priority = priority.toString();
     if (sort && sort.length) query.sort = sort;
 
@@ -74,7 +72,7 @@ export default function DrawerSettings({
   }, [
     authors,
     assignees,
-    channels,
+    // channels,
     afterDate,
     priority,
     sort,
@@ -118,13 +116,13 @@ export default function DrawerSettings({
             value={assignees}
             users={usersQuery.data}
           />
-          <ChannelsMultiSelect
+          {/* <ChannelsMultiSelect
             label="Slack-kanava"
             description="Rajaa ehdotuksia Slack-kanavan mukaan"
             onChange={setChannels}
             value={channels}
             channels={channelsQuery.data}
-          />
+          /> */}
           <NumberInput
             label="Prioriteetti"
             description="Näytä vain tätä korkeammalle priorisoidut ehdotukset"

@@ -8,9 +8,9 @@ import {
   Text,
   TypographyStylesProvider,
 } from "@mantine/core";
-import useFilteredData from "../hooks/useFilteredData";
+import { useFilteredData } from "../hooks/useFilteredData";
 import formatRawMarkdown, { stripRawMarkdown } from "../api/formatRawMarkdown";
-import { mapUserIDs } from "../api/getUsers";
+import { mapUserIDs, userDisplayName } from "../api/getUsers";
 import {
   IconUserCircle,
   IconUserCheck,
@@ -25,24 +25,20 @@ import {
   PriorityInfopill,
   VoteInfopill,
 } from "../components/Infopill";
+import filteredTaskContainerProps from "../types/FilteredTaskContainerProps";
 
-export default function TaskAccordion() {
-  const { filteredTasks, usersQuery, channelsQuery } = useFilteredData();
+export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
+  const { tasks, usersQuery, channelsQuery } = useFilteredData(filter);
   const usersMap = mapUserIDs(usersQuery.data);
   const channelsMap = new Map(channelsQuery.data?.map((ch) => [ch.id, ch]));
 
   return (
-    <Box p="1.5rem" bg="gray.1">
+    <Box p="1.5rem">
       <Accordion mt="4rem" variant="filled">
-        {filteredTasks?.map((task) => (
+        {tasks?.map((task) => (
           <Accordion.Item key={task.ts} value={task.ts}>
             <Accordion.Control
-              icon={
-                <Avatar
-                  src={usersMap.get(task.author)?.profile.image_32}
-                  size="sm"
-                />
-              }
+              icon={<Avatar src={task.author?.profile.image_32} size="sm" />}
             >
               <Text truncate="end" lineClamp={1}>
                 {stripRawMarkdown(task.description, usersMap, channelsMap)}
@@ -63,44 +59,30 @@ export default function TaskAccordion() {
                 </TypographyStylesProvider>
                 <Divider />
                 <Group gap="xs">
-                  <StatusInfopill status={task.status} />
+                  <StatusInfopill task={task} />
                   <Infopill
                     Icon={IconUserCircle}
-                    text={
-                      usersMap.get(task.author)?.profile.display_name ||
-                      usersMap.get(task.author)?.name ||
-                      task.author
-                    }
+                    text={userDisplayName(task.author)}
                     tooltip="Ehdottaja"
                   />
                   <Infopill
                     Icon={IconUserCheck}
-                    text={
-                      usersMap.get(task.assignee || "")?.profile.display_name ||
-                      undefined
-                    }
+                    text={userDisplayName(task.assignee)}
                     tooltip="Vastuutettu"
                   />
-                  <ChannelInfopill
-                    channel={channelsMap.get(task.channel)}
-                    task={task}
-                  />
+                  <ChannelInfopill task={task} />
                   <Infopill
                     Icon={IconCalendarUp}
-                    text={DateTime.fromISO(task.created)
-                      .setLocale("fi-FI")
-                      .toLocaleString(DateTime.DATE_SHORT)}
+                    text={task.created.toLocaleString(DateTime.DATE_SHORT)}
                     tooltip="Ehdotettu"
                   />
                   <Infopill
                     Icon={IconCalendarDot}
-                    text={DateTime.fromISO(task.modified)
-                      .setLocale("fi-FI")
-                      .toRelative()}
+                    text={task.modified.toRelative()}
                     tooltip="Muokattu"
                   />
                   <PriorityInfopill task={task} />
-                  <VoteInfopill task={task} usersMap={usersMap} />
+                  <VoteInfopill task={task} />
                 </Group>
               </Stack>
             </Accordion.Panel>

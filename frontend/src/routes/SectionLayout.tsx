@@ -1,23 +1,24 @@
 import { Outlet } from "react-router-dom";
-import DrawerSettings from "../components/DrawerSettings";
-import { Task } from "../types/Task";
+import { InputTask } from "../types/Task";
 import User from "../types/User";
 import Channel from "../types/Channel";
 import { useDisclosure } from "@mantine/hooks";
 import Header from "../components/Header";
+import FilterDrawer from "../components/FilterDrawer";
 
 export interface TaskDataOutletContext {
-  tasks: Task[] | null;
+  tasks: InputTask[] | null;
   users: User[] | null;
   channels: Channel[] | null;
 }
 
-export default function Layout() {
+export default function SectionLayout() {
   const [opened, { close, toggle }] = useDisclosure(false);
 
   return (
     <>
-      <DrawerSettings opened={opened} onClose={close} />
+      {/* <DrawerSettings opened={opened} onClose={close} /> */}
+      <FilterDrawer opened={opened} onClose={close} />
       <Header drawerOpened={opened} drawerToggle={toggle} />
       <Outlet />
     </>

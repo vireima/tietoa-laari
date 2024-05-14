@@ -5,13 +5,21 @@ import {
   Group,
   Burger,
   ThemeIcon,
-  Title,
   ActionIcon,
   useMantineColorScheme,
+  Tabs,
 } from "@mantine/core";
-import { IconMoon, IconSun } from "@tabler/icons-react";
+import {
+  IconChecklist,
+  IconMoon,
+  IconSeeding,
+  IconSun,
+  IconTargetArrow,
+} from "@tabler/icons-react";
 import TietoaIcon from "../assets/TietoaIcon";
 import { useHeadroom } from "@mantine/hooks";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import ChannelSelect from "./ChannelSelect";
 
 export default function Header({
   drawerOpened,
@@ -21,7 +29,13 @@ export default function Header({
   drawerToggle: () => void;
 }) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pinned = useHeadroom({ fixedAt: 150 });
+  const navigate = useNavigate();
+  const { status } = useParams();
+
+  console.log("status =", status);
+
   return (
     <Portal>
       <Paper
@@ -30,22 +44,58 @@ export default function Header({
           top: 0,
           left: 0,
           right: 0,
-          height: "4rem",
+          minHeight: "4rem",
           transform: `translate3d(0, ${pinned ? 0 : rem(-110)}, 0)`,
           transition: "transform 700ms ease",
         }}
         p={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
         pt="xs"
       >
-        <Group grow>
+        <Group justify="space-between">
           <Group>
             <Burger opened={drawerOpened} onClick={drawerToggle} />
             <ThemeIcon variant="default" radius="xl" size="lg">
               <TietoaIcon />
             </ThemeIcon>
-            <Title>Laari</Title>
+            {/* <Title>Laari</Title> */}
           </Group>
+          <Tabs
+            variant="outline"
+            defaultValue="laari"
+            value={status}
+            onChange={(val) =>
+              navigate({
+                pathname: `/${val}`,
+                search: `${searchParams}`,
+              })
+            }
+          >
+            <Tabs.List justify="center">
+              <Tabs.Tab value="laari" leftSection={<IconSeeding stroke={1} />}>
+                LAARI
+              </Tabs.Tab>
+              <Tabs.Tab value="jono" leftSection={<IconChecklist stroke={1} />}>
+                JONO
+              </Tabs.Tab>
+              <Tabs.Tab
+                value="maali"
+                leftSection={<IconTargetArrow stroke={1} />}
+              >
+                MAALI
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs>
           <Group justify="flex-end">
+            <ChannelSelect
+              placeholder="Slack-kanava..."
+              value={searchParams.get("channel")}
+              onChange={(value) => {
+                value === null
+                  ? searchParams.delete("channel")
+                  : searchParams.set("channel", value);
+                setSearchParams(searchParams);
+              }}
+            />
             <ActionIcon
               onClick={toggleColorScheme}
               variant="filled"

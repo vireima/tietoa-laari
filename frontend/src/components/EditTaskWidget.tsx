@@ -1,5 +1,5 @@
 import { useSetState } from "@mantine/hooks";
-import { Task } from "../types/Task";
+import { InputTask } from "../types/Task";
 import { Button, Group, Stack, Textarea } from "@mantine/core";
 import StatusSelect from "./StatusSelect";
 import { UsersSingleSelect } from "./UsersMultiSelect";
@@ -10,8 +10,8 @@ export default function EditTaskWidget({
   onSave,
   users,
 }: {
-  initialTask: Task;
-  onSave: (task: Task) => void;
+  initialTask: InputTask;
+  onSave: (task: InputTask) => void;
   onCancel: () => void;
   users: User[] | undefined;
 }) {

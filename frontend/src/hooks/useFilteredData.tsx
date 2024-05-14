@@ -1,124 +1,138 @@
-import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import getChannels from "../api/getChannels";
-import getTasks from "../api/getTasks";
-import getUsers from "../api/getUsers";
+import { userDisplayName } from "../api/getUsers";
 import { DateTime } from "ts-luxon";
-import { Task } from "../types/Task";
+import { ExtendedTask, InputTask, OutputVote } from "../types/Task";
+import Channel from "../types/Channel";
+import User from "../types/User";
+import convertEmoji from "../api/convertEmoji";
+import { statuses } from "../types/Status";
+import { Filter } from "../types/Filter";
+import useFilters from "./useFilters";
+import useQueries from "./useQueries";
 
-function filterTasksByPriority(
-  tasks: Task[] | undefined,
-  priority: number | null
-) {
-  if (!tasks) return undefined;
-  return priority ? tasks.filter((task) => task.priority >= priority) : tasks;
-}
-
-function filterTasksByChannel(
-  tasks: Task[] | undefined,
-  channels: string[] | null
-) {
-  if (!tasks) return undefined;
-  return channels && channels.length > 0
-    ? tasks.filter((task) => channels.includes(task.channel))
-    : tasks;
-}
-
-function filterTasksByAuthor(
-  tasks: Task[] | undefined,
-  authors: string[] | null
-) {
-  if (!tasks) return undefined;
-  return authors && authors.length > 0
-    ? tasks.filter((task) => authors.includes(task.author))
-    : tasks;
-}
-
-function filterTasksByAssignee(
-  tasks: Task[] | undefined,
-  assignees: string[] | null
-) {
-  if (!tasks) return undefined;
-  return assignees && assignees.length > 0
-    ? tasks.filter((task) => task.assignee && assignees.includes(task.assignee))
-    : tasks;
-}
-
-function filterTasksByDate(tasks: Task[] | undefined, after: string | null) {
-  if (after === null) return tasks;
-  const afterDate = DateTime.fromISO(after, { zone: "Europe/Helsinki" });
-  return afterDate.isValid
-    ? tasks?.filter((task) => DateTime.fromISO(task.created) >= afterDate)
-    : tasks;
+function filterTasks(tasks: ExtendedTask[], filter: Filter) {
+  return tasks?.filter(
+    (task) =>
+      !!filter.status &&
+      filter.status.length >= 1 &&
+      filter.status.includes(task.status.status) &&
+      !!filter.priority &&
+      task.priority >= filter.priority &&
+      (!filter.channel?.length ||
+        (!!filter.channel &&
+          filter.channel.length >= 1 &&
+          task.channel &&
+          filter.channel.includes(task.channel.id))) &&
+      (!filter.author?.length ||
+        (!!filter.author &&
+          filter.author.length >= 1 &&
+          task.author &&
+          filter.author.includes(task.author.id))) &&
+      (!filter.assignee?.length ||
+        (!!filter.assignee &&
+          filter.assignee.length >= 1 &&
+          !!task.assignee &&
+          filter.assignee.includes(task.assignee.id))) &&
+      !!filter.after &&
+      task.created >= filter.after &&
+      (!filter.tags?.length ||
+        (!!filter.tags &&
+          filter.tags.length >= 1 &&
+          filter.tags.every((tag) => task.tags.includes(tag))))
+  );
 }
 
 // Sorting
-function cmpCreated(a: Task, b: Task) {
-  return (
-    DateTime.fromISO(b.created).toSeconds() -
-    DateTime.fromISO(a.created).toSeconds()
-  );
+function cmpCreated(a: ExtendedTask, b: ExtendedTask) {
+  return b.created.toSeconds() - a.created.toSeconds();
 }
 
-function cmpModified(a: Task, b: Task) {
-  return (
-    DateTime.fromISO(b.modified).toSeconds() -
-    DateTime.fromISO(a.modified).toSeconds()
-  );
+function cmpModified(a: ExtendedTask, b: ExtendedTask) {
+  return b.modified.toSeconds() - a.modified.toSeconds();
 }
 
-function cmpChannel(a: Task, b: Task) {
-  return a.channel.localeCompare(b.channel);
+function cmpChannel(a: ExtendedTask, b: ExtendedTask) {
+  if (!a.channel?.name && !b.channel?.name)
+    return a.channel?.user && b.channel?.user
+      ? a.channel.user.localeCompare(b.channel.user)
+      : 0;
+  if (!a.channel?.name) return -1;
+  if (!b.channel?.name) return 1;
+  return a.channel.name.localeCompare(b.channel.name);
 }
 
-function cmpAuthor(a: Task, b: Task) {
-  return a.author.localeCompare(b.author);
+function cmpAuthor(a: ExtendedTask, b: ExtendedTask) {
+  return userDisplayName(a.author).localeCompare(userDisplayName(b.author));
 }
 
-function cmpAssignee(a: Task, b: Task) {
+function cmpAssignee(a: ExtendedTask, b: ExtendedTask) {
   if (!a.assignee && !b.assignee) return 0;
   if (!a.assignee) return -1;
   if (!b.assignee) return 1;
-  return a.assignee.localeCompare(b.assignee);
+  return userDisplayName(a.assignee).localeCompare(userDisplayName(b.assignee));
 }
 
-function cmpPriority(a: Task, b: Task) {
+function cmpPriority(a: ExtendedTask, b: ExtendedTask) {
   return b.priority - a.priority;
 }
 
-function cmpVotes(a: Task, b: Task) {
+function cmpVotes(a: ExtendedTask, b: ExtendedTask) {
   return b.votes.length - a.votes.length;
 }
 
-export default function useFilteredData() {
-  const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
-  const usersQuery = useQuery({ queryKey: ["users"], queryFn: getUsers });
-  const channelsQuery = useQuery({
-    queryKey: ["channels", tasksQuery.data],
-    queryFn: () => getChannels(tasksQuery.data),
-    enabled: !!usersQuery.data,
-  });
+function inputToExtendedTasks(
+  tasks: InputTask[] | undefined,
+  channels: Channel[] | undefined,
+  users: User[] | undefined
+) {
+  if (tasks) {
+    const channelsMap = new Map(
+      channels && channels.map((channel) => [channel.id, channel])
+    );
+    const usersMap = new Map(users && users.map((user) => [user.id, user]));
+    return tasks.map(
+      (task) =>
+        ({
+          ...task,
+          author: usersMap.get(task.author),
+          assignee: task.assignee && usersMap.get(task.assignee),
+          channel: channelsMap.get(task.channel),
+          created: DateTime.fromISO(task.created).setLocale("fi-FI"),
+          modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
+          status: statuses.find((s) => s.status === task.status),
+          votes: task.votes.map(
+            (vote) =>
+              ({
+                reaction: convertEmoji(`:${vote.reaction}:`),
+                user: usersMap.get(vote.user),
+              } as OutputVote)
+          ),
+        } as ExtendedTask)
+    );
+  }
+
+  return [];
+}
+
+export function useFilteredData(pathFilters?: Filter) {
+  const { tasksQuery, usersQuery, channelsQuery } = useQueries();
 
   const [searchParams] = useSearchParams();
+  const { filters } = useFilters(pathFilters ?? {});
 
-  const channels = searchParams.getAll("channel");
-  const authors = searchParams.getAll("author");
-  const assignees = searchParams.getAll("assignee");
-  const after = searchParams.get("after");
-  const priority = searchParams.get("priority");
+  const extendedTasks = inputToExtendedTasks(
+    tasksQuery.data,
+    channelsQuery.data,
+    usersQuery.data
+  );
 
-  const filteredTasks = filterTasksByPriority(
-    filterTasksByDate(
-      filterTasksByAssignee(
-        filterTasksByAuthor(
-          filterTasksByChannel(tasksQuery.data, channels),
-          authors
-        ),
-        assignees
-      ),
-      after
-    ),
-    Number(priority)
+  const filteredTasks = filterTasks(extendedTasks, filters);
+  console.info(filters);
+  console.info(
+    "filtering: ",
+    extendedTasks.length,
+    " -> ",
+    filteredTasks.length
   );
 
   const cmpMap = new Map([
@@ -148,5 +162,5 @@ export default function useFilteredData() {
     });
   }
 
-  return { filteredTasks, tasksQuery, usersQuery, channelsQuery };
+  return { tasks: filteredTasks, tasksQuery, usersQuery, channelsQuery };
 }

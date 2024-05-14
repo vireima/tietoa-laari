@@ -1,3 +1,4 @@
+import { Anchor, Blockquote, Center, Paper, Stack, Title } from "@mantine/core";
 import { useRouteError, isRouteErrorResponse } from "react-router-dom";
 
 export default function ErrorPage() {
@@ -5,24 +6,33 @@ export default function ErrorPage() {
 
   console.error(error);
 
-  let errorMessage: string = "";
+  let errorComponent;
 
   if (isRouteErrorResponse(error)) {
-    errorMessage = error.statusText;
+    errorComponent = (
+      <Blockquote cite={`${error.status} ${error.statusText}`}>
+        {error.data}
+      </Blockquote>
+    );
   } else if (error instanceof Error) {
-    errorMessage = error.message;
+    errorComponent = (
+      <Blockquote cite={`${error.name}`}>{error.message}</Blockquote>
+    );
   } else if (typeof error === "string") {
-    errorMessage = error;
+    errorComponent = <Blockquote>{error}</Blockquote>;
   } else {
-    errorMessage = "Tuntematon virhe :(";
+    errorComponent = <Blockquote>{"Tuntematon virhe :("}</Blockquote>;
   }
 
   return (
-    <div id="error-page">
-      <h1>Virhe</h1>
-      <p>
-        <i>{errorMessage}</i>
-      </p>
-    </div>
+    <Paper>
+      <Center h={400}>
+        <Stack>
+          <Title>Virhe!</Title>
+          {errorComponent}
+          <Anchor href="/">Tästä etusivulle</Anchor>
+        </Stack>
+      </Center>
+    </Paper>
   );
 }

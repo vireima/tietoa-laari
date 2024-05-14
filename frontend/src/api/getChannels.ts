@@ -1,8 +1,8 @@
 import axios from "axios";
-import { Task } from "../types/Task";
+import { InputTask } from "../types/Task";
 import Channel from "../types/Channel";
 
-export default async function getChannels(tasks: Task[] | undefined) {
+export default async function getChannels(tasks: InputTask[] | undefined) {
   if (!tasks) return undefined;
 
   const uniqueChannels = Array.from(

@@ -2,9 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
-import Tasks from "./routes/Tasks";
-import Layout from "./routes/Layout";
-import { createTheme, MantineProvider } from "@mantine/core";
+import SectionLayout from "./routes/SectionLayout";
+import { createTheme, MantineProvider, Stack, Text } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,16 +16,32 @@ const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <SectionLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
         index: true,
-        element: <Tasks />,
+
+        element: (
+          <Stack>
+            <Text>Tämä on indeksi.</Text>
+            <Text>Tämä on indeksi.</Text>
+            <Text>Tämä on indeksi.</Text>
+            <Text>Tämä on indeksi.</Text>
+          </Stack>
+        ),
       },
       {
-        path: "/list",
-        element: <TaskAccordion />,
+        path: "laari/:unit?",
+        element: <TaskAccordion filter={{ status: ["todo"] }} />,
+      },
+      {
+        path: "jono/:unit?",
+        element: <TaskAccordion filter={{ status: ["in progress"] }} />,
+      },
+      {
+        path: "maali/:unit?",
+        element: <TaskAccordion filter={{ status: ["done"] }} />,
       },
     ],
   },
