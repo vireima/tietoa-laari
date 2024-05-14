@@ -1,17 +1,18 @@
 import { useSetState } from "@mantine/hooks";
-import { InputTask } from "../types/Task";
+import { ExtendedTask } from "../types/Task";
 import { Button, Group, Stack, Textarea } from "@mantine/core";
 import StatusSelect from "./StatusSelect";
 import { UsersSingleSelect } from "./UsersMultiSelect";
 import User from "../types/User";
+import { statuses } from "../types/Status";
 
 export default function EditTaskWidget({
   initialTask,
   onSave,
   users,
 }: {
-  initialTask: InputTask;
-  onSave: (task: InputTask) => void;
+  initialTask: ExtendedTask;
+  onSave: (task: ExtendedTask) => void;
   onCancel: () => void;
   users: User[] | undefined;
 }) {
@@ -31,13 +32,17 @@ export default function EditTaskWidget({
       <UsersSingleSelect
         label="Vastuullinen tekijä"
         description="Rajaa ehdotuksia vastuullisen tekijän mukaan"
-        onChange={(userID) => editTask({ assignee: userID })}
-        value={editedTask.assignee}
+        onChange={(userID) =>
+          editTask({ assignee: users?.find((user) => user.id === userID) })
+        }
+        value={editedTask.assignee?.id ?? null}
         users={users}
       />
       <StatusSelect
-        status={editedTask.status}
-        onChange={(status) => editTask({ status: status })}
+        status={editedTask.status.status}
+        onChange={(status) =>
+          editTask({ status: statuses.find((st) => st.status === status) })
+        }
       />
       <Group>
         <Button variant="light" onClick={() => onSave(editedTask)}>

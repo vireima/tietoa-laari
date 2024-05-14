@@ -1,9 +1,9 @@
 import TaskWidget from "../components/TaskWidget";
 import { Loader, SimpleGrid } from "@mantine/core";
-import useFilteredData from "../hooks/useFilteredData";
+import { useFilteredData } from "../hooks/useFilteredData";
 
 function Tasks() {
-  const { filteredTasks, usersQuery, channelsQuery } = useFilteredData();
+  const { tasks, usersQuery, channelsQuery } = useFilteredData();
 
   // if (filteredTasks) {
   //   filteredTasks.sort(
@@ -15,7 +15,7 @@ function Tasks() {
 
   return (
     <>
-      {!filteredTasks ? (
+      {!tasks ? (
         <Loader />
       ) : (
         <SimpleGrid
@@ -24,7 +24,7 @@ function Tasks() {
           pt="4rem"
           bg="gray.1"
         >
-          {filteredTasks.map((task) => (
+          {tasks.map((task) => (
             <TaskWidget
               initialTask={task}
               users={usersQuery.data}

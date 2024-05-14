@@ -13,10 +13,10 @@ import {
   IconEdit,
 } from "@tabler/icons-react";
 import { DateTime } from "ts-luxon";
-import { InputTask } from "../types/Task";
+import { ExtendedTask } from "../types/Task";
 import User from "../types/User";
 import Channel from "../types/Channel";
-import { mapUserIDs } from "../api/getUsers";
+import { mapUserIDs, userDisplayName } from "../api/getUsers";
 import EmojiConvertor from "emoji-js";
 import formatRawMarkdown from "../api/formatRawMarkdown";
 import {
@@ -36,16 +36,11 @@ export default function DisplayTaskWidget({
   channels,
   onEdit,
 }: {
-  task: InputTask;
+  task: ExtendedTask;
   users: User[] | undefined;
   channels: Channel[] | undefined;
   onEdit?: () => void;
 }) {
-  const author = users?.find((user) => user.id === task.author);
-  const assignee = users?.find((user) => user.id === task.assignee);
-  const channel = channels?.find((channel) => channel.id === task.channel);
-  const created = DateTime.fromISO(task.created).setLocale("fi-FI");
-  const modified = DateTime.fromISO(task.modified).setLocale("fi-FI");
   const usersMap = mapUserIDs(users);
   const channelsMap = new Map(channels?.map((ch) => [ch.id, ch]));
 
@@ -69,30 +64,30 @@ export default function DisplayTaskWidget({
       </Group>
       <Divider />
       <Group gap="xs">
-        <StatusInfopill status={task.status} />
+        <StatusInfopill task={task} />
         <Infopill
           Icon={IconUserCircle}
-          text={author?.profile.display_name || author?.name || task.author}
+          text={userDisplayName(task.author)}
           tooltip="Ehdottaja"
         />
         <Infopill
           Icon={IconUserCheck}
-          text={assignee?.profile.display_name || undefined}
+          text={userDisplayName(task.assignee)}
           tooltip="Vastuutettu"
         />
-        <ChannelInfopill channel={channel} task={task} />
+        <ChannelInfopill task={task} />
         <Infopill
           Icon={IconCalendarUp}
-          text={created.toLocaleString(DateTime.DATE_SHORT)}
+          text={task.created.toLocaleString(DateTime.DATE_SHORT)}
           tooltip="Ehdotettu"
         />
         <Infopill
           Icon={IconCalendarDot}
-          text={modified.toRelative()}
+          text={task.modified.toRelative()}
           tooltip="Muokattu"
         />
         <PriorityInfopill task={task} />
-        <VoteInfopill task={task} usersMap={usersMap} />
+        <VoteInfopill task={task} />
       </Group>
     </Stack>
   );
