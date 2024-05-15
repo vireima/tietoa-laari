@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ExtendedTask, InputTask } from "../types/Task";
+import config from "../config";
 
 export default async function patchTasks(tasks: ExtendedTask[]) {
   const payload = tasks.map((task) => ({
@@ -16,7 +17,7 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
     })),
   }));
   const response = await axios.patch(
-    "https://laari.up.railway.app/tasks",
+    `https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/tasks`,
     payload
   );
   return response.data as InputTask[];

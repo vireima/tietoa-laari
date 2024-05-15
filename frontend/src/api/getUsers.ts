@@ -1,8 +1,11 @@
 import axios from "axios";
 import User from "../types/User";
+import config from "../config";
 
 export default async function getUsers() {
-  const response = await axios.get("https://laari.up.railway.app/users");
+  const response = await axios.get(
+    `https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/users`
+  );
   return response.data as User[];
 }
 
