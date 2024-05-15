@@ -21,15 +21,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-
-        element: (
-          <Stack>
-            <Text>Tämä on indeksi.</Text>
-            <Text>Tämä on indeksi.</Text>
-            <Text>Tämä on indeksi.</Text>
-            <Text>Tämä on indeksi.</Text>
-          </Stack>
-        ),
+        element: <TaskAccordion filter={{ status: ["todo"] }} />,
       },
       {
         path: "laari/:unit?",
