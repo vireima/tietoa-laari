@@ -96,7 +96,7 @@ function inputToExtendedTasks(
           ...task,
           author: usersMap.get(task.author),
           assignee: task.assignee && usersMap.get(task.assignee),
-          channel: channelsMap.get(task.channel),
+          channel: channelsMap.get(task.channel) || { id: task.channel },
           created: DateTime.fromISO(task.created).setLocale("fi-FI"),
           modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
           status: statuses.find((s) => s.status === task.status),
@@ -126,12 +126,13 @@ export function useFilteredData(pathFilters?: Filter) {
     usersQuery.data
   );
 
+  console.log("TÄSSÄ", extendedTasks, filters);
   const filteredTasks = filterTasks(extendedTasks, filters);
-  console.info(filters);
-  console.info(
-    "filtering: ",
+
+  console.log(
+    "HOX",
+    tasksQuery.data?.length,
     extendedTasks.length,
-    " -> ",
     filteredTasks.length
   );
 
@@ -161,6 +162,13 @@ export function useFilteredData(pathFilters?: Filter) {
       return 0;
     });
   }
+
+  console.log(
+    "HOX2",
+    tasksQuery.data?.length,
+    extendedTasks.length,
+    filteredTasks.length
+  );
 
   return { tasks: filteredTasks, tasksQuery, usersQuery, channelsQuery };
 }

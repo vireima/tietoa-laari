@@ -12,11 +12,9 @@ export default async function getChannels(tasks: InputTask[] | undefined) {
 
   return await Promise.all(
     uniqueChannels.map(async (channel) => {
-      console.log(
-        `Fetching https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/channels/${channel}`
-      );
+      console.log(`Fetching https://${config.API_URL}/channels/${channel}`);
       const response = await axios.get(
-        `https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/channels/${channel}`
+        `https://${config.API_URL}/channels/${channel}`
       );
       return <Channel>response.data;
     })

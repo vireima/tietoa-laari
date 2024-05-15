@@ -3,20 +3,19 @@ import { ExtendedTask } from "../types/Task";
 import { Button, Group, Stack, Textarea } from "@mantine/core";
 import StatusSelect from "./StatusSelect";
 import { UsersSingleSelect } from "./UsersMultiSelect";
-import User from "../types/User";
 import { statuses } from "../types/Status";
+import useQueries from "../hooks/useQueries";
 
 export default function EditTaskWidget({
   initialTask,
   onSave,
-  users,
 }: {
   initialTask: ExtendedTask;
   onSave: (task: ExtendedTask) => void;
   onCancel: () => void;
-  users: User[] | undefined;
 }) {
   const [editedTask, editTask] = useSetState(initialTask);
+  const { usersQuery } = useQueries();
 
   return (
     <Stack>
@@ -33,10 +32,12 @@ export default function EditTaskWidget({
         label="Vastuullinen tekijä"
         description="Rajaa ehdotuksia vastuullisen tekijän mukaan"
         onChange={(userID) =>
-          editTask({ assignee: users?.find((user) => user.id === userID) })
+          editTask({
+            assignee: usersQuery.data?.find((user) => user.id === userID),
+          })
         }
         value={editedTask.assignee?.id ?? null}
-        users={users}
+        users={usersQuery.data}
       />
       <StatusSelect
         status={editedTask.status.status}

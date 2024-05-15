@@ -7,7 +7,7 @@ export default function useQueries() {
   const tasksQuery = useQuery({
     queryKey: ["tasks"],
     queryFn: getTasks,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 1,
   });
   const usersQuery = useQuery({
     queryKey: ["users"],
@@ -15,7 +15,10 @@ export default function useQueries() {
     staleTime: 1000 * 60 * 15,
   });
   const channelsQuery = useQuery({
-    queryKey: ["channels", tasksQuery.data],
+    queryKey: [
+      "channels",
+      new Set(tasksQuery.data?.map((task) => task.channel)),
+    ],
     queryFn: () => getChannels(tasksQuery.data),
     enabled: !!usersQuery.data,
     staleTime: 1000 * 60 * 5,

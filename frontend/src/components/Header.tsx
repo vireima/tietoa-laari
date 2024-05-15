@@ -35,8 +35,6 @@ export default function Header({
   const navigate = useNavigate();
   const { status } = useParams();
 
-  console.log("status =", status);
-
   return (
     <Portal>
       <Paper
