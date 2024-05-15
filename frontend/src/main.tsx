@@ -3,12 +3,13 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import SectionLayout from "./routes/SectionLayout";
-import { createTheme, MantineProvider, Stack, Text } from "@mantine/core";
+import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import TaskAccordion from "./routes/TaskAccordion";
+import config from "./config";
 
 const theme = createTheme({});
 const queryClient = new QueryClient();
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
 ]);
 
 console.log("ENV", process.env.NODE_ENV);
+console.log("PRIVATE ENV", process.env.RAILWAY_BACKEND_PRIVATE_DOMAIN);
+console.log("PRIVATE ENV", process.env.RAILWAY_BACKEND_PUBLIC_DOMAIN);
+console.log("PRIVATE", config.RAILWAY_BACKEND_PRIVATE_DOMAIN);
+console.log("PRIVATE", config.RAILWAY_BACKEND_PUBLIC_DOMAIN);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
