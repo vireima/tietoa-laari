@@ -8,7 +8,7 @@ export default function FilterDrawer(props: DrawerProps) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-    <Drawer {...props} size="sm">
+    <Drawer {...props} size="xs">
       <ChannelSelect
         value={searchParams.get("channel")}
         onChange={(value) => {
