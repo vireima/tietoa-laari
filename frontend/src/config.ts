@@ -3,19 +3,16 @@
 // dotenv.config();
 
 interface ENV {
-  RAILWAY_BACKEND_PRIVATE_DOMAIN?: string;
-  RAILWAY_BACKEND_PUBLIC_DOMAIN?: string;
+  API_URL?: string;
 }
 
 interface Config {
-  RAILWAY_BACKEND_PRIVATE_DOMAIN: string;
-  RAILWAY_BACKEND_PUBLIC_DOMAIN: string;
+  API_URL: string;
 }
 
 const getConfig = (): ENV => {
   return {
-    RAILWAY_BACKEND_PRIVATE_DOMAIN: process.env.RAILWAY_BACKEND_PRIVATE_DOMAIN,
-    RAILWAY_BACKEND_PUBLIC_DOMAIN: process.env.RAILWAY_BACKEND_PUBLIC_DOMAIN,
+    API_URL: process.env.API_URL,
   };
 };
 

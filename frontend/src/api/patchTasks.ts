@@ -17,7 +17,7 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
     })),
   }));
   const response = await axios.patch(
-    `https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/tasks`,
+    `https://${config.API_URL}/tasks`,
     payload
   );
   return response.data as InputTask[];

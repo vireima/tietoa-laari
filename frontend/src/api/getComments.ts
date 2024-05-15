@@ -6,7 +6,7 @@ import config from "../config";
 
 export default async function getTasks(task: ExtendedTask) {
   const response = await axios.get(
-    `https://${config.RAILWAY_BACKEND_PRIVATE_DOMAIN}/tasks/${task.channel}/${task.ts}/comments`
+    `https://${config.API_URL}/tasks/${task.channel}/${task.ts}/comments`
   );
   return response.data;
 }

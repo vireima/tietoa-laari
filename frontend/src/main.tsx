@@ -41,10 +41,7 @@ const router = createBrowserRouter([
 ]);
 
 console.log("ENV", process.env.NODE_ENV);
-console.log("PRIVATE ENV", process.env.RAILWAY_BACKEND_PRIVATE_DOMAIN);
-console.log("PRIVATE ENV", process.env.RAILWAY_BACKEND_PUBLIC_DOMAIN);
-console.log("PRIVATE", config.RAILWAY_BACKEND_PRIVATE_DOMAIN);
-console.log("PRIVATE", config.RAILWAY_BACKEND_PUBLIC_DOMAIN);
+console.log("API_URL", config.API_URL);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
