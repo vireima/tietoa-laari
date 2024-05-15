@@ -7,6 +7,7 @@ import {
   ThemeIcon,
   ActionIcon,
   useMantineColorScheme,
+  Text,
   Tabs,
 } from "@mantine/core";
 import {
@@ -54,7 +55,7 @@ export default function Header({
         <Group justify="space-between">
           <Group>
             <Burger opened={drawerOpened} onClick={drawerToggle} />
-            <ThemeIcon variant="default" radius="xl" size="lg">
+            <ThemeIcon variant="default" radius="xl" size="lg" visibleFrom="xs">
               <TietoaIcon />
             </ThemeIcon>
             {/* <Title>Laari</Title> */}
@@ -72,21 +73,22 @@ export default function Header({
           >
             <Tabs.List justify="center">
               <Tabs.Tab value="laari" leftSection={<IconSeeding stroke={1} />}>
-                LAARI
+                <Text visibleFrom="xs">LAARI</Text>
               </Tabs.Tab>
               <Tabs.Tab value="jono" leftSection={<IconChecklist stroke={1} />}>
-                JONO
+                <Text visibleFrom="xs">JONO</Text>
               </Tabs.Tab>
               <Tabs.Tab
                 value="maali"
                 leftSection={<IconTargetArrow stroke={1} />}
               >
-                MAALI
+                <Text visibleFrom="xs">MAALI</Text>
               </Tabs.Tab>
             </Tabs.List>
           </Tabs>
           <Group justify="flex-end">
             <ChannelSelect
+              visibleFrom="md"
               placeholder="Slack-kanava..."
               value={searchParams.get("channel")}
               onChange={(value) => {
@@ -101,6 +103,7 @@ export default function Header({
               variant="filled"
               radius="xl"
               size="lg"
+              visibleFrom="xs"
             >
               {colorScheme !== "dark" ? (
                 <IconMoon size="1.2rem" />
