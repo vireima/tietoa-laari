@@ -141,7 +141,6 @@ async def get_tasks_by_channel(channel: str):
 @logger.catch
 @app.get("/tasks/{channel}/{ts}")
 async def get_task(channel: str, ts: str):
-
     return await db.query(channel=channel, ts=ts)
 
 
@@ -179,12 +178,18 @@ async def get_users():
 @logger.catch
 @app.get("/channels")
 async def get_channels():
+    """
+    Get information about all the public channels the bot houses.
+    """
     return await slack_client.channels()
 
 
 @logger.catch
 @app.get("/channels/{channel_id}")
 async def get_channel(channel_id: str):
+    """
+    Get channel information by id.
+    """
     return await slack_client.channel(channel_id)
 
 
