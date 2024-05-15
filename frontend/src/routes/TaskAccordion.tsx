@@ -43,8 +43,14 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
               <Accordion.Control
                 icon={<Avatar src={task.author?.profile.image_32} size="sm" />}
               >
-                <Text truncate="end" lineClamp={1}>
-                  {stripRawMarkdown(task.description, usersMap, channelsMap)}
+                <Text lineClamp={1}>
+                  {
+                    stripRawMarkdown(
+                      task.description,
+                      usersMap,
+                      channelsMap
+                    ).split("\n", 1)[0]
+                  }
                 </Text>
               </Accordion.Control>
               <Accordion.Panel>
