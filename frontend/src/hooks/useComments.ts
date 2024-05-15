@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { ExtendedTask } from "../types/Task";
+import getComments from "../api/getComments";
 
 export default function useComments(task: ExtendedTask) {
-  const channelsQuery = useQuery({
+  return useQuery({
     queryKey: ["comments", task.channel?.id, task.ts],
-    queryFn: () => getChannels(tasksQuery.data),
-    enabled: !!usersQuery.data,
-    staleTime: 1000 * 60 * 5,
+    queryFn: () => getComments(task),
+    staleTime: 1000 * 60 * 2,
   });
 }
