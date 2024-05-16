@@ -7,11 +7,12 @@ import time
 import traceback
 
 import orjson
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
 from multimethod import multimethod
+from slack_sdk.errors import SlackApiError
 from starlette.responses import Response
 
 from backend import models
@@ -147,7 +148,10 @@ async def get_task(channel: str, ts: str):
 @logger.catch
 @app.get("/tasks/{channel}/{ts}/comments")
 async def get_task_comments(channel: str, ts: str):
-    return await slack_client.comments(channel, ts)
+    try:
+        return await slack_client.comments(channel, ts)
+    except SlackApiError as err:
+        raise HTTPException(404, str(err))
 
 
 @logger.catch
