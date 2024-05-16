@@ -16,7 +16,7 @@ import { DateTime } from "ts-luxon";
 import { ExtendedTask } from "../types/Task";
 import User from "../types/User";
 import Channel from "../types/Channel";
-import { mapUserIDs, userDisplayName } from "../api/getUsers";
+import { userDisplayName } from "../api/getUsers";
 import EmojiConvertor from "emoji-js";
 import formatRawMarkdown from "../api/formatRawMarkdown";
 import {
@@ -26,14 +26,13 @@ import {
   StatusInfopill,
   VoteInfopill,
 } from "./Infopill";
+import useMappedQueries from "../hooks/useMappedQueries";
 
 const emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
 
 export default function DisplayTaskWidget({
   task,
-  users,
-  channels,
   onEdit,
 }: {
   task: ExtendedTask;
@@ -41,8 +40,7 @@ export default function DisplayTaskWidget({
   channels: Channel[] | undefined;
   onEdit?: () => void;
 }) {
-  const usersMap = mapUserIDs(users);
-  const channelsMap = new Map(channels?.map((ch) => [ch.id, ch]));
+  const { usersMap, channelsMap } = useMappedQueries();
 
   return (
     <Stack>

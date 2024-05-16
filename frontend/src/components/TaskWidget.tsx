@@ -49,7 +49,6 @@ export default function TaskWidget({
             onCancel={() => {
               handlers.close();
             }}
-            users={users}
           />
         </Modal>
         <DisplayTaskWidget
