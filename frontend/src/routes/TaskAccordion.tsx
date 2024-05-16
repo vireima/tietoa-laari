@@ -6,6 +6,8 @@ import TaskAccordionPanel from "../components/TaskAccordionPanel";
 import MarkdownStrippedText from "../components/MarkdownStrippedText";
 import UserWidget from "../components/UserWidget";
 import { useState } from "react";
+import VotesWidget from "../components/VotesWidget";
+import { PriorityInfopill } from "../components/Infopill";
 
 export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
   const { tasks } = useFilteredData(filter);
@@ -27,6 +29,10 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
               <Accordion.Control icon={<UserWidget user={task.author} />}>
                 <Group justify="space-between">
                   <MarkdownStrippedText text={task.description} />
+                  <Group gap="xs">
+                    <VotesWidget task={task} />
+                    <PriorityInfopill task={task} />
+                  </Group>
                 </Group>
               </Accordion.Control>
               <TaskAccordionPanel task={task} />

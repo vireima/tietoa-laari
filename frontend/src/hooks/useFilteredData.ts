@@ -100,13 +100,12 @@ function inputToExtendedTasks(
           created: DateTime.fromISO(task.created).setLocale("fi-FI"),
           modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
           status: statuses.find((s) => s.status === task.status),
-          votes: task.votes.map(
-            (vote) =>
-              ({
-                reaction: convertEmoji(`:${vote.reaction}:`),
-                user: usersMap.get(vote.user),
-              } as OutputVote)
-          ),
+          votes: task.votes.map((vote) => {
+            return <OutputVote>{
+              reaction: convertEmoji(`:${vote.reaction}:`),
+              user: usersMap.get(vote.user),
+            };
+          }),
         } as ExtendedTask)
     );
   }
@@ -126,15 +125,7 @@ export function useFilteredData(pathFilters?: Filter) {
     usersQuery.data
   );
 
-  console.log("TÄSSÄ", extendedTasks, filters);
   const filteredTasks = filterTasks(extendedTasks, filters);
-
-  console.log(
-    "HOX",
-    tasksQuery.data?.length,
-    extendedTasks.length,
-    filteredTasks.length
-  );
 
   const cmpMap = new Map([
     ["created", cmpCreated],
@@ -162,13 +153,6 @@ export function useFilteredData(pathFilters?: Filter) {
       return 0;
     });
   }
-
-  console.log(
-    "HOX2",
-    tasksQuery.data?.length,
-    extendedTasks.length,
-    filteredTasks.length
-  );
 
   return { tasks: filteredTasks, tasksQuery, usersQuery, channelsQuery };
 }

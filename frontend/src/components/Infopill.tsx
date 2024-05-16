@@ -120,7 +120,7 @@ export function PriorityInfopill({ task }: { task: ExtendedTask }) {
       Icon={IconUrgent}
       text={task.priority.toString()}
       tooltip="Prioriteetti"
-      bg={`red.${Math.min(task.priority + 1, 9)}`}
+      bg={`red.${Math.min(task.priority + 2, 9)}`}
       c={"red.0"}
       color={"red.0"}
       pl="0.3rem"
