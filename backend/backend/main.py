@@ -4,7 +4,6 @@ import random
 import string
 import sys
 import time
-import traceback
 
 import orjson
 from fastapi import FastAPI, HTTPException, Request
@@ -117,14 +116,7 @@ async def add_process_time_header(request: Request, call_next):
 
 @app.get("/")
 async def root():
-    try:
-        # raise ValueError("Lol virhe tässä!")
-        return {"details": "Root!"}
-
-    except Exception as ex:
-
-        with logger.contextualize(exception=traceback.format_tb(ex.__traceback__)):
-            logger.error("Virhe")
+    return {"details": "Root!"}
 
 
 @logger.catch
@@ -151,7 +143,7 @@ async def get_task_comments(channel: str, ts: str):
     try:
         return await slack_client.comments(channel, ts)
     except SlackApiError as err:
-        raise HTTPException(404, str(err))
+        raise HTTPException(404, str(err)) from err
 
 
 @logger.catch
@@ -163,7 +155,7 @@ async def delete_task(task_id: str):
 @logger.catch
 @app.patch("/tasks")
 async def patch_tasks(tasks: list[models.TaskUpdateModel]):
-    result = await db.patch(tasks)
+    await db.patch(tasks)
     return await db.query([str(task.id) for task in tasks])
 
 

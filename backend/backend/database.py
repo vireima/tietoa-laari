@@ -1,6 +1,7 @@
 # pyright: reportRedeclaration=false
 
 import datetime
+import re
 
 import arrow
 from bson import ObjectId
@@ -25,14 +26,20 @@ class Database:
         """
         Insert one task into the database. Use Slack message as a task prototype.
         """
+        slite = re.search(
+            r"<https://tietoa\.slite\.com/api/s/(\w+)/?[^>]*>", message.text
+        )
+
         await self.insert_task(
             models.TaskInputModel(
                 author=message.user,
+                assignees=re.findall(r"<@(\w+)>", message.text),
                 channel=message.channel,
                 ts=message.ts,
                 description=message.text,
                 created=datetime.datetime.now(models.TZ_UTC),
                 modified=datetime.datetime.now(models.TZ_UTC),
+                slite=None if slite is None else slite.group(1),
             )
         )
 
@@ -152,8 +159,9 @@ class Database:
         logger.debug(
             f"Updating description: {message.previous_message.text} -> {message.message.text}"
         )
+
         result = await self.collection.find_one_and_update(
-            {"channel": message.channel, "ts": message.message.ts},
+            {"channel": message.channel, "ts": message.ts},
             {
                 "$set": {
                     "description": message.message.text,

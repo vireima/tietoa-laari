@@ -158,6 +158,8 @@ class StatusEnum(str, Enum):
 class TaskInputModel(BaseModel):
     author: str
     assignee: str | None = None
+    assignees: list[str] = Field(default_factory=list)
+    slite: str | None = None
     channel: str
     ts: str
     description: str | None = None
