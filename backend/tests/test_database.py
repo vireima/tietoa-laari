@@ -52,13 +52,16 @@ async def test_update_task(database: Database):
 
     update = models.InnerMessageChangedEvent(
         channel="channel_id",
-        ts="test_update_task",
+        ts="a_new_ts",
         type="message",
         subtype="message_changed",
         event_ts="1",
         channel_type="group",
         message=models.ChangedMessage(
-            type="message", text="Changed task description", user="user_id", ts="new ts"
+            type="message",
+            text="Changed task description",
+            user="user_id",
+            ts="test_update_task",
         ),
         previous_message=models.ChangedMessage(
             type="message",
