@@ -50,7 +50,12 @@ export default function TaskAccordionPanel({ task }: TaskAccordionPanelProps) {
   return (
     <Accordion.Panel>
       <LoadingOverlay visible={mutation.isPending} zIndex={1000} />
-      <Modal opened={opened} onClose={handlers.close}>
+      <Modal
+        opened={opened}
+        onClose={handlers.close}
+        size={"lg"}
+        title="Muokkaa ehdotusta"
+      >
         <EditTaskWidget
           initialTask={task}
           onSave={async (task) => {

@@ -1,14 +1,26 @@
-import { Stepper } from "@mantine/core";
+import {
+  BoxProps,
+  ElementProps,
+  Stepper,
+  StepperFactory,
+  StylesApiProps,
+} from "@mantine/core";
 import { Status, statuses } from "../types/Status";
 import { useState } from "react";
 
+interface StatusSelectProps
+  extends BoxProps,
+    StylesApiProps<StepperFactory>,
+    ElementProps<"div"> {
+  status: Status;
+  onStatusChange: (status: Status) => void;
+}
+
 export default function StatusSelect({
   status,
-  onChange,
-}: {
-  status: Status;
-  onChange?: (status: Status) => void;
-}) {
+  onStatusChange,
+  ...others
+}: StatusSelectProps) {
   const [active, setActive] = useState(
     statuses.findIndex((val) => {
       return val.status == status.toString();
@@ -19,8 +31,9 @@ export default function StatusSelect({
       active={active}
       onStepClick={(index) => {
         setActive(index + 1);
-        onChange && onChange(statuses[index].status);
+        onStatusChange && onStatusChange(statuses[index].status);
       }}
+      {...others}
     >
       {statuses.map((st, index) => (
         <Stepper.Step

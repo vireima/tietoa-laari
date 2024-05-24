@@ -1,8 +1,8 @@
 import {
   IconCheck,
-  IconCircleDotted,
   IconCircleHalf2,
   IconCircleOff,
+  IconSeeding,
 } from "@tabler/icons-react";
 
 export type Status = "todo" | "in progress" | "done" | "closed";
@@ -21,7 +21,7 @@ export const statuses = [
     status: "todo" as Status,
     label: "Ehdotus",
     description: "Ehdotettu, ei aloitettu",
-    iconElement: IconCircleDotted,
+    iconElement: IconSeeding,
     bgcolor: "blue.1",
     color: "blue.6",
   },

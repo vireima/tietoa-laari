@@ -28,6 +28,7 @@ export default function ChannelSelect(props: SelectProps) {
 
   return (
     <Select
+      variant="transparent"
       {...props}
       leftSection={<IconHash stroke={1.2} size="1.2rem" />}
       data={channelsQuery.data?.map((channel) => ({
@@ -35,7 +36,6 @@ export default function ChannelSelect(props: SelectProps) {
         value: channel.id,
         channel: channel,
       }))}
-      variant="transparent"
       searchable
       clearable
       renderOption={channelSelectRenderOption}
