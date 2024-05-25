@@ -140,10 +140,7 @@ async def get_task(channel: str, ts: str):
 @logger.catch
 @app.get("/tasks/{channel}/{ts}/comments")
 async def get_task_comments(channel: str, ts: str):
-    try:
-        return await slack_client.comments(channel, ts)
-    except SlackApiError as err:
-        raise HTTPException(404, str(err)) from err
+    return await slack_client.comments(channel, ts)
 
 
 @logger.catch
