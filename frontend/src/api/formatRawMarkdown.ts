@@ -16,10 +16,12 @@ export function stripRawMarkdown(
     (match, p1) => `#${channelsMap.get(p1)?.name || p1}`
   );
 
-  const bold = channelMentions.replaceAll(
-    /\*([^\n*]+)\*/g,
-    (match, p1) => `${p1}`
+  const links = channelMentions.replaceAll(
+    /<([^|>]+)\|?([^>]+)?>/g,
+    (match, p1, p2) => `${p2 ?? p1}`
   );
+
+  const bold = links.replaceAll(/\*([^\n*]+)\*/g, (match, p1) => `${p1}`);
 
   const italic = bold.replaceAll(/_([^\n_]+)_/g, (match, p1) => `${p1}`);
 
@@ -56,7 +58,12 @@ export default function formatRawMarkdown(
       }</a>`
   );
 
-  const bold = channelMentions.replaceAll(
+  const links = channelMentions.replaceAll(
+    /<((?:http|www)[^|>]+)\|?([^>]+)?>/g,
+    (match, p1, p2) => `<a href='${p1}' target='_blank'>${p2 ?? p1}</a>`
+  );
+
+  const bold = links.replaceAll(
     /\*([^\n*]+)\*/g,
     (match, p1) => `<b>${p1}</b>`
   );

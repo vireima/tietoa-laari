@@ -90,24 +90,27 @@ function inputToExtendedTasks(
       channels && channels.map((channel) => [channel.id, channel])
     );
     const usersMap = new Map(users && users.map((user) => [user.id, user]));
-    return tasks.map(
-      (task) =>
-        ({
-          ...task,
-          author: usersMap.get(task.author),
-          assignee: task.assignee && usersMap.get(task.assignee),
-          channel: channelsMap.get(task.channel) || { id: task.channel },
-          created: DateTime.fromISO(task.created).setLocale("fi-FI"),
-          modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
-          status: statuses.find((s) => s.status === task.status),
-          votes: task.votes.map((vote) => {
-            return <OutputVote>{
-              reaction: convertEmoji(`:${vote.reaction}:`),
-              user: usersMap.get(vote.user),
-            };
-          }),
-        } as ExtendedTask)
-    );
+
+    return tasks.map((task) => {
+      return {
+        ...task,
+        author: usersMap.get(task.author),
+        assignee: task.assignee && usersMap.get(task.assignee),
+        assignees: task.assignees.map((assignee) => {
+          return usersMap.get(assignee);
+        }),
+        channel: channelsMap.get(task.channel) || { id: task.channel },
+        created: DateTime.fromISO(task.created).setLocale("fi-FI"),
+        modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
+        status: statuses.find((s) => s.status === task.status),
+        votes: task.votes.map((vote) => {
+          return <OutputVote>{
+            reaction: convertEmoji(`:${vote.reaction}:`),
+            user: usersMap.get(vote.user),
+          };
+        }),
+      } as ExtendedTask;
+    });
   }
 
   return [];

@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionPanelProps,
   ActionIcon,
+  Box,
   Divider,
   Flex,
   Group,
@@ -59,7 +60,6 @@ export default function TaskAccordionPanel({ task }: TaskAccordionPanelProps) {
         <EditTaskWidget
           initialTask={task}
           onSave={async (task) => {
-            console.log("onSave()", task);
             mutation.mutate([task]);
             handlers.close();
           }}
@@ -84,13 +84,21 @@ export default function TaskAccordionPanel({ task }: TaskAccordionPanelProps) {
           <Infopill
             Icon={IconUserCircle}
             text={userDisplayName(task.author)}
-            tooltip="Ehdottaja"
+            tooltip="Kirjaaja"
           />
-          <Infopill
-            Icon={IconUserCheck}
-            text={userDisplayName(task.assignee)}
-            tooltip="Vastuutettu"
-          />
+          {task.assignees.map((assignee, index) => (
+            <Box key={index}>
+              {assignee ? (
+                <Infopill
+                  Icon={IconUserCheck}
+                  text={userDisplayName(assignee)}
+                  tooltip="Vastuu"
+                />
+              ) : (
+                <></>
+              )}
+            </Box>
+          ))}
           <ChannelInfopill task={task} />
           <Infopill
             Icon={IconCalendarUp}
