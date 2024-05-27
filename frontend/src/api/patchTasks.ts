@@ -7,6 +7,7 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
     ...task,
     author: task.author?.id,
     assignee: task.assignee?.id,
+    assignees: task.assignees.map((assignee) => assignee?.id),
     channel: task.channel?.id,
     created: task.created.toJSDate(),
     modified: task.created.toJSDate(),

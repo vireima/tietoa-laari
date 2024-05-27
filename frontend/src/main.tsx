@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import TaskAccordion from "./routes/TaskAccordion";
 import config from "./config";
+import { CookiesProvider } from "react-cookie";
 
 const theme = createTheme({});
 const queryClient = new QueryClient();
@@ -47,7 +48,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <RouterProvider router={router} />
+        <CookiesProvider defaultSetOptions={{ path: "/" }}>
+          <RouterProvider router={router} />
+        </CookiesProvider>
       </MantineProvider>
       <ReactQueryDevtools client={queryClient} />
     </QueryClientProvider>

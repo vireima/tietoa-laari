@@ -169,17 +169,21 @@ class TaskInputModel(BaseModel):
     votes: list[Reaction] = Field(default_factory=list)
     status: StatusEnum = StatusEnum.todo
     archived: bool = False
+    tags: list[str] = Field(default_factory=list)
 
 
 class TaskUpdateModel(BaseModel):
     id: PyObjectId = Field(alias="_id")
     assignee: str | None = None
+    assignees: list[str] | None = None
     description: str | None = None
     priority: int | None = None
     modified: DatetimeUTC | None = None
     votes: list[Reaction] | None = None
     status: StatusEnum | None = None
     archived: bool | None = None
+    tags: list[str] | None = None
+    slite: str | None = None
 
 
 class TaskOutputModel(TaskInputModel):

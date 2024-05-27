@@ -2,12 +2,8 @@ import { Accordion, Box, Center, Group, Text } from "@mantine/core";
 import { useFilteredData } from "../hooks/useFilteredData";
 import { IconSparkles } from "@tabler/icons-react";
 import filteredTaskContainerProps from "../types/FilteredTaskContainerProps";
-import TaskAccordionPanel from "../components/TaskAccordionPanel";
-import MarkdownStrippedText from "../components/MarkdownStrippedText";
-import UserWidget from "../components/UserWidget";
 import { useState } from "react";
-import VotesWidget from "../components/VotesWidget";
-import { PriorityInfopill } from "../components/Infopill";
+import TaskAccordionItem from "../components/TaskAccordionItem";
 
 export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
   const { tasks } = useFilteredData(filter);
@@ -23,18 +19,24 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
           onChange={setSelected}
         >
           {tasks?.map((task) => (
-            <Accordion.Item key={task.ts} value={task.ts}>
-              <Accordion.Control icon={<UserWidget user={task.author} />}>
-                <Group justify="space-between">
-                  <MarkdownStrippedText text={task.description} />
-                  <Group gap="xs">
-                    <VotesWidget task={task} />
-                    <PriorityInfopill task={task} />
-                  </Group>
-                </Group>
-              </Accordion.Control>
-              <TaskAccordionPanel task={task} />
-            </Accordion.Item>
+            <TaskAccordionItem key={task.ts} value={task.ts} task={task} />
+            // <Accordion.Item key={task.ts} value={task.ts}>
+            //   <Accordion.Control icon={<UserWidget user={task.author} />}>
+            //     <Group justify="space-between">
+            //       <MarkdownStrippedText text={task.description} />
+            //       <Group gap="xs">
+            //         <VotesWidget task={task} />
+            //         <PriorityInfopill task={task} />
+            //       </Group>
+            //     </Group>
+            //   </Accordion.Control>
+            //   <TaskAccordionPanel
+            //     task={task}
+            //     onKeyDown={getHotkeyHandler([
+            //       ["E", () => console.log("painettiin e")],
+            //     ])}
+            //   />
+            // </Accordion.Item>
           ))}
         </Accordion>
       ) : (

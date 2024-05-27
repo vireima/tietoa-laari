@@ -1,5 +1,5 @@
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
-import Channel from "../types/Channel";
+import Channel from "../../types/Channel";
 import { useState } from "react";
 import { IconHash } from "@tabler/icons-react";
 

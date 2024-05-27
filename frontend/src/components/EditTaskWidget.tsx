@@ -1,4 +1,4 @@
-import { useSetState } from "@mantine/hooks";
+import { useHotkeys, useSetState } from "@mantine/hooks";
 import { ExtendedTask } from "../types/Task";
 import {
   Button,
@@ -10,9 +10,14 @@ import {
   Title,
 } from "@mantine/core";
 import StatusSelect from "./StatusSelect";
-import { UsersSingleSelect } from "./UsersMultiSelect";
+// import UsersMultiSelect, { UsersSingleSelect } from "./UsersMultiSelect";
+import UsersMultiSelect from "./Users/UsersMultiSelect";
 import { statuses } from "../types/Status";
-import useQueries from "../hooks/useQueries";
+import useMappedQueries from "../hooks/useMappedQueries";
+
+function filterDefined(inputs: (string | undefined)[]) {
+  return inputs.filter((i) => !!i) as string[];
+}
 
 export default function EditTaskWidget({
   initialTask,
@@ -23,7 +28,8 @@ export default function EditTaskWidget({
   onCancel: () => void;
 }) {
   const [editedTask, editTask] = useSetState(initialTask);
-  const { usersQuery } = useQueries();
+  const { usersMap } = useMappedQueries();
+  useHotkeys([["mod+Enter", () => onSave(editedTask)]]);
 
   return (
     <Stack gap="xl">
@@ -37,7 +43,7 @@ export default function EditTaskWidget({
           editTask({ description: event.currentTarget.value })
         }
       />
-      <UsersSingleSelect
+      {/* <UsersSingleSelect
         label="Vastuullinen tekijä"
         description="Rajaa ehdotuksia vastuullisen tekijän mukaan"
         onChange={(userID) =>
@@ -47,6 +53,14 @@ export default function EditTaskWidget({
         }
         value={editedTask.assignee?.id ?? null}
         users={usersQuery.data}
+      /> */}
+      <UsersMultiSelect
+        value={filterDefined(editedTask.assignees.map((user) => user?.id))}
+        onChange={(users) =>
+          editTask({
+            assignees: users.map((userId) => usersMap.get(userId)),
+          })
+        }
       />
       <Title order={6}>Prioriteetti</Title>
       <SegmentedControl

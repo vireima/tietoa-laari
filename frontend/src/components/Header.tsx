@@ -18,7 +18,7 @@ import {
   IconTargetArrow,
 } from "@tabler/icons-react";
 import TietoaIcon from "../assets/TietoaIcon";
-import { useHeadroom } from "@mantine/hooks";
+import { useHeadroom, useHotkeys } from "@mantine/hooks";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ChannelSelect from "./ChannelSelect";
 
@@ -34,6 +34,33 @@ export default function Header({
   const pinned = useHeadroom({ fixedAt: 150 });
   const navigate = useNavigate();
   const { status } = useParams();
+  useHotkeys([
+    [
+      "1",
+      () =>
+        navigate({
+          pathname: `/laari`,
+          search: `${searchParams}`,
+        }),
+    ],
+
+    [
+      "2",
+      () =>
+        navigate({
+          pathname: `/jono`,
+          search: `${searchParams}`,
+        }),
+    ],
+    [
+      "3",
+      () =>
+        navigate({
+          pathname: `/maali`,
+          search: `${searchParams}`,
+        }),
+    ],
+  ]);
 
   return (
     <Portal>

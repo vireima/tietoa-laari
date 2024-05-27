@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { InputTask } from "../types/Task";
 import User from "../types/User";
 import Channel from "../types/Channel";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useHotkeys } from "@mantine/hooks";
 import Header from "../components/Header";
 import FilterDrawer from "../components/FilterDrawer";
 
@@ -14,6 +14,7 @@ export interface TaskDataOutletContext {
 
 export default function SectionLayout() {
   const [opened, { close, toggle }] = useDisclosure(false);
+  useHotkeys([["F", () => toggle()]]);
 
   return (
     <>

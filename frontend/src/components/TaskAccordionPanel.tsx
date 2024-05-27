@@ -7,7 +7,6 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  Modal,
   Stack,
 } from "@mantine/core";
 import {
@@ -29,47 +28,34 @@ import {
 import { ExtendedTask } from "../types/Task";
 import MarkdownFormattedText from "./MarkdownFormattedText";
 import CommentThreadSpoiler from "./CommentThreadSpoiler";
-import { useDisclosure } from "@mantine/hooks";
-import EditTaskWidget from "./EditTaskWidget";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import patchTasks from "../api/patchTasks";
 
 interface TaskAccordionPanelProps extends AccordionPanelProps {
   task: ExtendedTask;
+  onEdit: () => void;
+  loading?: boolean;
 }
 
-export default function TaskAccordionPanel({ task }: TaskAccordionPanelProps) {
-  const [opened, handlers] = useDisclosure(false);
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: patchTasks,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-  });
+export default function TaskAccordionPanel({
+  task,
+  onEdit,
+  loading,
+}: TaskAccordionPanelProps) {
+  // const [opened, handlers] = useDisclosure(false);
+  // const queryClient = useQueryClient();
+  // const mutation = useMutation({
+  //   mutationFn: patchTasks,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["tasks"] });
+  //   },
+  // });
 
   return (
     <Accordion.Panel>
-      <LoadingOverlay visible={mutation.isPending} zIndex={1000} />
-      <Modal
-        opened={opened}
-        onClose={handlers.close}
-        size={"lg"}
-        title="Muokkaa ehdotusta"
-      >
-        <EditTaskWidget
-          initialTask={task}
-          onSave={async (task) => {
-            mutation.mutate([task]);
-            handlers.close();
-          }}
-          onCancel={handlers.close}
-        />
-      </Modal>
+      <LoadingOverlay visible={!!loading} zIndex={1000} />
       <Stack>
         <Flex align="flex-start" justify="space-between">
           <MarkdownFormattedText text={task.description} />
-          <ActionIcon onClick={handlers.open} variant="light">
+          <ActionIcon onClick={onEdit} variant="light">
             <IconEdit stroke={1.2} />
           </ActionIcon>
         </Flex>
