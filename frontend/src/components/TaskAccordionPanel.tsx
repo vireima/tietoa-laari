@@ -3,11 +3,14 @@ import {
   AccordionPanelProps,
   ActionIcon,
   Box,
+  Collapse,
   Divider,
   Flex,
   Group,
+  Indicator,
   LoadingOverlay,
   Stack,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconUserCircle,
@@ -15,6 +18,8 @@ import {
   IconCalendarUp,
   IconCalendarDot,
   IconEdit,
+  IconMessage,
+  IconChecklist,
 } from "@tabler/icons-react";
 import { DateTime } from "ts-luxon";
 import { userDisplayName } from "../api/getUsers";
@@ -28,6 +33,9 @@ import {
 import { ExtendedTask } from "../types/Task";
 import MarkdownFormattedText from "./MarkdownFormattedText";
 import CommentThreadSpoiler from "./CommentThreadSpoiler";
+import { useDisclosure } from "@mantine/hooks";
+import { actionIconProps, iconProps } from "../config";
+import useExtendedComments from "../hooks/useExtendedComments";
 
 interface TaskAccordionPanelProps extends AccordionPanelProps {
   task: ExtendedTask;
@@ -40,14 +48,8 @@ export default function TaskAccordionPanel({
   onEdit,
   loading,
 }: TaskAccordionPanelProps) {
-  // const [opened, handlers] = useDisclosure(false);
-  // const queryClient = useQueryClient();
-  // const mutation = useMutation({
-  //   mutationFn: patchTasks,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["tasks"] });
-  //   },
-  // });
+  const [opened, { toggle }] = useDisclosure(false);
+  const comments = useExtendedComments(task);
 
   return (
     <Accordion.Panel>
@@ -55,16 +57,15 @@ export default function TaskAccordionPanel({
       <Stack>
         <Flex align="flex-start" justify="space-between">
           <MarkdownFormattedText text={task.description} />
-          <ActionIcon onClick={onEdit} variant="light">
-            <IconEdit stroke={1.2} />
-          </ActionIcon>
         </Flex>
         <Divider />
-        <CommentThreadSpoiler
-          task={task}
-          showLabel="Näytä viestiketju"
-          hideLabel="Piilota viestiketju"
-        />
+        <Collapse in={opened}>
+          <CommentThreadSpoiler
+            task={task}
+            showLabel="Näytä viestiketju"
+            hideLabel="Piilota viestiketju"
+          />
+        </Collapse>
         <Group gap="xs">
           <StatusInfopill task={task} />
           <Infopill
@@ -96,8 +97,35 @@ export default function TaskAccordionPanel({
             text={task.modified.toRelative()}
             tooltip="Muokattu"
           />
+          <Infopill
+            Icon={IconChecklist}
+            text={task.slite && "Slite"}
+            href={`https://tietoa.slite.com/api/s/${task.slite}`}
+            tooltip="Wiki-linkki"
+          />
           <PriorityInfopill task={task} />
           <VoteInfopill task={task} />
+          {comments?.length && comments.length > 1 && (
+            <Tooltip label="Avaa Slack-kommentit" withArrow>
+              <Indicator
+                label={comments.length - 1}
+                size={18}
+                offset={0}
+                withBorder
+                inline
+                styles={{ indicator: { fontSize: "0.6rem" } }}
+              >
+                <ActionIcon onClick={toggle} {...actionIconProps}>
+                  <IconMessage {...iconProps} />
+                </ActionIcon>
+              </Indicator>
+            </Tooltip>
+          )}
+          <Tooltip label="Muokkaa ehdotusta" withArrow>
+            <ActionIcon onClick={onEdit} {...actionIconProps}>
+              <IconEdit {...iconProps} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Stack>
     </Accordion.Panel>

@@ -29,11 +29,12 @@ export default function EditTaskWidget({
 }) {
   const [editedTask, editTask] = useSetState(initialTask);
   const { usersMap } = useMappedQueries();
-  useHotkeys([["mod+Enter", () => onSave(editedTask)]]);
+  useHotkeys([["mod+Enter", () => onSave(editedTask)]], []);
 
   return (
     <Stack gap="xl">
       <Textarea
+        data-autofocus
         label="Kuvaus"
         description="Kuvausta voi muokata myös Slack-viestiä editoimalla."
         value={editedTask.description}

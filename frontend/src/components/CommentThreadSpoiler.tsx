@@ -1,4 +1,4 @@
-import { Flex, Spoiler, SpoilerProps, Stack } from "@mantine/core";
+import { Divider, Flex, Spoiler, SpoilerProps, Stack } from "@mantine/core";
 import { ExtendedTask } from "../types/Task";
 import useExtendedComments from "../hooks/useExtendedComments";
 import MarkdownFormattedText from "./MarkdownFormattedText";
@@ -16,20 +16,20 @@ export default function CommentThreadSpoiler({
 
   if (comments?.length && comments.length >= 2)
     return (
-      <Spoiler {...others} maxHeight={0}>
-        <Stack gap="xs">
-          {comments.slice(1).map((comment) => (
-            <Flex
-              key={comment.ts}
-              justify="flex-start"
-              align="flex-start"
-              gap="xs"
-            >
-              <UserWidget user={comment.user} showName />
-              <MarkdownFormattedText text={comment.text} />
-            </Flex>
-          ))}
-        </Stack>
-      </Spoiler>
+      // <Spoiler {...others} maxHeight={0}>
+      <Stack gap="xs">
+        {comments.slice(1).map((comment) => (
+          <Flex
+            key={comment.ts}
+            justify="flex-start"
+            align="flex-start"
+            gap="xs"
+          >
+            <UserWidget user={comment.user} showName />
+            <MarkdownFormattedText text={comment.text} />
+          </Flex>
+        ))}
+      </Stack>
+      // </Spoiler>
     );
 }

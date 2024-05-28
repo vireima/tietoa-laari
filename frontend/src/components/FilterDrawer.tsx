@@ -1,6 +1,15 @@
 import { useSearchParams } from "react-router-dom";
 // import useQueries from "../hooks/useQueries";
-import { Divider, Drawer, DrawerProps, Stack } from "@mantine/core";
+import {
+  Divider,
+  Drawer,
+  DrawerProps,
+  Group,
+  Kbd,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import ChannelSelect from "./ChannelSelect";
 import SortOptionsMultiSelect from "./SortOptionsMultiSelect";
 
@@ -36,6 +45,48 @@ export default function FilterDrawer(props: DrawerProps) {
             setSearchParams(searchParams);
           }}
         />
+        <Divider />
+        <Title order={6}>Pikanäppäimiä</Title>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>1</Kbd> / <Kbd>2</Kbd> / <Kbd>3</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Laari / Jono / Maali
+          </Text>
+        </Group>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>F</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Avaa tämä valikko
+          </Text>
+        </Group>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>Ctrl</Kbd>+<Kbd>E</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Muokkaa ehdotusta
+          </Text>
+        </Group>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>Ctrl</Kbd>+<Kbd>Enter</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Tallenna muokkaus
+          </Text>
+        </Group>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>Esc</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Sulje avoin valikko
+          </Text>
+        </Group>
       </Stack>
     </Drawer>
   );

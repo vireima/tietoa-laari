@@ -9,6 +9,7 @@ import {
   useMantineColorScheme,
   Text,
   Tabs,
+  Stack,
 } from "@mantine/core";
 import {
   IconChecklist,
@@ -19,7 +20,7 @@ import {
 } from "@tabler/icons-react";
 import TietoaIcon from "../assets/TietoaIcon";
 import { useHeadroom, useHotkeys } from "@mantine/hooks";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ChannelSelect from "./ChannelSelect";
 
 export default function Header({
@@ -31,9 +32,10 @@ export default function Header({
 }) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const pinned = useHeadroom({ fixedAt: 150 });
   const navigate = useNavigate();
-  const { status } = useParams();
+
   useHotkeys([
     [
       "1",
@@ -60,6 +62,7 @@ export default function Header({
           search: `${searchParams}`,
         }),
     ],
+    ["mod+T", () => toggleColorScheme()],
   ]);
 
   return (
@@ -70,74 +73,99 @@ export default function Header({
           top: 0,
           left: 0,
           right: 0,
-          minHeight: "4rem",
+          minHeight: "2rem",
           transform: `translate3d(0, ${pinned ? 0 : rem(-110)}, 0)`,
           transition: "transform 700ms ease",
         }}
-        p={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
-        pt="xs"
+        radius={0}
       >
-        <Group justify="space-between">
-          <Group>
-            <Burger opened={drawerOpened} onClick={drawerToggle} />
-            <ThemeIcon variant="default" radius="xl" size="lg" visibleFrom="xs">
-              <TietoaIcon />
-            </ThemeIcon>
-            {/* <Title>Laari</Title> */}
-          </Group>
-          <Tabs
-            variant="outline"
-            defaultValue="laari"
-            value={status}
-            onChange={(val) =>
-              navigate({
-                pathname: `/${val}`,
-                search: `${searchParams}`,
-              })
-            }
+        <Stack gap="xs">
+          <Group
+            justify="space-between"
+            pl={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
+            pr={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
+            pt="0.7rem"
+            // bg="gray"
+            style={{ borderBottom: "2px solid var(--mantine-color-gray-3)" }}
           >
-            <Tabs.List justify="center">
-              <Tabs.Tab value="laari" leftSection={<IconSeeding stroke={1} />}>
-                <Text visibleFrom="xs">LAARI</Text>
-              </Tabs.Tab>
-              <Tabs.Tab value="jono" leftSection={<IconChecklist stroke={1} />}>
-                <Text visibleFrom="xs">JONO</Text>
-              </Tabs.Tab>
-              <Tabs.Tab
-                value="maali"
-                leftSection={<IconTargetArrow stroke={1} />}
+            <Group mb="0.7rem">
+              <Burger opened={drawerOpened} onClick={drawerToggle} />
+              <ThemeIcon
+                variant="default"
+                radius="xl"
+                size="lg"
+                visibleFrom="xs"
               >
-                <Text visibleFrom="xs">MAALI</Text>
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs>
-          <Group justify="flex-end">
-            <ChannelSelect
-              visibleFrom="md"
-              placeholder="Slack-kanava..."
-              value={searchParams.get("channel")}
-              onChange={(value) => {
-                value === null
-                  ? searchParams.delete("channel")
-                  : searchParams.set("channel", value);
-                setSearchParams(searchParams);
+                <TietoaIcon />
+              </ThemeIcon>
+            </Group>
+
+            <Tabs
+              variant="default"
+              defaultValue="/laari"
+              value={location.pathname}
+              onChange={(val) =>
+                navigate({
+                  pathname: `${val}`,
+                  search: `${searchParams}`,
+                })
+              }
+              style={{
+                position: "relative",
+                bottom: -2,
               }}
-            />
-            <ActionIcon
-              onClick={toggleColorScheme}
-              variant="filled"
-              radius="xl"
-              size="lg"
-              visibleFrom="xs"
             >
-              {colorScheme !== "dark" ? (
-                <IconMoon size="1.2rem" />
-              ) : (
-                <IconSun size="1.2rem" />
-              )}
-            </ActionIcon>
+              <Tabs.List justify="center">
+                <Tabs.Tab
+                  value="/laari"
+                  leftSection={<IconSeeding stroke={1} />}
+                >
+                  <Text visibleFrom="xs">LAARI</Text>
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="/jono"
+                  leftSection={<IconChecklist stroke={1} />}
+                >
+                  <Text visibleFrom="xs">JONO</Text>
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="/maali"
+                  leftSection={<IconTargetArrow stroke={1} />}
+                >
+                  <Text visibleFrom="xs">MAALI</Text>
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs>
+
+            <Group justify="flex-end" mb="0.7rem">
+              <ChannelSelect
+                visibleFrom="md"
+                placeholder="Slack-kanava..."
+                value={searchParams.get("channel")}
+                onChange={(value) => {
+                  value === null
+                    ? searchParams.delete("channel")
+                    : searchParams.set("channel", value);
+                  setSearchParams(searchParams);
+                }}
+              />
+
+              <ActionIcon
+                onClick={toggleColorScheme}
+                variant="filled"
+                radius="xl"
+                size="lg"
+                visibleFrom="xs"
+              >
+                {colorScheme !== "dark" ? (
+                  <IconMoon size="1.2rem" />
+                ) : (
+                  <IconSun size="1.2rem" />
+                )}
+              </ActionIcon>
+            </Group>
           </Group>
-        </Group>
+        </Stack>
       </Paper>
     </Portal>
   );
