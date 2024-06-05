@@ -10,33 +10,23 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <Box p={{ base: "0.2rem", sm: "1rem", lg: "2rem" }} mt="4rem">
+    <Box
+      p={{ base: "0.2rem", sm: "1rem", lg: "10rem", xl: "20rem" }}
+      pt={0}
+      // w={{ base: "70%", sm: "80%", xs: "95%" }}
+      // ml="auto"
+      // mr="auto"
+      mt="6rem"
+    >
       {tasks?.length ? (
         <Accordion
-          variant="contained"
-          chevronPosition="left"
+          variant="filled"
+          // chevronPosition="left"
           value={selected}
           onChange={setSelected}
         >
           {tasks?.map((task) => (
             <TaskAccordionItem key={task.ts} value={task.ts} task={task} />
-            // <Accordion.Item key={task.ts} value={task.ts}>
-            //   <Accordion.Control icon={<UserWidget user={task.author} />}>
-            //     <Group justify="space-between">
-            //       <MarkdownStrippedText text={task.description} />
-            //       <Group gap="xs">
-            //         <VotesWidget task={task} />
-            //         <PriorityInfopill task={task} />
-            //       </Group>
-            //     </Group>
-            //   </Accordion.Control>
-            //   <TaskAccordionPanel
-            //     task={task}
-            //     onKeyDown={getHotkeyHandler([
-            //       ["E", () => console.log("painettiin e")],
-            //     ])}
-            //   />
-            // </Accordion.Item>
           ))}
         </Accordion>
       ) : (

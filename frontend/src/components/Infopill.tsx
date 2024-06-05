@@ -46,7 +46,7 @@ export function Infopill({
     <Box {...others}>
       {text ? (
         <Tooltip label={tooltip}>
-          <Group gap="xs">
+          <Group gap="xs" wrap="nowrap">
             <ThemeIcon
               variant="transparent"
               color={color}

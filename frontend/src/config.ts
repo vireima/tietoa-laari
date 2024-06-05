@@ -36,7 +36,7 @@ export default sanitizedConfig;
 // Visual config
 
 export const actionIconProps: ActionIconProps = {
-  variant: "filled",
+  variant: "transparent",
   size: "sm",
 };
 
