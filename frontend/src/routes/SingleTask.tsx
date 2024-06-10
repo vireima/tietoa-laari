@@ -1,9 +1,8 @@
-import { Accordion, Box, Stack, Text } from "@mantine/core";
+import { Accordion, Box } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import useSingleTaskQuery from "../hooks/useSingleTaskQuery";
 import useMappedQueries from "../hooks/useMappedQueries";
 import { extendTask } from "../hooks/useFilteredData";
-import TaskAccordionPanel from "../components/TaskAccordionPanel";
 import TaskAccordionItem from "../components/TaskAccordionItem";
 
 export default function SingleTask() {

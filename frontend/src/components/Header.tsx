@@ -62,6 +62,14 @@ export default function Header({
           search: `${searchParams}`,
         }),
     ],
+    [
+      "4",
+      () =>
+        navigate({
+          pathname: `/arkisto`,
+          search: `${searchParams}`,
+        }),
+    ],
     ["mod+T", () => toggleColorScheme()],
   ]);
 

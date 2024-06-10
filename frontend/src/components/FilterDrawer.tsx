@@ -49,10 +49,10 @@ export default function FilterDrawer(props: DrawerProps) {
         <Title order={6}>Pikanäppäimiä</Title>
         <Group>
           <Text size="xs" c="dimmed">
-            <Kbd>1</Kbd> / <Kbd>2</Kbd> / <Kbd>3</Kbd>
+            <Kbd>1</Kbd> / <Kbd>2</Kbd> / <Kbd>3</Kbd> / <Kbd>3</Kbd>
           </Text>
           <Text size="xs" c="dimmed">
-            Laari / Jono / Maali
+            Laari / Jono / Maali / Arkisto
           </Text>
         </Group>
         <Group>
@@ -85,6 +85,14 @@ export default function FilterDrawer(props: DrawerProps) {
           </Text>
           <Text size="xs" c="dimmed">
             Sulje avoin valikko
+          </Text>
+        </Group>
+        <Group>
+          <Text size="xs" c="dimmed">
+            <Kbd>Ctrl</Kbd>+<Kbd>T</Kbd>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Vaihda päivä/yö -teemaa
           </Text>
         </Group>
       </Stack>

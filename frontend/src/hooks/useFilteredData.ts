@@ -98,10 +98,6 @@ export function extendTask(
   channels: Map<string, Channel>,
   users: Map<string, User>
 ): ExtendedTask {
-  console.log("t", task);
-  console.log("a", task.assignees);
-  console.log("is", Array.isArray(task.assignees));
-
   return {
     ...task,
     author: users.get(task.author),
