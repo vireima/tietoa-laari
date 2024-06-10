@@ -4,7 +4,7 @@ import Channel from "../types/Channel";
 import config from "../config";
 
 export default async function getChannels(tasks: InputTask[] | undefined) {
-  if (!tasks) return undefined;
+  if (!tasks) return [];
 
   const uniqueChannels = Array.from(
     new Set(tasks?.map((task) => task.channel))

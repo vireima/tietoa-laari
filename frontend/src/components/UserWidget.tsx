@@ -28,7 +28,7 @@ export default function UserWidget({
             </Stack>
           }
         >
-          <Avatar src={user.profile.image_512} size="md" />
+          <Avatar src={user.profile.image_512} size="sm" />
         </Tooltip>
         {showName && <Text c={`#${user.color}`}>{userDisplayName(user)}</Text>}
       </Group>

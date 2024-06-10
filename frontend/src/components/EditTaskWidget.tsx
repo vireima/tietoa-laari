@@ -6,6 +6,7 @@ import {
   Group,
   SegmentedControl,
   Stack,
+  Switch,
   Textarea,
   Title,
 } from "@mantine/core";
@@ -36,7 +37,7 @@ export default function EditTaskWidget({
       <Textarea
         data-autofocus
         label="Kuvaus"
-        description="Kuvausta voi muokata myös Slack-viestiä editoimalla."
+        description="Ensimmäinen rivi on asian otsikko. Kuvausta voi muokata myös Slack-viestiä editoimalla."
         value={editedTask.description}
         minRows={5}
         autosize
@@ -56,6 +57,8 @@ export default function EditTaskWidget({
         users={usersQuery.data}
       /> */}
       <UsersMultiSelect
+        label="Vastuulliset"
+        description="Toteuttamisesta vastaavat henkilöt. Kuka teki/tekee valmiiksi ja keneltä voi kysyä lisää?"
         value={filterDefined(editedTask.assignees.map((user) => user?.id))}
         onChange={(users) =>
           editTask({
@@ -81,6 +84,16 @@ export default function EditTaskWidget({
         status={editedTask.status.status}
         onStatusChange={(status) =>
           editTask({ status: statuses.find((st) => st.status === status) })
+        }
+      />
+      <Divider />
+      <Switch
+        label="Arkistoi"
+        description="Arkistoi ehdotus. Ei näy sen jälkeen enää missään. Arkistoi tuplat, turhat ja virheet."
+        checked={editedTask.archived}
+        color="red"
+        onChange={(event) =>
+          editTask({ archived: event.currentTarget.checked })
         }
       />
       <Group>

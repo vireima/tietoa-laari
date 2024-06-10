@@ -6,7 +6,7 @@ export interface Filter {
   channel?: string[];
   after?: DateTime;
   author?: string[];
-  assignee?: string[];
+  assignees?: string[];
   priority?: number;
   votes?: number;
   tags?: string[];

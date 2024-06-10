@@ -23,7 +23,7 @@ export default function useFilters(override: Filter) {
       .concat(filters?.status ?? []) as Status[],
     channel: searchParams.getAll("channel").concat(filters?.channel ?? []),
     author: searchParams.getAll("author").concat(filters?.author ?? []),
-    assignee: searchParams.getAll("assignee").concat(filters?.assignee ?? []),
+    assignees: searchParams.getAll("assignee").concat(filters?.assignees ?? []),
     after: filters?.after
       ? DateTime.max(afterDateTime, filters.after)
       : afterDateTime,
@@ -34,7 +34,7 @@ export default function useFilters(override: Filter) {
     archived:
       searchParams.get("archived") !== null
         ? Boolean(searchParams.get("archived"))
-        : undefined,
+        : filters.archived,
   };
 
   return { filters: combined };

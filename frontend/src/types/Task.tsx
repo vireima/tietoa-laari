@@ -15,7 +15,7 @@ export interface OutputVote {
 
 export interface InputTask {
   author: string;
-  assignee: string | undefined;
+  // assignee: string | undefined;
   assignees: string[];
   channel: string;
   created: string;
@@ -27,12 +27,13 @@ export interface InputTask {
   votes: InputVote[];
   tags: string[];
   slite: string | undefined;
+  archived: boolean;
   _id: string;
 }
 
 export interface ExtendedTask {
   author?: User;
-  assignee?: User;
+  // assignee?: User;
   assignees: (User | undefined)[];
   channel?: Channel;
   created: DateTime;
@@ -44,5 +45,6 @@ export interface ExtendedTask {
   votes: OutputVote[];
   tags: string[];
   slite?: string;
+  archived: boolean;
   _id: string;
 }

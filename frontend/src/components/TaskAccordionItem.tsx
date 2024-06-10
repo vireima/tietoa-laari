@@ -6,6 +6,7 @@ import {
   Group,
   Modal,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { getHotkeyHandler, useDisclosure } from "@mantine/hooks";
 import { PriorityInfopill } from "./Infopill";
@@ -16,6 +17,7 @@ import { ExtendedTask } from "../types/Task";
 import EditTaskWidget from "./EditTaskWidget";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import patchTasks from "../api/patchTasks";
+import { userDisplayName } from "../api/getUsers";
 
 interface TaskAccordionItemProps extends AccordionItemProps {
   task: ExtendedTask;
@@ -60,7 +62,15 @@ export default function TaskAccordionItem({
           <Grid.Col span={1}>
             <Avatar.Group>
               {task.assignees.map((assignee) => (
-                <Avatar src={assignee?.profile.image_512} size="sm" />
+                <Tooltip
+                  label={
+                    assignee?.profile.real_name || userDisplayName(assignee)
+                  }
+                  withArrow
+                  key={assignee?.id}
+                >
+                  <Avatar src={assignee?.profile.image_512} size="sm" />
+                </Tooltip>
               ))}
             </Avatar.Group>
           </Grid.Col>

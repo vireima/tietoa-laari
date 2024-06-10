@@ -35,7 +35,7 @@ export default function StatusSelect({
       }}
       {...others}
     >
-      {statuses.map((st, index) => (
+      {statuses.slice(0, -1).map((st, index) => (
         <Stepper.Step
           label={st.label}
           description={st.description}

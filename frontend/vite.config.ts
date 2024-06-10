@@ -7,6 +7,9 @@ export default defineConfig(({ mode }) => {
   return {
     define: {
       "process.env.API_URL": JSON.stringify(env.API_URL),
+      "process.env.RAILWAY_PUBLIC_DOMAIN": JSON.stringify(
+        env.RAILWAY_PUBLIC_DOMAIN
+      ),
     },
     plugins: [react()],
   };

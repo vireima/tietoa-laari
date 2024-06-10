@@ -4,22 +4,23 @@ import {
   ActionIcon,
   Box,
   Collapse,
-  Divider,
   Flex,
   Group,
   Indicator,
   LoadingOverlay,
   Stack,
   Tooltip,
+  CopyButton,
 } from "@mantine/core";
 import {
   IconUserCircle,
   IconUserCheck,
   IconCalendarUp,
   IconCalendarDot,
-  IconEdit,
   IconMessage,
   IconChecklist,
+  IconLink,
+  IconPencil,
 } from "@tabler/icons-react";
 import { DateTime } from "ts-luxon";
 import { userDisplayName } from "../api/getUsers";
@@ -34,7 +35,7 @@ import { ExtendedTask } from "../types/Task";
 import MarkdownFormattedText from "./MarkdownFormattedText";
 import CommentThreadSpoiler from "./CommentThreadSpoiler";
 import { useDisclosure } from "@mantine/hooks";
-import { actionIconProps, iconProps } from "../config";
+import config, { actionIconProps, iconProps } from "../config";
 import useExtendedComments from "../hooks/useExtendedComments";
 
 interface TaskAccordionPanelProps extends AccordionPanelProps {
@@ -58,7 +59,7 @@ export default function TaskAccordionPanel({
         <Flex align="flex-start" justify="space-between">
           <MarkdownFormattedText text={task.description} />
         </Flex>
-        <Divider />
+        {/* <Divider /> */}
         <Collapse in={opened}>
           <CommentThreadSpoiler
             task={task}
@@ -121,12 +122,26 @@ export default function TaskAccordionPanel({
               </Indicator>
             </Tooltip>
           )}
+          <CopyButton
+            value={`https://${config.RAILWAY_PUBLIC_DOMAIN}/${task.channel?.id}/${task.ts}`}
+          >
+            {({ copied, copy }) => (
+              <Tooltip label={copied ? "Kopioitu!" : "Permalinkki"} withArrow>
+                <ActionIcon onClick={copy} {...actionIconProps}>
+                  <IconLink {...iconProps} />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </CopyButton>
           <Tooltip label="Muokkaa ehdotusta" withArrow>
             <ActionIcon onClick={onEdit} {...actionIconProps}>
-              <IconEdit {...iconProps} />
+              <IconPencil {...iconProps} />
             </ActionIcon>
           </Tooltip>
         </Group>
+        {/* <Text c="dimmed" size="xs">
+          {task.channel?.id} {task.ts}
+        </Text> */}
       </Stack>
     </Accordion.Panel>
   );

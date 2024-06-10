@@ -6,15 +6,18 @@ import { ActionIconProps } from "@mantine/core";
 
 interface ENV {
   API_URL?: string;
+  RAILWAY_PUBLIC_DOMAIN?: string;
 }
 
 interface Config {
   API_URL: string;
+  RAILWAY_PUBLIC_DOMAIN: string;
 }
 
 const getConfig = (): ENV => {
   return {
     API_URL: process.env.API_URL,
+    RAILWAY_PUBLIC_DOMAIN: process.env.RAILWAY_PUBLIC_DOMAIN,
   };
 };
 

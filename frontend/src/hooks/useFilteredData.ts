@@ -10,31 +10,40 @@ import { Filter } from "../types/Filter";
 import useFilters from "./useFilters";
 import useQueries from "./useQueries";
 
-function filterTasks(tasks: ExtendedTask[], filter: Filter) {
-  return tasks?.filter(
+const isUser = (user: User | undefined): user is User => {
+  return !!user;
+};
+
+export function filterTasks(tasks: ExtendedTask[], filter: Filter) {
+  return tasks.filter(
     (task) =>
-      !!filter.status &&
-      filter.status.length >= 1 &&
-      filter.status.includes(task.status.status) &&
-      !!filter.priority &&
-      task.priority >= filter.priority &&
+      (!filter.status?.length ||
+        (!!filter.status &&
+          filter.status.length >= 1 &&
+          filter.status.includes(task.status.status))) &&
       (!filter.channel?.length ||
         (!!filter.channel &&
           filter.channel.length >= 1 &&
           task.channel &&
           filter.channel.includes(task.channel.id))) &&
+      !!filter.archived === task.archived &&
       (!filter.author?.length ||
         (!!filter.author &&
           filter.author.length >= 1 &&
           task.author &&
           filter.author.includes(task.author.id))) &&
-      (!filter.assignee?.length ||
-        (!!filter.assignee &&
-          filter.assignee.length >= 1 &&
-          !!task.assignee &&
-          filter.assignee.includes(task.assignee.id))) &&
-      !!filter.after &&
-      task.created >= filter.after &&
+      (!filter.assignees?.length ||
+        (!!filter.assignees &&
+          filter.assignees.length >= 1 &&
+          !!task.assignees &&
+          filter.assignees.some((assignee) =>
+            task.assignees
+              .filter(isUser)
+              .map((a) => a.id)
+              .includes(assignee)
+          ))) &&
+      (!filter.after || task.created >= filter.after) &&
+      (!filter.priority || task.priority >= filter.priority) &&
       (!filter.tags?.length ||
         (!!filter.tags &&
           filter.tags.length >= 1 &&
@@ -65,12 +74,16 @@ function cmpAuthor(a: ExtendedTask, b: ExtendedTask) {
   return userDisplayName(a.author).localeCompare(userDisplayName(b.author));
 }
 
-function cmpAssignee(a: ExtendedTask, b: ExtendedTask) {
-  if (!a.assignee && !b.assignee) return 0;
-  if (!a.assignee) return -1;
-  if (!b.assignee) return 1;
-  return userDisplayName(a.assignee).localeCompare(userDisplayName(b.assignee));
+function cmpAssignees(a: ExtendedTask, b: ExtendedTask) {
+  return b.assignees.length - a.assignees.length;
 }
+
+// function cmpAssignee(a: ExtendedTask, b: ExtendedTask) {
+//   if (!a.assignee && !b.assignee) return 0;
+//   if (!a.assignee) return -1;
+//   if (!b.assignee) return 1;
+//   return userDisplayName(a.assignee).localeCompare(userDisplayName(b.assignee));
+// }
 
 function cmpPriority(a: ExtendedTask, b: ExtendedTask) {
   return b.priority - a.priority;
@@ -80,37 +93,46 @@ function cmpVotes(a: ExtendedTask, b: ExtendedTask) {
   return b.votes.length - a.votes.length;
 }
 
+export function extendTask(
+  task: InputTask,
+  channels: Map<string, Channel>,
+  users: Map<string, User>
+): ExtendedTask {
+  console.log("t", task);
+  console.log("a", task.assignees);
+  console.log("is", Array.isArray(task.assignees));
+
+  return {
+    ...task,
+    author: users.get(task.author),
+    assignees: task.assignees.map((assignee) => {
+      return users.get(assignee);
+    }),
+    channel: channels.get(task.channel) || <Channel>{ id: task.channel },
+    created: DateTime.fromISO(task.created).setLocale("fi-FI"),
+    modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
+    status: statuses.find((s) => s.status === task.status) || statuses[0],
+    votes: task.votes.map((vote) => {
+      return <OutputVote>{
+        reaction: convertEmoji(`:${vote.reaction}:`),
+        user: users.get(vote.user),
+      };
+    }),
+  };
+}
+
 function inputToExtendedTasks(
   tasks: InputTask[] | undefined,
   channels: Channel[] | undefined,
   users: User[] | undefined
-) {
+): ExtendedTask[] {
   if (tasks) {
     const channelsMap = new Map(
       channels && channels.map((channel) => [channel.id, channel])
     );
     const usersMap = new Map(users && users.map((user) => [user.id, user]));
 
-    return tasks.map((task) => {
-      return {
-        ...task,
-        author: usersMap.get(task.author),
-        assignee: task.assignee && usersMap.get(task.assignee),
-        assignees: task.assignees.map((assignee) => {
-          return usersMap.get(assignee);
-        }),
-        channel: channelsMap.get(task.channel) || { id: task.channel },
-        created: DateTime.fromISO(task.created).setLocale("fi-FI"),
-        modified: DateTime.fromISO(task.modified).setLocale("fi-FI"),
-        status: statuses.find((s) => s.status === task.status),
-        votes: task.votes.map((vote) => {
-          return <OutputVote>{
-            reaction: convertEmoji(`:${vote.reaction}:`),
-            user: usersMap.get(vote.user),
-          };
-        }),
-      } as ExtendedTask;
-    });
+    return tasks.map((task) => extendTask(task, channelsMap, usersMap));
   }
 
   return [];
@@ -135,7 +157,7 @@ export function useFilteredData(pathFilters?: Filter) {
     ["modified", cmpModified],
     ["channel", cmpChannel],
     ["author", cmpAuthor],
-    ["assignee", cmpAssignee],
+    ["assignees", cmpAssignees],
     ["priority", cmpPriority],
     ["votes", cmpVotes],
   ]);

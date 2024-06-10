@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import TaskAccordion from "./routes/TaskAccordion";
 import config from "./config";
 import { CookiesProvider } from "react-cookie";
+import SingleTask from "./routes/SingleTask";
 
 const theme = createTheme({});
 const queryClient = new QueryClient();
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
       {
         path: "maali/:unit?",
         element: <TaskAccordion filter={{ status: ["done"] }} />,
+      },
+      {
+        path: "arkisto",
+        element: <TaskAccordion filter={{ archived: true }} />,
+      },
+      {
+        path: ":channel/:ts",
+        element: <SingleTask />,
       },
     ],
   },
