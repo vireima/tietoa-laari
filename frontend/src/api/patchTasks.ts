@@ -6,7 +6,6 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
   const payload = tasks.map((task) => ({
     ...task,
     author: task.author?.id,
-    assignee: task.assignee?.id,
     assignees: task.assignees.map((assignee) => assignee?.id),
     channel: task.channel?.id,
     created: task.created.toJSDate(),
