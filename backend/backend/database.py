@@ -95,7 +95,9 @@ class Database:
         """
         Queries the database for (all the) tasks.
         """
-        query = {} if include_archived else {"archived": False}
+        query: dict[str, str | bool | ObjectId] = (
+            {} if include_archived else {"archived": False}
+        )
 
         if task_id is not None:
             query.update({"_id": ObjectId(task_id)})

@@ -6,11 +6,13 @@ from backend.slack import Slack
 
 
 def format_channel(channel: str, channels: list[SlackChannelModel]) -> str:
-    return f"#{next((ch.name for ch in channels if ch.id == channel), "<tyhjä>")}"
+    return f"#{next((ch.name for ch in channels if ch.id == channel), '<tyhjä>')}"
 
 
 def format_user(user: str, users: list[SlackUserModel]) -> str:
-    return next((usr.profile.display_name for usr in users if usr.id == user), "<tyhjä>")
+    return next(
+        (usr.profile.display_name for usr in users if usr.id == user), "<tyhjä>"
+    )
 
 
 def task_to_html(

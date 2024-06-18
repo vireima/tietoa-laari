@@ -225,14 +225,14 @@ async def process(
 @multimethod
 async def process(
     event: models.MentionEventModel, background_tasks: BackgroundTasks
-) -> None:  # noqa: F811
+) -> None:
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
 @multimethod
 async def process(
     event: models.ReactionEventModel, background_tasks: BackgroundTasks
-) -> None:  # noqa: F811
+) -> None:
     logger.success(
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
@@ -255,7 +255,7 @@ async def process(
 @multimethod
 async def process(
     event: models.MessageEventModel, background_tasks: BackgroundTasks
-) -> None:  # noqa: F811
+) -> None:
     logger.trace("Processing a message")
     await process_message_subtypes(event.event, background_tasks)
 
