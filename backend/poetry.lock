@@ -753,6 +753,17 @@ typing-extensions = ">=4.7.0"
 dev = ["coverage", "pytest (>=7.4.4)"]
 
 [[package]]
+name = "emoji-data-python"
+version = "1.5.0"
+description = "Python emoji toolkit"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "emoji_data_python-1.5.0-py3-none-any.whl", hash = "sha256:0c6015dea8734f054082f52146f4f553f03f46200031dab15ad2a554aef6a8f2"},
+    {file = "emoji_data_python-1.5.0.tar.gz", hash = "sha256:a9359d46d123971e430f6e1d3d4c1a11f2a90e2ff0b2ef390d099dafdde6c0d0"},
+]
+
+[[package]]
 name = "executing"
 version = "2.0.1"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -3185,4 +3196,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0bc16bd3853fa26da6d0efd6bb228631bb04a300b8316ff428875733cc57c464"
+content-hash = "98d82dc4066d872ace6f5299d8e1f168620d316d820e2b0935f134b247c2f611"

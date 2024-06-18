@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 
 import arrow
 import emoji
+import emoji_data_python
 import pytz
 from bson import ObjectId
 from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, ConfigDict, Field
@@ -41,14 +42,14 @@ def validate_reaction(reaction: str) -> str:
     """
     Validates a reaction text ("smile") into a emoji 🙂
     """
-    return emoji.emojize(f":{reaction}:", variant="emoji_type", language="alias")
+    return emoji_data_python.replace_colons(reaction)
 
 
 def validate_description(desc: str) -> str:
     """
     Validates a description text by changing emoji shortcodes into emojis.
     """
-    return emoji.emojize(desc, variant="emoji_type", language="alias")
+    return emoji_data_python.replace_colons(desc)
 
 
 DatetimeUTC = Annotated[datetime, BeforeValidator(validate_utc_datetime)]
