@@ -121,14 +121,14 @@ async def root():
 
 @logger.catch
 @app.get("/tasks")
-async def get_tasks():
-    return await db.query()
+async def get_tasks(include_archived: bool = False):
+    return await db.query(include_archived=include_archived)
 
 
 @logger.catch
 @app.get("/tasks/{channel}")
-async def get_tasks_by_channel(channel: str):
-    return await db.query(channel=channel)
+async def get_tasks_by_channel(channel: str, include_archived: bool = False):
+    return await db.query(channel=channel, include_archived=include_archived)
 
 
 @logger.catch

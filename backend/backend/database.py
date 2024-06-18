@@ -90,11 +90,12 @@ class Database:
         task_id: str | None = None,
         ts: str | None = None,
         channel: str | None = None,
+        include_archived: bool = False,
     ) -> list[models.TaskOutputModel]:
         """
         Queries the database for (all the) tasks.
         """
-        query = {}
+        query = {} if include_archived else {"archived": False}
 
         if task_id is not None:
             query.update({"_id": ObjectId(task_id)})
