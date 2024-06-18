@@ -6,17 +6,17 @@ import sys
 import time
 
 import orjson
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
 from multimethod import multimethod
-from slack_sdk.errors import SlackApiError
 from starlette.responses import Response
 
 from backend import models
 from backend.database import db
 from backend.slack import slack_client
+from backend.slite import make_slite_page
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
 
@@ -146,20 +146,26 @@ async def get_task_comments(channel: str, ts: str):
 @logger.catch
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
-    return await db.delete(task_id)
+    cached = await db.delete(task_id)
+    await update_slite()
+    return cached
 
 
 @logger.catch
 @app.patch("/tasks")
 async def patch_tasks(tasks: list[models.TaskUpdateModel]):
     await db.patch(tasks)
+    await update_slite()
+
     return await db.query([str(task.id) for task in tasks])
 
 
 @logger.catch
 @app.delete("/tasks")
 async def delete_tasks(tasks: list[models.TaskUpdateModel]):
-    return await db.delete(tasks)
+    cached = await db.delete(tasks)
+    await update_slite()
+    return cached
 
 
 @logger.catch
@@ -234,6 +240,8 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
                 vote, event.event.item.channel, event.event.item.ts
             )
 
+    await update_slite()
+
 
 @multimethod
 async def process(event: models.MessageEventModel) -> None:  # noqa: F811
@@ -256,19 +264,25 @@ async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
         await db.insert_task(msg)
         logger.success("Inserted a task.")
 
+        await update_slite()
+
 
 @multimethod
 async def process_message_subtypes(  # noqa: F811
     msg: models.InnerMessageChangedEvent,
 ) -> None:
     logger.trace("Processing an update message")
+
     result = await db.update_task(msg)
+
     if not result:
         logger.error(f"Update failed: {msg.channel}/{msg.ts} '{msg.message.text}'")
     else:
         logger.success(
             f"Updated a task: description='{result.description}', mod={result.modified}"
         )
+
+        await update_slite()
 
 
 @multimethod
@@ -277,3 +291,8 @@ async def process_message_subtypes(  # noqa: F811
 ) -> None:
     logger.trace("Processing a deletion")
     logger.warning(f"Message deleted in Slack ({msg.channel}/{msg.deleted_ts})")
+
+
+async def update_slite():
+    logger.trace("Updating Slite page")
+    await make_slite_page(await db.query(), slack_client)

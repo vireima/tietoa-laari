@@ -30,7 +30,7 @@ class Slack:
         return [user for user in user_models if not (user.deleted or user.is_bot)]
 
     @AsyncTTL(time_to_live=60 * 5)
-    async def channels(self):
+    async def channels(self) -> list[models.SlackChannelModel]:
         """
         Retrieves all channels in the team as a list. Cached for 5 mins.
         """
@@ -41,14 +41,15 @@ class Slack:
         ):
             channels += page.get("channels", [])
 
-        return channels
+        return [models.SlackChannelModel(**channel) for channel in channels]
 
-    async def channel(self, channel: str):
+    async def channel(self, channel: str) -> models.SlackChannelModel | None:
         """
         Retrieves information about one channel or group.
         """
         async for page in await self.client.conversations_info(channel=channel):
-            return page.get("channel", None)
+            channel_dict = page.get("channel", None)
+            return models.SlackChannelModel(**channel_dict) if channel_dict else None
 
     async def comments(self, channel: str, ts: str):
         REPLY_PAGE_LIMIT = 150

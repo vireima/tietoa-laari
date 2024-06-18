@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 import arrow
 import pytz
 from bson import ObjectId
-from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, Field
+from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, ConfigDict, Field
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
@@ -208,3 +208,17 @@ class SlackUserModel(BaseModel):
     updated: int
     profile: SlackProfileModel
     is_bot: bool
+
+
+# Channel models
+class SlackChannelModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: str
+    name: str
+    is_channel: bool
+    is_group: bool
+    is_im: bool
+    is_mpim: bool
+    is_private: bool
+    is_archived: bool
