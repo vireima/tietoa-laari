@@ -37,7 +37,9 @@ class Slack:
         CHANNELS_PAGE_LIMIT = 150
         channels = []
         async for page in await self.client.conversations_list(
-            limit=CHANNELS_PAGE_LIMIT, exclude_archived=True
+            limit=CHANNELS_PAGE_LIMIT,
+            exclude_archived=True,
+            types="public_channel,private_channel,im",
         ):
             channels += page.get("channels", [])
 

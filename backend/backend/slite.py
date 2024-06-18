@@ -5,8 +5,13 @@ from backend.models import SlackChannelModel, SlackUserModel, TaskOutputModel
 from backend.slack import Slack
 
 
-def format_channel(channel: str, channels: list[SlackChannelModel]) -> str:
-    return f"#{next((ch.name for ch in channels if ch.id == channel), '<tyhjä>')}"
+def format_channel(channel_id: str, channels: list[SlackChannelModel]) -> str:
+    channel = next((ch for ch in channels if ch.id == channel), None)
+
+    if not channel:
+        return ""
+
+    return f"#{channel.name}"
 
 
 def format_user(user: str, users: list[SlackUserModel]) -> str:
@@ -29,7 +34,7 @@ def task_to_html(
         <td>{author}</td>
         <td>{channel}</td>
         <td>{task.created}</td>
-        <td>{task.slite}</td>
+        <td>{task.slite if task.slite else ""}</td>
         <td>{task.status.name}</td>
         <td>{len(task.votes)}</td>
         <td><a href='{f"https://{settings.frontend_url}/{task.channel}/{task.ts}"}'>Linkki</a></td>
