@@ -215,10 +215,11 @@ class SlackChannelModel(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     id: str
-    name: str
-    is_channel: bool
-    is_group: bool
-    is_im: bool
-    is_mpim: bool
-    is_private: bool
-    is_archived: bool
+    name: str = ""
+    is_channel: bool = False
+    is_group: bool = False
+    is_im: bool = False
+    is_mpim: bool = False
+    is_private: bool = False
+    is_archived: bool = False
+    user: str = ""
