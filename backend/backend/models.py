@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Annotated, Literal
 
 import arrow
+import emoji
 import pytz
 from bson import ObjectId
 from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, ConfigDict, Field
@@ -36,8 +37,24 @@ def validate_local_datetime(dt: datetime | str) -> datetime:
     return TZ_LOCAL.localize(dt) if dt.tzinfo is None else dt
 
 
+def validate_reaction(reaction: str) -> str:
+    """
+    Validates a reaction text ("smile") into a emoji 🙂
+    """
+    return emoji.emojize(f":{reaction}:", variant="emoji_type", language="alias")
+
+
+def validate_description(desc: str) -> str:
+    """
+    Validates a description text by changing emoji shortcodes into emojis.
+    """
+    return emoji.emojize(desc, variant="emoji_type", language="alias")
+
+
 DatetimeUTC = Annotated[datetime, BeforeValidator(validate_utc_datetime)]
 DatetimeLocal = Annotated[datetime, BeforeValidator(validate_local_datetime)]
+EmojiDescription = Annotated[str, BeforeValidator(validate_description)]
+UnicodeReaction = Annotated[str, BeforeValidator(validate_reaction)]
 
 
 # Slack input models
@@ -118,7 +135,7 @@ class ReactionItem(BaseModel):
 class InnerReactionEvent(BaseModel):
     type: Literal["reaction_added", "reaction_removed"]
     user: str
-    reaction: str
+    reaction: UnicodeReaction
     item_user: str
     event_ts: str
     item: ReactionItem
@@ -143,7 +160,7 @@ class VerificationModel(BaseModel):
 
 
 class Reaction(BaseModel):
-    reaction: str
+    reaction: UnicodeReaction
     user: str
 
 
@@ -162,7 +179,7 @@ class TaskInputModel(BaseModel):
     slite: str | None = None
     channel: str
     ts: str
-    description: str | None = None
+    description: EmojiDescription | None = None
     priority: int = 0
     created: DatetimeUTC
     modified: DatetimeUTC
@@ -176,7 +193,7 @@ class TaskUpdateModel(BaseModel):
     id: PyObjectId = Field(alias="_id")
     assignee: str | None = None
     assignees: list[str] | None = None
-    description: str | None = None
+    description: EmojiDescription | None = None
     priority: int | None = None
     modified: DatetimeUTC | None = None
     votes: list[Reaction] | None = None

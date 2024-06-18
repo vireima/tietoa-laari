@@ -4,7 +4,6 @@ import { DateTime } from "ts-luxon";
 import { ExtendedTask, InputTask, OutputVote } from "../types/Task";
 import Channel from "../types/Channel";
 import User from "../types/User";
-import convertEmoji from "../api/convertEmoji";
 import { statuses } from "../types/Status";
 import { Filter } from "../types/Filter";
 import useFilters from "./useFilters";
@@ -100,7 +99,7 @@ export function extendTask(
 ): ExtendedTask {
   return {
     ...task,
-    description: convertEmoji(task.description),
+    description: task.description,
     author: users.get(task.author),
     assignees: task.assignees.map((assignee) => {
       return users.get(assignee);
@@ -111,7 +110,7 @@ export function extendTask(
     status: statuses.find((s) => s.status === task.status) || statuses[0],
     votes: task.votes.map((vote) => {
       return <OutputVote>{
-        reaction: convertEmoji(`:${vote.reaction}:`),
+        reaction: vote.reaction,
         user: users.get(vote.user),
       };
     }),
