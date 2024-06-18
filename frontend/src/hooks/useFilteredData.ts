@@ -100,6 +100,7 @@ export function extendTask(
 ): ExtendedTask {
   return {
     ...task,
+    description: convertEmoji(task.description),
     author: users.get(task.author),
     assignees: task.assignees.map((assignee) => {
       return users.get(assignee);

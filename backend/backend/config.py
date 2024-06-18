@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     slack_bot_token: str
     slite_api_key: str
     slite_note_id: str
+    frontend_url: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="allow"

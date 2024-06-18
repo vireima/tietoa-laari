@@ -6,11 +6,11 @@ from backend.slack import Slack
 
 
 def format_channel(channel: str, channels: list[SlackChannelModel]) -> str:
-    return channel
+    return f"#{next((ch.name for ch in channels if ch.id == channel), "<tyhjä>")}"
 
 
 def format_user(user: str, users: list[SlackUserModel]) -> str:
-    return user
+    return next((usr.profile.display_name for usr in users if usr.id == user), "<tyhjä>")
 
 
 def task_to_html(
@@ -28,8 +28,10 @@ def task_to_html(
         <td>{channel}</td>
         <td>{task.created}</td>
         <td>{task.slite}</td>
-        <td>{task.status}</td>
+        <td>{task.status.name}</td>
         <td>{len(task.votes)}</td>
+        <td><a href='{f"https://{settings.frontend_url}/{task.channel}/{task.ts}"}'>Linkki</a></td>
+        <td><a href='{f"https://tietoa.slack.com/archives/{task.channel}/p{task.ts}"}'>SLinkki</a></td>
     </tr>"""
 
 
@@ -47,6 +49,8 @@ def tasks_to_html(
             <th>Slite-linkki</th>
             <th>Status</th>
             <th>Slack-reaktioiden määrä</th>
+            <th>Linkki</th>
+            <th>Slack-linkki</th>
         </tr>
         {"".join(task_to_html(task, channels, users) for task in tasks)}
     </table>"""

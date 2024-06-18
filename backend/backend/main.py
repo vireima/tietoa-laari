@@ -6,7 +6,7 @@ import sys
 import time
 
 import orjson
-from fastapi import FastAPI, Request
+from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
@@ -201,18 +201,21 @@ async def events_api_endpoint(
         | models.MessageEventModel
         | models.MentionEventModel
     ),
+    background_tasks: BackgroundTasks,
 ):
     """
     Respond to an incoming Slack Events API event.
     """
-    return await process(body)
+    return await process(body, background_tasks)
 
 
 ### Events API ###
 
 
 @multimethod
-async def process(event: models.VerificationModel) -> str:
+async def process(
+    event: models.VerificationModel, background_tasks: BackgroundTasks
+) -> str:
     """
     Respond to the Slack verification request with plaintext.
     """
@@ -220,12 +223,16 @@ async def process(event: models.VerificationModel) -> str:
 
 
 @multimethod
-async def process(event: models.MentionEventModel) -> None:  # noqa: F811
+async def process(
+    event: models.MentionEventModel, background_tasks: BackgroundTasks
+) -> None:  # noqa: F811
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
 @multimethod
-async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
+async def process(
+    event: models.ReactionEventModel, background_tasks: BackgroundTasks
+) -> None:  # noqa: F811
     logger.success(
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
@@ -240,17 +247,23 @@ async def process(event: models.ReactionEventModel) -> None:  # noqa: F811
                 vote, event.event.item.channel, event.event.item.ts
             )
 
-    await update_slite()
+    logger.trace("Adding bg task")
+    background_tasks.add_task(update_slite)
+    logger.trace("Returning from reaction process()")
 
 
 @multimethod
-async def process(event: models.MessageEventModel) -> None:  # noqa: F811
+async def process(
+    event: models.MessageEventModel, background_tasks: BackgroundTasks
+) -> None:  # noqa: F811
     logger.trace("Processing a message")
-    await process_message_subtypes(event.event)
+    await process_message_subtypes(event.event, background_tasks)
 
 
 @multimethod
-async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
+async def process_message_subtypes(
+    msg: models.InnerMessageEvent, background_tasks: BackgroundTasks
+) -> None:
     logger.trace("Processing a new message")
     if msg.thread_ts is not None:
         logger.debug("This is a thread reply.")
@@ -264,12 +277,14 @@ async def process_message_subtypes(msg: models.InnerMessageEvent) -> None:
         await db.insert_task(msg)
         logger.success("Inserted a task.")
 
-        await update_slite()
+        logger.trace("Adding bg task")
+        background_tasks.add_task(update_slite)
+        logger.trace("Returning from new message process()")
 
 
 @multimethod
 async def process_message_subtypes(  # noqa: F811
-    msg: models.InnerMessageChangedEvent,
+    msg: models.InnerMessageChangedEvent, background_tasks: BackgroundTasks
 ) -> None:
     logger.trace("Processing an update message")
 
@@ -282,7 +297,9 @@ async def process_message_subtypes(  # noqa: F811
             f"Updated a task: description='{result.description}', mod={result.modified}"
         )
 
-        await update_slite()
+        logger.trace("Adding bg task")
+        background_tasks.add_task(update_slite)
+        logger.trace("Returning from edit message process()")
 
 
 @multimethod
@@ -294,5 +311,6 @@ async def process_message_subtypes(  # noqa: F811
 
 
 async def update_slite():
-    logger.trace("Updating Slite page")
+    logger.trace("Updating Slite page...")
     await make_slite_page(await db.query(), slack_client)
+    logger.trace("Updated.")
