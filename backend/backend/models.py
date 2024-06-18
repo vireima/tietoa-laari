@@ -42,7 +42,7 @@ def validate_reaction(reaction: str) -> str:
     """
     Validates a reaction text ("smile") into a emoji 🙂
     """
-    return emoji_data_python.replace_colons(reaction)
+    return emoji_data_python.replace_colons(f":{reaction}:")
 
 
 def validate_description(desc: str) -> str:
