@@ -247,9 +247,7 @@ async def process(
                 vote, event.event.item.channel, event.event.item.ts
             )
 
-    logger.trace("Adding bg task")
-    background_tasks.add_task(update_slite)
-    logger.trace("Returning from reaction process()")
+    await update_slite()
 
 
 @multimethod
@@ -277,9 +275,7 @@ async def process_message_subtypes(
         await db.insert_task(msg)
         logger.success("Inserted a task.")
 
-        logger.trace("Adding bg task")
-        background_tasks.add_task(update_slite)
-        logger.trace("Returning from new message process()")
+        await update_slite()
 
 
 @multimethod
@@ -297,9 +293,7 @@ async def process_message_subtypes(  # noqa: F811
             f"Updated a task: description='{result.description}', mod={result.modified}"
         )
 
-        logger.trace("Adding bg task")
-        background_tasks.add_task(update_slite)
-        logger.trace("Returning from edit message process()")
+        await update_slite()
 
 
 @multimethod

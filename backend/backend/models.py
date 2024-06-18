@@ -136,7 +136,7 @@ class ReactionItem(BaseModel):
 class InnerReactionEvent(BaseModel):
     type: Literal["reaction_added", "reaction_removed"]
     user: str
-    reaction: UnicodeReaction
+    reaction: str
     item_user: str
     event_ts: str
     item: ReactionItem
