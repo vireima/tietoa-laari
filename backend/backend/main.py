@@ -214,7 +214,7 @@ async def events_api_endpoint(
 
 @multimethod
 async def process(
-    event: models.VerificationModel, background_tasks: BackgroundTasks
+    event: models.VerificationModel, background_tasks: BackgroundTasks  # noqa: ARG001
 ) -> str:
     """
     Respond to the Slack verification request with plaintext.
@@ -223,15 +223,15 @@ async def process(
 
 
 @multimethod
-async def process(
-    event: models.MentionEventModel, background_tasks: BackgroundTasks
+async def process(  # noqa: F811
+    event: models.MentionEventModel, background_tasks: BackgroundTasks  # noqa: ARG001
 ) -> None:
     logger.success(f"Mention event! '{event.event.text}' by {event.event.user}")
 
 
 @multimethod
-async def process(
-    event: models.ReactionEventModel, background_tasks: BackgroundTasks
+async def process(  # noqa: F811
+    event: models.ReactionEventModel, background_tasks: BackgroundTasks  # noqa: ARG001
 ) -> None:
     logger.success(
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
@@ -251,7 +251,7 @@ async def process(
 
 
 @multimethod
-async def process(
+async def process(  # noqa: F811
     event: models.MessageEventModel, background_tasks: BackgroundTasks
 ) -> None:
     logger.trace("Processing a message")
@@ -260,7 +260,7 @@ async def process(
 
 @multimethod
 async def process_message_subtypes(
-    msg: models.InnerMessageEvent, background_tasks: BackgroundTasks
+    msg: models.InnerMessageEvent, background_tasks: BackgroundTasks  # noqa: ARG001
 ) -> None:
     logger.trace("Processing a new message")
     if msg.thread_ts is not None:
@@ -280,7 +280,8 @@ async def process_message_subtypes(
 
 @multimethod
 async def process_message_subtypes(  # noqa: F811
-    msg: models.InnerMessageChangedEvent, background_tasks: BackgroundTasks
+    msg: models.InnerMessageChangedEvent,
+    background_tasks: BackgroundTasks,  # noqa: ARG001
 ) -> None:
     logger.trace("Processing an update message")
 

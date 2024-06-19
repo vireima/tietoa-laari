@@ -6,7 +6,7 @@ from backend.slack import Slack
 
 
 def format_channel(channel_id: str, channels: list[SlackChannelModel]) -> str:
-    channel = next((ch for ch in channels if ch.id == channel), None)
+    channel = next((ch for ch in channels if ch.id == channel_id), None)
 
     if not channel:
         return ""

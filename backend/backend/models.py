@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Annotated, Literal
 
 import arrow
-import emoji
 import emoji_data_python
 import pytz
 from bson import ObjectId
