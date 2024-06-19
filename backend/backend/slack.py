@@ -66,7 +66,7 @@ class Slack:
         except SlackApiError as err:
             logger.warning(str(err))
 
-        return replies
+        return [models.SlackReplyModel(**reply) for reply in replies]
 
 
 slack_client = Slack()

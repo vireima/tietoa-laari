@@ -241,3 +241,13 @@ class SlackChannelModel(BaseModel):
     is_private: bool = False
     is_archived: bool = False
     user: str = ""
+
+
+# Reply models
+class SlackReplyModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    user: str
+    text: EmojiDescription
+    thread_ts: str
+    ts: str
