@@ -5,6 +5,7 @@ import string
 import sys
 import time
 
+import emoji_data_python
 import orjson
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -237,7 +238,10 @@ async def process(  # noqa: F811
         f"Reaction event! {event.event.type} {event.event.reaction} by {event.event.user}"
     )
 
-    vote = models.Reaction(reaction=event.event.reaction, user=event.event.user)
+    vote = models.Reaction(
+        reaction=emoji_data_python.replace_colons(f":{event.event.reaction}:"),
+        user=event.event.user,
+    )
 
     match event.event.type:
         case "reaction_added":
