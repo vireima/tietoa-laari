@@ -249,5 +249,5 @@ class SlackReplyModel(BaseModel):
 
     user: str
     text: EmojiDescription
-    thread_ts: str
+    thread_ts: str | None = None
     ts: str
