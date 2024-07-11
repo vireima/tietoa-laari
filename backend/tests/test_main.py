@@ -81,13 +81,17 @@ def test_process():
 
 def test_message_event(mocker, message_payload):
     insert_task = mocker.patch("backend.database.db.insert_task", AsyncMock())
+    update_slite = mocker.patch("backend.main.update_slite", AsyncMock())
     res = client.post("/event", json=message_payload)
     assert res.status_code == status.HTTP_200_OK
     insert_task.assert_called_once()
+    update_slite.assert_called_once()
 
 
 def test_message_changed_event(mocker, message_changed_payload):
     update_task = mocker.patch("backend.database.db.update_task", AsyncMock())
+    update_slite = mocker.patch("backend.main.update_slite", AsyncMock())
     res = client.post("/event", json=message_changed_payload)
     assert res.status_code == status.HTTP_200_OK
     update_task.assert_called_once()
+    update_slite.assert_called_once()
