@@ -97,7 +97,6 @@ export function extendTask(
   channels: Map<string, Channel>,
   users: Map<string, User>
 ): ExtendedTask {
-  if (!task.archived) console.log("extending:", task);
   return {
     ...task,
     description: task.description,

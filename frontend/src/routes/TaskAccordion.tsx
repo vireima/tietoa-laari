@@ -9,6 +9,8 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
   const { tasks } = useFilteredData(filter);
   const [selected, setSelected] = useState<string | null>(null);
 
+  console.log("Tasks shown:", tasks);
+
   return (
     <Box
       p={{ base: "0.2rem", sm: "1rem", lg: "10rem", xl: "20rem" }}

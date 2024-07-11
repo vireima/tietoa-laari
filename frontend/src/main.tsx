@@ -3,7 +3,13 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import SectionLayout from "./routes/SectionLayout";
-import { createTheme, MantineProvider } from "@mantine/core";
+import {
+  colorsTuple,
+  createTheme,
+  // MantineColorsTuple,
+  MantineProvider,
+  ThemeIcon,
+} from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,7 +19,30 @@ import config from "./config";
 import { CookiesProvider } from "react-cookie";
 import SingleTask from "./routes/SingleTask";
 
-const theme = createTheme({});
+// const primary: MantineColorsTuple = [
+//   "#eff8f1",
+//   "#e3ece5",
+//   "#c6d6ca",
+//   "#a6bfad",
+//   "#8bac94",
+//   "#7aa085",
+//   "#709a7c",
+//   "#5e8669",
+//   "#52785c",
+//   "#42684e",
+// ];
+
+const theme = createTheme({
+  colors: {
+    primary: colorsTuple("#35424c"),
+  },
+  primaryColor: "primary",
+  primaryShade: 9,
+  // white: "#eeeef0",
+  components: {
+    ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: "transparent" } }),
+  },
+});
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([

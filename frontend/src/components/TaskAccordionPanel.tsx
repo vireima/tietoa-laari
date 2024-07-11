@@ -11,6 +11,7 @@ import {
   Stack,
   Tooltip,
   CopyButton,
+  Divider,
 } from "@mantine/core";
 import {
   IconUserCircle,
@@ -56,6 +57,7 @@ export default function TaskAccordionPanel({
     <Accordion.Panel>
       <LoadingOverlay visible={!!loading} zIndex={1000} />
       <Stack>
+        <Divider />
         <Flex align="flex-start" justify="space-between">
           <MarkdownFormattedText text={task.description} />
         </Flex>

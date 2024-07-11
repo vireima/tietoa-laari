@@ -94,12 +94,16 @@ export default function Header({
             pr={{ base: "0.2rem", sm: "1rem", lg: "2rem" }}
             pt="0.7rem"
             // bg="gray"
-            style={{ borderBottom: "2px solid var(--mantine-color-gray-3)" }}
+            // style={{ borderBottom: "2px solid var(--mantine-color-gray-3)" }}
           >
             <Group mb="0.7rem">
-              <Burger opened={drawerOpened} onClick={drawerToggle} />
+              <Burger
+                opened={drawerOpened}
+                onClick={drawerToggle}
+                color="primary"
+              />
               <ThemeIcon
-                variant="default"
+                variant="transparent"
                 radius="xl"
                 size="lg"
                 visibleFrom="xs"
@@ -109,7 +113,7 @@ export default function Header({
             </Group>
 
             <Tabs
-              variant="default"
+              variant="pills"
               defaultValue="/laari"
               value={location.pathname}
               onChange={(val) =>
@@ -126,19 +130,19 @@ export default function Header({
               <Tabs.List justify="center">
                 <Tabs.Tab
                   value="/laari"
-                  leftSection={<IconSeeding stroke={1} />}
+                  leftSection={<IconSeeding stroke={2} />}
                 >
                   <Text visibleFrom="xs">LAARI</Text>
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="/jono"
-                  leftSection={<IconChecklist stroke={1} />}
+                  leftSection={<IconChecklist stroke={2} />}
                 >
                   <Text visibleFrom="xs">JONO</Text>
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="/maali"
-                  leftSection={<IconTargetArrow stroke={1} />}
+                  leftSection={<IconTargetArrow stroke={2} />}
                 >
                   <Text visibleFrom="xs">MAALI</Text>
                 </Tabs.Tab>
@@ -160,15 +164,15 @@ export default function Header({
 
               <ActionIcon
                 onClick={toggleColorScheme}
-                variant="filled"
+                variant="transparent"
                 radius="xl"
                 size="lg"
                 visibleFrom="xs"
               >
                 {colorScheme !== "dark" ? (
-                  <IconMoon size="1.2rem" />
+                  <IconMoon size="1.2rem" stroke={2} />
                 ) : (
-                  <IconSun size="1.2rem" />
+                  <IconSun size="1.2rem" stroke={2} />
                 )}
               </ActionIcon>
             </Group>
