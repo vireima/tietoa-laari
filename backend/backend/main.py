@@ -175,6 +175,16 @@ async def get_users():
     return await slack_client.users()
 
 
+@app.get("/duplicates")
+async def get_duplicates():
+    return await db.duplicates()
+
+
+@app.delete("/duplicates")
+async def delete_duplicates():
+    return await db.purge()
+
+
 @logger.catch
 @app.get("/channels")
 async def get_channels():

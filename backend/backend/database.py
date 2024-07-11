@@ -176,5 +176,53 @@ class Database:
 
         return models.TaskOutputModel(**result) if result else None
 
+    async def duplicates(self, stringfy_ids=True):
+        pipeline = [
+            {
+                "$group": {
+                    "_id": {"channel": "$channel", "ts": "$ts"},
+                    "tasks": {"$push": {"_id": "$_id", "created": "$created"}},
+                    "count": {"$sum": 1},
+                }
+            },
+            {"$match": {"count": {"$gt": 1}}},
+        ]
+
+        duplicates = await self.collection.aggregate(pipeline=pipeline).to_list(None)
+        return purge_object_id(duplicates) if stringfy_ids else duplicates
+
+    async def purge(self):
+        """
+        Removed duplicates (by channel + ts), leaves the first entry by 'created' datetime.
+        """
+        duplicates = await self.duplicates(stringfy_ids=False)
+
+        ids_to_remove = []
+
+        for group in duplicates:
+            ids_to_remove.extend(
+                [
+                    task["_id"]
+                    for task in sorted(group["tasks"], key=lambda x: x["created"])[1:]
+                ]
+            )
+
+        logger.warning(f"Removing ids {ids_to_remove}...")
+
+        result = await self.collection.delete_many({"_id": {"$in": ids_to_remove}})
+
+        return {"deleted": result.deleted_count}
+
 
 db = Database(str(settings.mongo_url), settings.mongo_db, settings.mongo_collection)
+
+
+def purge_object_id(collection):
+    if isinstance(collection, list):
+        return [purge_object_id(item) for item in collection]
+    elif isinstance(collection, dict):
+        return {key: purge_object_id(value) for key, value in collection.items()}
+    elif isinstance(collection, ObjectId):
+        return str(collection)
+
+    return collection
