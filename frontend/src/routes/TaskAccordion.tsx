@@ -18,7 +18,12 @@ export default function TaskAccordion({ filter }: filteredTaskContainerProps) {
       mt="6rem"
     >
       {tasks?.length ? (
-        <Accordion variant="filled" value={selected} onChange={setSelected}>
+        <Accordion
+          variant="filled"
+          value={selected}
+          onChange={setSelected}
+          chevronPosition="left"
+        >
           {tasks?.map((task) => (
             <TaskAccordionItem key={task.ts} value={task.ts} task={task} />
           ))}

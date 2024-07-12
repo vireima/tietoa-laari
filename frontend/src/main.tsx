@@ -20,16 +20,16 @@ import { CookiesProvider } from "react-cookie";
 import SingleTask from "./routes/SingleTask";
 
 // const primary: MantineColorsTuple = [
-//   "#eff8f1",
-//   "#e3ece5",
-//   "#c6d6ca",
-//   "#a6bfad",
+//   "#C0CED3",
+//   "#AEBFC7",
+//   "#9CB0BA",
+//   "#7892A1",
 //   "#8bac94",
-//   "#7aa085",
-//   "#709a7c",
-//   "#5e8669",
-//   "#52785c",
-//   "#42684e",
+//   "#668393",
+//   "#5A7281",
+//   "#4D626F",
+//   "#41515D",
+//   "#34414B",
 // ];
 
 const theme = createTheme({

@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionItemProps,
   Avatar,
+  Center,
   Grid,
   Group,
   Modal,
@@ -18,6 +19,7 @@ import EditTaskWidget from "./EditTaskWidget";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import patchTasks from "../api/patchTasks";
 import { userDisplayName } from "../api/getUsers";
+import styles from "../styles/TaskAccordionItem.module.css";
 
 interface TaskAccordionItemProps extends AccordionItemProps {
   task: ExtendedTask;
@@ -42,19 +44,40 @@ export default function TaskAccordionItem({
       key={task.ts}
       value={task.ts}
       onKeyDown={getHotkeyHandler([["mod+E", () => handlers.toggle()]])}
+      className={styles.item}
     >
       <Accordion.Control /*icon={<UserWidget user={task.author} />}*/>
         <Grid>
           <Grid.Col span="content">
-            <Text c="dimmed" miw="8rem" opacity={0.5} size="sm">
-              {task.created.toRelative()}
-            </Text>
+            <Center h="100%">
+              <Text
+                c="dimmed"
+                miw="5rem"
+                opacity={0.5}
+                size="xs"
+                visibleFrom="sm"
+              >
+                {task.created.toRelative()}
+              </Text>
+              <Text
+                c="dimmed"
+                miw="1rem"
+                opacity={0.5}
+                size="xs"
+                hiddenFrom="sm"
+              >
+                {task.created.toLocaleString({
+                  month: "numeric",
+                  day: "numeric",
+                })}
+              </Text>
+            </Center>
           </Grid.Col>
           <Grid.Col span="auto">
-            <MarkdownStrippedText text={task.description} />
+            <MarkdownStrippedText text={task.description} size="sm" />
           </Grid.Col>
           <Grid.Col span="content">
-            <Group gap="xs" wrap="nowrap">
+            <Group gap="xs" wrap="nowrap" visibleFrom="sm">
               <VotesWidget task={task} />
               <PriorityInfopill task={task} />
             </Group>

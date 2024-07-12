@@ -14,6 +14,7 @@ export default function UserWidget({
     return (
       <Group gap="xs">
         <Tooltip
+          withArrow
           label={
             <Stack gap="xs">
               <Text>{user.profile.real_name}</Text>
@@ -28,9 +29,16 @@ export default function UserWidget({
             </Stack>
           }
         >
-          <Avatar src={user.profile.image_512} size="sm" />
+          <Group gap={"xs"}>
+            <Avatar src={user.profile.image_512} size="sm" />
+
+            {showName && (
+              <Text c={`#${user.color}`} fw={700}>
+                {userDisplayName(user)}
+              </Text>
+            )}
+          </Group>
         </Tooltip>
-        {showName && <Text c={`#${user.color}`}>{userDisplayName(user)}</Text>}
       </Group>
     );
 }
