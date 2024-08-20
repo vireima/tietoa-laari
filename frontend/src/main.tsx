@@ -18,6 +18,8 @@ import TaskAccordion from "./routes/TaskAccordion";
 import config from "./config";
 import { CookiesProvider } from "react-cookie";
 import SingleTask from "./routes/SingleTask";
+import TasklistLayout from "./routes/TasklistLayout";
+import Tasklist from "./components/Tasklist";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
@@ -76,6 +78,12 @@ const router = createBrowserRouter([
         element: <SingleTask />,
       },
     ],
+  },
+  {
+    path: "/nova",
+    element: <TasklistLayout />,
+    errorElement: <ErrorPage />,
+    children: [{ index: true, element: <Tasklist /> }],
   },
 ]);
 
