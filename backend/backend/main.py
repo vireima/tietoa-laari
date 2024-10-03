@@ -261,7 +261,8 @@ async def process(  # noqa: F811
                 vote, event.event.item.channel, event.event.item.ts
             )
 
-    await update_slite()
+    # Removed Slite updating due to latency
+    # await update_slite()
 
 
 @multimethod
@@ -289,7 +290,8 @@ async def process_message_subtypes(
         await db.insert_task(msg)
         logger.success("Inserted a task.")
 
-        await update_slite()
+        # Removed Slite updating due to latency
+        # await update_slite()
 
 
 @multimethod
@@ -308,7 +310,8 @@ async def process_message_subtypes(  # noqa: F811
             f"Updated a task: description='{result.description}', mod={result.modified}"
         )
 
-        await update_slite()
+        # Removed Slite updating due to latency
+        # await update_slite()
 
 
 @multimethod
