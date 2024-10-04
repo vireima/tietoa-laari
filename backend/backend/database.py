@@ -52,7 +52,11 @@ class Database:
         task_dict.update(
             {"created": arrow.utcnow().datetime, "modified": arrow.utcnow().datetime}
         )
-        await self.collection.insert_one(task_dict)
+
+        # Upsert instead of insert to avoid race conditions inserting multiple entries.
+        await self.collection.update_one(
+            {"channel": task.channel, "ts": task.ts}, task_dict, upsert=True
+        )
 
     async def add_task_votes(self, vote: models.Reaction, channel: str, ts: str):
         """
