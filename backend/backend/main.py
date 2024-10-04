@@ -148,7 +148,7 @@ async def get_task_comments(channel: str, ts: str):
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: str):
     cached = await db.delete(task_id)
-    await update_slite()
+    # await update_slite()
     return cached
 
 
@@ -156,7 +156,7 @@ async def delete_task(task_id: str):
 @app.patch("/tasks")
 async def patch_tasks(tasks: list[models.TaskUpdateModel]):
     await db.patch(tasks)
-    await update_slite()
+    # await update_slite()
 
     return await db.query([str(task.id) for task in tasks])
 
@@ -165,7 +165,7 @@ async def patch_tasks(tasks: list[models.TaskUpdateModel]):
 @app.delete("/tasks")
 async def delete_tasks(tasks: list[models.TaskUpdateModel]):
     cached = await db.delete(tasks)
-    await update_slite()
+    # await update_slite()
     return cached
 
 
