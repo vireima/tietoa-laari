@@ -55,7 +55,7 @@ class Database:
 
         # Upsert instead of insert to avoid race conditions inserting multiple entries.
         await self.collection.update_one(
-            {"channel": task.channel, "ts": task.ts}, task_dict, upsert=True
+            {"channel": task.channel, "ts": task.ts}, {"$set": task_dict}, upsert=True
         )
 
     async def add_task_votes(self, vote: models.Reaction, channel: str, ts: str):
