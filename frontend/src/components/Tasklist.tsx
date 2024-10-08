@@ -8,6 +8,7 @@ import {
   Table,
   Text,
   TextInput,
+  Transition,
 } from "@mantine/core";
 import useQueries from "../hooks/useQueries";
 import { useFilteredData } from "../hooks/useFilteredData";
@@ -16,6 +17,7 @@ import { useEventListener, useListState, useMap } from "@mantine/hooks";
 import { ExtendedTask } from "../types/Task";
 import { useState } from "react";
 import { IconThumbUpFilled } from "@tabler/icons-react";
+import classes from "../Styles/Tasklist.module.css";
 
 function filterData(data: ExtendedTask[], search: string) {
   if (!search) return data;
@@ -35,6 +37,7 @@ export default function Tasklist() {
   const [search, setSearch] = useState("");
   const searchFilteredTasks = filterData(tasks, search);
   const selected = useMap<string, boolean>();
+  const [opened, setOpened] = useState("");
 
   const select = (id: string) => {
     selected.set(id, true);
@@ -69,12 +72,40 @@ export default function Tasklist() {
             {searchFilteredTasks.map((task) => (
               <Table.Tr
                 key={task._id}
-                onClick={() => toggle(task._id)}
+                onClick={() => setOpened(opened === task._id ? "" : task._id)}
+                // onClick={() => toggle(task._id)}
                 // style={{ transition: "all 3s ease-in-out 1s" }}
               >
-                <Table.Td>
-                  {selected.get(task._id) ?? false ? ">" : ""}
-                  {task.description}
+                <Table.Td style={{ transition: "all 3s ease-in-out 1s" }}>
+                  <Stack>
+                    <Text
+                      {...(opened != task._id ? { truncate: "end" } : {})}
+                      style={{ transition: "all 3s ease-in-out 1s" }}
+                    >
+                      {/* {selected.get(task._id) ?? false ? ">" : ""} */}
+                      {task.description}
+                    </Text>
+                    {opened === task._id ? (
+                      <Group>
+                        Luotu:{" "}
+                        {task.created.toLocaleString({
+                          month: "numeric",
+                          day: "numeric",
+                          minute: "numeric",
+                          hour: "numeric",
+                        })}
+                        , päivitetty:{" "}
+                        {task.modified.toLocaleString({
+                          month: "numeric",
+                          day: "numeric",
+                          minute: "numeric",
+                          hour: "numeric",
+                        })}
+                      </Group>
+                    ) : (
+                      <></>
+                    )}
+                  </Stack>
                 </Table.Td>
                 <Table.Td>
                   <task.status.iconElement size="1rem" stroke={2} />
@@ -88,7 +119,7 @@ export default function Tasklist() {
                   ) : (
                     <></>
                   )}
-                </Table.Td>{" "}
+                </Table.Td>
                 <Table.Td>{task.tags.join(" ")}</Table.Td>
                 <Table.Td visibleFrom="md">
                   {task.author?.profile.display_name}
