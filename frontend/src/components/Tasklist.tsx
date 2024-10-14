@@ -20,7 +20,7 @@ import {
   IconSelector,
   IconThumbUpFilled,
 } from "@tabler/icons-react";
-import classes from "../Styles/Tasklist.module.css";
+import classes from "../styles/Tasklist.module.css";
 import useSorted from "../hooks/useSorted";
 import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
