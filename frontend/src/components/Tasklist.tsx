@@ -1,10 +1,14 @@
 import {
+  Anchor,
   Burger,
   Center,
   Container,
+  Divider,
   Drawer,
   Flex,
   Group,
+  List,
+  ListItem,
   rem,
   Stack,
   Table,
@@ -30,6 +34,7 @@ import useSorted from "../hooks/useSorted";
 import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
+import Changelog from "./Changelog";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -98,9 +103,68 @@ export default function Tasklist() {
 
   return (
     <Center>
-      <Drawer opened={settingsOpened} onClose={settingsClose} position="bottom">
-        <Title>Laari</Title>
-        <Text></Text>
+      <Drawer
+        opened={settingsOpened}
+        onClose={settingsClose}
+        position="bottom"
+        title={<Title>Laari</Title>}
+        overlayProps={{ backgroundOpacity: 0.15 }}
+        padding={"xl"}
+        size={"xl"}
+      >
+        <Stack>
+          <Text>
+            Laari on Tietoan kehitysideoiden ja -ajatusten talletuspaikka.
+            Työympäristössä jotain kehitettävää? Laita ajatus joihinkin
+            seuraavista kanavista:
+          </Text>
+          <List ml="1rem">
+            <ListItem>
+              <Group>
+                <Anchor href="slack://channel?team=T1FB2571R&id=C07RJR1R2PQ">
+                  #team-laari-tie
+                </Anchor>
+                Tietomallinnus-tiimit kehitysideat
+              </Group>
+            </ListItem>
+            <ListItem>
+              <Group>
+                <Anchor href="slack://channel?team=T1FB2571R&id=C07RC1CA99V">
+                  #team-laari-lah
+                </Anchor>
+                Lähtötiedot-tiimit kehitysideat
+              </Group>
+            </ListItem>
+            <ListItem>
+              <Group>
+                <Anchor href="slack://channel?team=T1FB2571R&id=C07S57XKTR7">
+                  #team-laari-vis
+                </Anchor>
+                Visualisointi-tiimit kehitysideat
+              </Group>
+            </ListItem>
+            <ListItem>
+              <Group>
+                <Anchor href="slack://channel?team=T1FB2571R&id=C07RSEW76D9">
+                  #c-laari
+                </Anchor>
+                Kaikki muut kehitysideat
+              </Group>
+            </ListItem>
+          </List>
+          <Text>
+            Teknisissä asioissa laita idea Laariin tai pistä viesti{" "}
+            <Anchor
+              href="slack://user?team=T1FB2571R&id=DCHJRD96D"
+              underline="always"
+            >
+              @ville
+            </Anchor>
+            lle.
+          </Text>
+          <Divider />
+          <Changelog />
+        </Stack>
       </Drawer>
       <Stack maw={{ base: "100%", sm: "80%" }}>
         <Flex wrap={"nowrap"} justify={"flex-start"} align={"center"}>
