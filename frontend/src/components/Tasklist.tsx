@@ -1,25 +1,20 @@
 import {
-  Box,
   Center,
-  Grid,
   Group,
-  keys,
   rem,
   Stack,
   Table,
   TableThProps,
   Text,
   TextInput,
-  Transition,
   UnstyledButton,
 } from "@mantine/core";
-import useQueries from "../hooks/useQueries";
 import { useFilteredData } from "../hooks/useFilteredData";
-import TasklistItem from "./TasklistItem";
-import { useEventListener, useListState, useMap } from "@mantine/hooks";
+import { useMap } from "@mantine/hooks";
 import { ExtendedTask } from "../types/Task";
 import { useState } from "react";
 import {
+  IconArrowBigRightLinesFilled,
   IconChevronDown,
   IconChevronUp,
   IconSelector,
@@ -27,6 +22,8 @@ import {
 } from "@tabler/icons-react";
 import classes from "../Styles/Tasklist.module.css";
 import useSorted from "../hooks/useSorted";
+import StatusDropdown from "./StatusDropdown";
+import TasklistItem from "./TasklistItem";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -86,12 +83,6 @@ export default function Tasklist() {
     selected.set(id, !(selected.get(id) ?? false));
   };
 
-  // console.log(
-  //   "desc sorted:",
-  //   isSorted("description"),
-  //   isReversed("description")
-  // );
-
   return (
     <Center>
       <Stack maw={{ base: "100%", sm: "80%" }}>
@@ -103,7 +94,12 @@ export default function Tasklist() {
             setSearch(event.currentTarget.value);
           }}
         />
-        <Table stickyHeader highlightOnHover layout="fixed">
+        <Table
+          stickyHeader
+          highlightOnHover
+          layout="fixed"
+          verticalSpacing="sm"
+        >
           <Table.Thead>
             <Table.Tr style={{ fontWeight: 700 }}>
               <Th
@@ -121,17 +117,22 @@ export default function Tasklist() {
               >
                 Luotu
               </Th>
-              {/* <Table.Td visibleFrom="md">Ehdottaja</Table.Td> */}
-              <Table.Td miw="6em" visibleFrom="md">
+              <Th
+                visibleFrom="md"
+                reversed={isReversed("channel")}
+                sorted={isSorted("channel")}
+                onSort={() => setSorting("channel")}
+              >
                 Kanava
-              </Table.Td>
+              </Th>
+
               <Th
                 reversed={isReversed("status")}
                 sorted={isSorted("status")}
                 onSort={() => setSorting("status")}
                 w="4rem"
               >
-                St
+                <IconArrowBigRightLinesFilled size="1rem" stroke={2} />
               </Th>
               <Th
                 reversed={isReversed("votes")}
@@ -145,61 +146,15 @@ export default function Tasklist() {
           </Table.Thead>
           <Table.Tbody>
             {searchFilteredTasks.map((task) => (
-              <Table.Tr
+              <TasklistItem
                 key={task._id}
-                onClick={() => setOpened(opened === task._id ? "" : task._id)}
-                // onClick={() => toggle(task._id)}
-                // style={{ transition: "all 3s ease-in-out 1s" }}
-              >
-                <Table.Td style={{ transition: "all 3s ease-in-out 1s" }}>
-                  <Stack>
-                    <Text
-                      {...(opened != task._id ? { truncate: "end" } : {})}
-                      style={{ transition: "all 3s ease-in-out 1s" }}
-                    >
-                      {/* {selected.get(task._id) ?? false ? ">" : ""} */}
-                      {task.description}
-                    </Text>
-                    {opened === task._id ? (
-                      <Group>
-                        Luotu:{" "}
-                        {task.created.toLocaleString({
-                          month: "numeric",
-                          day: "numeric",
-                          minute: "numeric",
-                          hour: "numeric",
-                        })}
-                        , päivitetty:{" "}
-                        {task.modified.toLocaleString({
-                          month: "numeric",
-                          day: "numeric",
-                          minute: "numeric",
-                          hour: "numeric",
-                        })}
-                      </Group>
-                    ) : (
-                      <></>
-                    )}
-                  </Stack>
-                </Table.Td>
-                <Table.Td>{task.created.toLocaleString()}</Table.Td>
-                <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
-                  #{task.channel?.name}
-                </Table.Td>
-                <Table.Td bg="red">
-                  <task.status.iconElement size="1rem" stroke={2} />
-                </Table.Td>
-                <Table.Td bg="blue">
-                  {task.votes.length ? (
-                    <Group gap="xs">
-                      <IconThumbUpFilled size="1rem" stroke={2} />
-                      {task.votes.length}
-                    </Group>
-                  ) : (
-                    <></>
-                  )}
-                </Table.Td>
-              </Table.Tr>
+                task={task}
+                selected={false}
+                opened={opened === task._id}
+                onOpen={(openedTask) =>
+                  setOpened(opened === openedTask._id ? "" : openedTask._id)
+                }
+              />
             ))}
           </Table.Tbody>
         </Table>
