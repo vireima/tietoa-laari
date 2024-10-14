@@ -14,6 +14,7 @@ export interface ExtendedStatus {
   iconElement: typeof IconCheck;
   bgcolor: string;
   color: string;
+  number: number;
 }
 
 export const statuses = [
@@ -24,6 +25,7 @@ export const statuses = [
     iconElement: IconSeeding,
     bgcolor: "blue.1",
     color: "blue.6",
+    number: 0,
   },
   {
     status: "in progress" as Status,
@@ -33,6 +35,7 @@ export const statuses = [
     // icon: <IconCircleHalf2 color="yellow" />,
     bgcolor: "cyan.2",
     color: "cyan.6",
+    number: 10,
   },
   {
     status: "done" as Status,
@@ -42,6 +45,7 @@ export const statuses = [
     iconElement: IconCheck,
     bgcolor: "teal.2",
     color: "teal.7",
+    number: 20,
   },
   {
     status: "closed" as Status,
@@ -51,5 +55,6 @@ export const statuses = [
     iconElement: IconCircleOff,
     bgcolor: "gray.2",
     color: "gray.6",
+    number: 30,
   },
 ] as ExtendedStatus[];
