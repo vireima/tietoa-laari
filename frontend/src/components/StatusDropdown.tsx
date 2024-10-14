@@ -1,4 +1,5 @@
 import {
+  Container,
   Group,
   Loader,
   Menu,
@@ -11,6 +12,7 @@ import { ExtendedStatus, statuses } from "../types/Status";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { patchPartialTasks } from "../api/patchTasks";
 import { ExtendedTask } from "../types/Task";
+import Tooltip from "./Tooltip";
 
 interface StatusDropdownProps {
   task: ExtendedTask;
@@ -35,32 +37,36 @@ export default function StatusDropdown({ task }: StatusDropdownProps) {
   }
 
   return (
-    <Menu>
-      <Menu.Target>
-        <Icon size="1rem" stroke={2} />
-      </Menu.Target>
-      <Menu.Dropdown>
-        {statuses.map((status) => {
-          return (
-            <Menu.Item
-              key={status.number}
-              leftSection={<status.iconElement size="1rem" stroke={2} />}
-              onClick={() =>
-                status.number !== task.status.number
-                  ? mutation.mutate([
-                      {
-                        _id: task._id,
-                        status: status,
-                      },
-                    ])
-                  : null
-              }
-            >
-              {status.label}
-            </Menu.Item>
-          );
-        })}
-      </Menu.Dropdown>
-    </Menu>
+    <Tooltip tooltip={task.status.label} position="top">
+      <Container fluid={true}>
+        <Menu>
+          <Menu.Target>
+            <Icon size="1rem" stroke={2} />
+          </Menu.Target>
+          <Menu.Dropdown>
+            {statuses.map((status) => {
+              return (
+                <Menu.Item
+                  key={status.number}
+                  leftSection={<status.iconElement size="1rem" stroke={2} />}
+                  onClick={() =>
+                    status.number !== task.status.number
+                      ? mutation.mutate([
+                          {
+                            _id: task._id,
+                            status: status,
+                          },
+                        ])
+                      : null
+                  }
+                >
+                  {status.label}
+                </Menu.Item>
+              );
+            })}
+          </Menu.Dropdown>
+        </Menu>
+      </Container>
+    </Tooltip>
   );
 }

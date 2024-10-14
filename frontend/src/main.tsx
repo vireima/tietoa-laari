@@ -80,7 +80,7 @@ const router = createBrowserRouter([
   //   ],
   // },
   {
-    path: "/nova",
+    path: "/",
     element: <TasklistLayout />,
     errorElement: <ErrorPage />,
     children: [{ index: true, element: <Tasklist /> }],
