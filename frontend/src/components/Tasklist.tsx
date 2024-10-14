@@ -179,6 +179,18 @@ export default function Tasklist() {
             }}
           />
         </Flex>
+        <Flex wrap={"nowrap"} justify={"flex-start"} align={"center"}>
+          <Burger opened={settingsOpened} onClick={settingsToggle}></Burger>
+          <TextInput
+            w="100%"
+            value={search}
+            placeholder="Vapaa haku"
+            m="0.3em"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setSearch(event.currentTarget.value);
+            }}
+          />
+        </Flex>
         <Table
           stickyHeader
           highlightOnHover
@@ -221,6 +233,9 @@ export default function Tasklist() {
                 <Tooltip tooltip="Status">
                   <IconArrowBigRightLinesFilled size="1rem" stroke={2} />
                 </Tooltip>
+                <Tooltip tooltip="Status">
+                  <IconArrowBigRightLinesFilled size="1rem" stroke={2} />
+                </Tooltip>
               </Th>
               <Th
                 reversed={isReversed("votes")}
@@ -228,6 +243,9 @@ export default function Tasklist() {
                 onSort={() => setSorting("votes")}
                 w="4rem"
               >
+                <Tooltip tooltip="Slack-reaktioita">
+                  <IconThumbUpFilled size="1rem" stroke={2} />
+                </Tooltip>
                 <Tooltip tooltip="Slack-reaktioita">
                   <IconThumbUpFilled size="1rem" stroke={2} />
                 </Tooltip>
