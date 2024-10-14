@@ -4,7 +4,12 @@ export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
       <Timeline.Item title="v1.0.1 Ensimmäiset päivitykset">
-        <Text c="dimmed">Tämä dokumentaatio, linkit Slack-kanaville.</Text>
+        <Text c="dimmed">
+          Tämä dokumentaatio, linkit Slack-kanaville, viestien
+          Slack-muotoiluiden tukemista täällä nettikäyttiksen puolella
+          parannettu (boldaus yms, linkit, käyttäjien tägääminen). Ryhmien
+          (kuten @channel tai @timpat) ja bottien (@Laari) maininnat kesken.
+        </Text>
         <Text size="xs" mt={4}>
           14.10.2024
         </Text>
