@@ -18,6 +18,7 @@ import classes from "../styles/Tasklist.module.css";
 import { useElementSize, useTimeout } from "@mantine/hooks";
 import { useState } from "react";
 import Tooltip from "./Tooltip";
+import MarkdownFormattedText from "./MarkdownFormattedText";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
   task: ExtendedTask;
@@ -41,7 +42,7 @@ export default function TasklistItem({
         <Spoiler showLabel="" hideLabel="" expanded={opened} maxHeight={25}>
           <Stack>
             <Text {...(opened ? {} : { truncate: "end" })}>
-              {task.description}
+              <MarkdownFormattedText text={task.description} />
             </Text>
 
             <Group>
