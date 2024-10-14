@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 // import SectionLayout from "./routes/SectionLayout";
 import {
+  Anchor,
   colorsTuple,
   createTheme,
   // MantineColorsTuple,
@@ -43,6 +44,7 @@ const theme = createTheme({
   // white: "#eeeef0",
   components: {
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: "transparent" } }),
+    Anchor: Anchor.extend({ defaultProps: { underline: "always" } }),
   },
 });
 const queryClient = new QueryClient();
