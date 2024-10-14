@@ -1,10 +1,14 @@
 import {
+  Anchor,
   Burger,
   Center,
   Container,
+  Divider,
   Drawer,
   Flex,
   Group,
+  List,
+  ListItem,
   rem,
   Stack,
   Table,
@@ -30,6 +34,7 @@ import useSorted from "../hooks/useSorted";
 import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
+import Changelog from "./Changelog";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
