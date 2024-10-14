@@ -27,6 +27,16 @@ function cmpDescription(a: ExtendedTask, b: ExtendedTask) {
   return a.description.localeCompare(b.description);
 }
 
+function cmpChannel(a: ExtendedTask, b: ExtendedTask) {
+  if (!a.channel?.name && !b.channel?.name)
+    return a.channel?.user && b.channel?.user
+      ? a.channel.user.localeCompare(b.channel.user)
+      : 0;
+  if (!a.channel?.name) return -1;
+  if (!b.channel?.name) return 1;
+  return a.channel.name.localeCompare(b.channel.name);
+}
+
 // function sortTasks(
 //   tasks: ExtendedTask[],
 //   cmp: (a: ExtendedTask, b: ExtendedTask) => number,
@@ -52,6 +62,7 @@ function sortTasks(tasks: ExtendedTask[], sortDirections: SortDirection[]) {
     // ["priority", cmpPriority],
     ["votes", cmpVotes],
     ["description", cmpDescription],
+    ["channel", cmpChannel],
   ]);
 
   // Iterate the array backwards
