@@ -2,20 +2,22 @@ import {
   Anchor,
   Box,
   Collapse,
+  Divider,
   Group,
+  Popover,
   rem,
   Spoiler,
   Stack,
   Table,
   Text,
-  Tooltip,
 } from "@mantine/core";
 import { ExtendedTask } from "../types/Task";
-import { IconThumbUpFilled } from "@tabler/icons-react";
+import { IconArrowRightBar, IconThumbUpFilled } from "@tabler/icons-react";
 import StatusDropdown from "./StatusDropdown";
 import classes from "../styles/Tasklist.module.css";
 import { useElementSize, useTimeout } from "@mantine/hooks";
 import { useState } from "react";
+import Tooltip from "./Tooltip";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
   task: ExtendedTask;
@@ -36,24 +38,8 @@ export default function TasklistItem({
           onOpen(task);
         }}
       >
-        {/* <Stack
-        // ref={ref}
-        // className={
-        //   opened
-        //     ? `${classes.row} ${classes.open}`
-        //     : `${classes.row} ${classes.closed}`
-        // }
-        // style={{ maxHeight: opened ? height : "2em" }}
-        > */}
-        {/* {!opened ? <Text truncate="end">{task.description}</Text> : <></>} */}
-        {/* <Collapse in={opened} transitionDuration={1000}> */}
         <Spoiler showLabel="" hideLabel="" expanded={opened} maxHeight={25}>
-          <Box
-          // className={classes.row}
-          // style={{
-          //   maxHeight: !opened ? rem(25) : height ? rem(height) : undefined,
-          // }}
-          >
+          <Stack>
             <Text {...(opened ? {} : { truncate: "end" })}>
               {task.description}
             </Text>
@@ -65,7 +51,7 @@ export default function TasklistItem({
                 href={`https://tietoa.slack.com/archives/${task?.channel?.id}/p${task.ts}`}
                 target="_blank"
               >
-                Slack
+                ↦ Slack-linkki
               </Anchor>
               <Text c="dimmed" size="sm">
                 Luotu:{" "}
@@ -86,15 +72,30 @@ export default function TasklistItem({
                 })}
               </Text>
               <Text c="dimmed" size="sm">
-                @{task.author?.profile.display_name}
+                Ehdottaja: @{task.author?.profile.display_name}
               </Text>
+              {task.assignees.length ? (
+                <Text c="dimmed" size="sm">
+                  Työryhmä:{" "}
+                  {task.assignees
+                    .map((user) => "@" + user?.profile.display_name)
+                    .join(", ")}
+                </Text>
+              ) : (
+                <></>
+              )}
+              {task.slite ? (
+                <Anchor href={`https://tietoa.slite.com/api/s/${task.slite}`}>
+                  Wiki
+                </Anchor>
+              ) : (
+                <></>
+              )}
             </Group>
-          </Box>
+          </Stack>
         </Spoiler>
-        {/* </Collapse> */}
-        {/* </Stack> */}
       </Table.Td>
-      <Table.Td style={{ verticalAlign: "top" }}>
+      <Table.Td style={{ verticalAlign: "top" }} visibleFrom="md">
         {task.created.toLocaleString()}
       </Table.Td>
       <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
@@ -106,12 +107,13 @@ export default function TasklistItem({
       <Table.Td>
         {task.votes.length ? (
           <Tooltip
-            label={
-              <Stack>
-                {task.votes.map(
-                  (vote) =>
-                    `${vote.user?.profile.display_name}: ${vote.reaction}`
-                )}
+            tooltip={
+              <Stack gap="xs">
+                {task.votes.map((vote) => (
+                  <Text>
+                    {`@${vote.user?.profile.display_name}: ${vote.reaction}`}
+                  </Text>
+                ))}
               </Stack>
             }
           >
