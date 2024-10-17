@@ -24,10 +24,7 @@ class Slack:
 
         user_models = [models.SlackUserModel(**user) for user in users]
 
-        # DEBUG
-        logger.debug(f"Found user: {[u for u in user_models if u.id == 'U048USFG5B2']}")
-
-        return [user for user in user_models if not (user.deleted or user.is_bot)]
+        return [user for user in user_models if not (user.deleted)]
 
     @AsyncTTL(time_to_live=60 * 5)
     async def channels(self) -> list[models.SlackChannelModel]:
