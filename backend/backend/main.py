@@ -7,7 +7,7 @@ import time
 
 import emoji_data_python
 import orjson
-from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
@@ -19,7 +19,12 @@ from backend.database import db
 from backend.slack import slack_client
 from backend.slite import make_slite_page
 
+from fastapi.security import OpenIdConnect
+
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
+oidc = OpenIdConnect(
+    openIdConnectUrl="https://slack.com/.well-known/openid-configuration"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -118,6 +123,11 @@ async def add_process_time_header(request: Request, call_next):
 @app.get("/")
 async def root():
     return {"details": "Root!"}
+
+
+@app.get("/secure")
+async def secure(token=Depends(oidc)):
+    return token
 
 
 @logger.catch
