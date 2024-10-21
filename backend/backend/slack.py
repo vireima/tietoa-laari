@@ -65,5 +65,21 @@ class Slack:
 
         return [models.SlackReplyModel(**reply) for reply in replies]
 
+    async def auth(self, code: str):
+        oauth_response = await self.client.oauth_v2_access(
+            client_id=settings.slack_client_id,
+            client_secret=settings.slack_client_secret,
+            code=code,
+            redirect_uri=settings.slack_redirect_uri,
+        )
+        logger.debug(oauth_response)
+
+        access_token = oauth_response.get("access_token")
+        logger.debug(access_token)
+        logger.debug(oauth_response.get("authed_user") or "<no user>")
+        logger.debug(oauth_response.get("team") or "<no team>")
+
+        return access_token
+
 
 slack_client = Slack()

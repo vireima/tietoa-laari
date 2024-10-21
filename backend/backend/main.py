@@ -21,10 +21,17 @@ from backend.slite import make_slite_page
 
 from fastapi.security import OpenIdConnect
 
+# from starlette_oauth2_api import AuthenticateMiddleware
+
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
-oidc = OpenIdConnect(
-    openIdConnectUrl="https://slack.com/.well-known/openid-configuration"
-)
+# oidc = OpenIdConnect(
+#     openIdConnectUrl="https://slack.com/.well-known/openid-configuration"
+# )
+
+# app.add_middleware(
+#     AuthenticateMiddleware,
+#     providers={"slack": {"issuer": "https://slack.com", "audience": "", "keys": "https://slack.com/openid/connect/keys"}},
+# )
 
 app.add_middleware(
     CORSMiddleware,
@@ -126,8 +133,8 @@ async def root():
 
 
 @app.get("/secure")
-async def secure(token=Depends(oidc)):
-    return token
+async def secure(code: str):
+    return slack_client.auth(code=code)
 
 
 @logger.catch
