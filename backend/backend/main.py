@@ -134,7 +134,7 @@ async def root():
 
 @app.get("/secure")
 async def secure(code: str):
-    return slack_client.auth(code=code)
+    return await slack_client.auth(code=code)
 
 
 @logger.catch
