@@ -79,7 +79,9 @@ class Slack:
         return access_token
 
     async def test_token(self, token: str):
-        test_response = self.client.auth_test(token=token)
+        test_response = await self.client.auth_test(token=token)
+
+        logger.debug(f"testing token, response: {test_response}")
 
         if not test_response["ok"]:
             logger.warning(f"auth test response failed: {test_response}")
