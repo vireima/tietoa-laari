@@ -79,6 +79,7 @@ class Slack:
         return access_token
 
     async def test_token(self, token: str):
+        logger.debug(f"test_token(); token={token}")
         test_response = await self.client.auth_test(token=token)
 
         logger.debug(f"testing token, response: {test_response}")

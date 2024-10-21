@@ -153,6 +153,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def decode_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    logger.debug(f"decode_token(); token = {token}")
     if not await slack_client.test_token(token):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
