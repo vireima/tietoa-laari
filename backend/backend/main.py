@@ -133,9 +133,15 @@ async def root():
     return {"details": "Root!"}
 
 
+from slack_sdk.errors import SlackApiError
+
+
 @app.get("/secure")
 async def secure(code: str):
-    return await slack_client.auth(code=code)
+    try:
+        return await slack_client.auth(code=code)
+    except SlackApiError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
 from fastapi.security import OAuth2PasswordBearer
@@ -147,7 +153,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def decode_token(token: Annotated[str, Depends(oauth2_scheme)]):
-    if not slack_client.test_token(token):
+    if not await slack_client.test_token(token):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
