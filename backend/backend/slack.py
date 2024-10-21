@@ -72,14 +72,24 @@ class Slack:
             code=code,
             redirect_uri=settings.slack_redirect_uri,
         )
-        logger.debug(oauth_response)
 
-        access_token = oauth_response.get("access_token")
-        logger.debug(access_token)
-        logger.debug(oauth_response.get("authed_user") or "<no user>")
-        logger.debug(oauth_response.get("team") or "<no team>")
+        logger.debug(oauth_response)
+        access_token = oauth_response.get("authed_user")["access_token"]
 
         return access_token
+
+    async def test_token(self, token: str):
+        test_response = self.client.auth_test(token=token)
+
+        if not test_response["ok"]:
+            logger.warning(f"auth test response failed: {test_response}")
+            return False
+
+        if test_response["team_id"] != "T1FB2571R":
+            logger.warning(f"auth test failed, wrong team: {test_response["team_id"]}")
+            return False
+
+        return True
 
 
 slack_client = Slack()
