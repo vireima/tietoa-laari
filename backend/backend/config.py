@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # grist_api_userdoc: str
     # grist_api_usertable: str
     slack_bot_token: str
+    slack_client_id: str
+    slack_client_secret: str
+    slack_redirect_uri: str
     slite_api_key: str
     slite_note_id: str
     frontend_url: str
