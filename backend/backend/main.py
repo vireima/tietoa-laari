@@ -4,10 +4,11 @@ import random
 import string
 import sys
 import time
+from typing import Annotated
 
 import emoji_data_python
 import orjson
-from fastapi import BackgroundTasks, Depends, FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from loguru import logger
@@ -135,6 +136,24 @@ async def root():
 @app.get("/secure")
 async def secure(code: str):
     return await slack_client.auth(code=code)
+
+
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import status
+
+# from jose import JWTError, jwt
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+async def decode_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    if not slack_client.test_token(token):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+@app.get("/secured")
+async def secured(token: Annotated[str, Depends(decode_token)]):
+    return f"Tätä ei saa joutua vääriin käsiin: {token}"
 
 
 @logger.catch
