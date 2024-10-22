@@ -7,8 +7,10 @@ export default function useAuth() {
 
   useEffect(() => {
     if (!cookies.auth) {
-      if (auth === null) removeCookie("auth");
-      else setCookie("auth", auth);
+      if (auth === null) {
+        console.log("Removing auth cookie");
+        removeCookie("auth");
+      } else setCookie("auth", auth);
     }
   }, [auth, cookies, setCookie]);
 

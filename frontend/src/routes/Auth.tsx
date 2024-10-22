@@ -1,6 +1,6 @@
 import { Box } from "@mantine/core";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import config from "../config";
@@ -11,19 +11,28 @@ export default function Auth() {
   const navigate = useNavigate();
   const [auth, setAuth] = useAuth();
   const code = search.get("code");
+  const [error, setError] = useState(false);
 
   console.log("auth:", auth);
 
   useEffect(() => {
-    if (code !== null)
+    if (code !== null) {
+      setAuth(null);
       axios
         .get(`https://${config.API_URL}/token?code=${code}`)
         .then((response) => {
+          console.log("response from /token: ", response.data);
+
           setAuth(response.data);
+          setError(false);
         })
         .then(() => navigate("/"))
-        .catch((err) => console.error(`Error on /token: ${err}`));
+        .catch((err) => {
+          setError(true);
+          console.error(`Error on /token: ${err}`);
+        });
+    }
   }, [code]);
 
-  return <Box>{!code ? <SignIn /> : "Authing..."}</Box>;
+  return <Box>{!code || error ? <SignIn /> : "Authing..."}</Box>;
 }
