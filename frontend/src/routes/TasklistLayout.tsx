@@ -4,11 +4,16 @@ import Header from "../components/Header";
 import FilterDrawer from "../components/FilterDrawer";
 import { Box, LoadingOverlay } from "@mantine/core";
 import useQueries from "../hooks/useQueries";
+import useAuth from "../hooks/useAuth";
 
 export default function TasklistLayout() {
   const { tasksQuery, usersQuery, channelsQuery } = useQueries();
   const [opened, { close, toggle }] = useDisclosure(false);
   useHotkeys([["F", () => toggle()]]);
+
+  const [auth, setAuth] = useAuth();
+
+  console.log("TasklistLayout, auth = ", auth);
 
   return (
     <Box>
