@@ -80,7 +80,7 @@ class Slack:
 
     async def test_token(self, token: str):
         logger.debug(f"test_token(); token={token}")
-        test_response = await self.client.auth_test(token=token)
+        test_response = await self.client.openid_connect_userInfo(token=token)
 
         logger.debug(f"testing token, response: {test_response}")
 
@@ -88,7 +88,7 @@ class Slack:
             logger.warning(f"auth test response failed: {test_response}")
             return False
 
-        if test_response["team_id"] != "T1FB2571R":
+        if test_response["https://slack.com/team_id"] != "T1FB2571R":
             logger.warning(f"auth test failed, wrong team: {test_response["team_id"]}")
             return False
 
