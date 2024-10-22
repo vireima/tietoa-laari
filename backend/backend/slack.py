@@ -6,6 +6,8 @@ from slack_sdk.web.async_client import AsyncWebClient
 from backend import models
 from backend.config import settings
 
+from backend.security import encrypt, decrypt
+
 
 class Slack:
     def __init__(self):
@@ -76,23 +78,31 @@ class Slack:
         logger.debug(oauth_response)
         access_token = oauth_response.get("authed_user")["access_token"]
 
-        return access_token
+        return encrypt(access_token)
 
     async def test_token(self, token: str):
-        logger.debug(f"test_token(); token={token}")
-        test_response = await self.client.openid_connect_userInfo(token=token)
+        decrypted = decrypt(token)
 
-        logger.debug(f"testing token, response: {test_response}")
+        logger.debug(f"test_token(); token={decrypted}")
+        try:
+            test_response = await self.client.openid_connect_userInfo(token=decrypted)
 
-        if not test_response["ok"]:
-            logger.warning(f"auth test response failed: {test_response}")
+            logger.debug(f"testing token, response: {test_response}")
+
+            if not test_response["ok"]:
+                logger.warning(f"auth test response failed: {test_response}")
+                return False
+
+            if test_response["https://slack.com/team_id"] != "T1FB2571R":
+                logger.warning(
+                    f"auth test failed, wrong team: {test_response["team_id"]}"
+                )
+                return False
+
+            return True
+        except SlackApiError as err:
+            logger.warning(err)
             return False
-
-        if test_response["https://slack.com/team_id"] != "T1FB2571R":
-            logger.warning(f"auth test failed, wrong team: {test_response["team_id"]}")
-            return False
-
-        return True
 
 
 slack_client = Slack()
