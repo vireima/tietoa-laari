@@ -105,6 +105,8 @@ export default function Tasklist() {
     selected.set(id, !(selected.get(id) ?? false));
   };
 
+  console.log("tasks:", tasks);
+
   return (
     <Center>
       <Drawer

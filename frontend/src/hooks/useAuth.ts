@@ -16,7 +16,7 @@ export default function useAuth() {
       removeCookie("auth");
     } else {
       console.log("setting auth cookie: ", state);
-      setCookie("auth", auth);
+      setCookie("auth", state);
     }
   };
 

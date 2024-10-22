@@ -165,7 +165,9 @@ async def secured(token: Annotated[str, Depends(decode_token)]):
 
 @logger.catch
 @app.get("/tasks")
-async def get_tasks(include_archived: bool = False):
+async def get_tasks(
+    token: Annotated[str, Depends(decode_token)], include_archived: bool = False
+):
     return await db.query(include_archived=include_archived)
 
 
