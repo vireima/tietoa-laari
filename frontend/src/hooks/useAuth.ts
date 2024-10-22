@@ -5,6 +5,9 @@ export default function useAuth() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
   const [auth, setAuth_] = useState<string | null>(cookies.auth ?? null);
 
+  console.log("useAuth(), cookie =", cookies.auth);
+  console.log("useAuth(), auth-state =", auth);
+
   const setAuth = (state: string | null) => {
     setAuth_(state);
 
