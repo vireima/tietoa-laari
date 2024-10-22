@@ -16,8 +16,9 @@ export default function Auth() {
   console.log("auth:", auth);
 
   useEffect(() => {
+    setAuth(null);
+
     if (code !== null) {
-      setAuth(null);
       axios
         .get(`https://${config.API_URL}/token?code=${code}`)
         .then((response) => {
@@ -26,7 +27,7 @@ export default function Auth() {
           setAuth(response.data);
           setError(false);
         })
-        .then(() => navigate("/"))
+        .then(() => setTimeout(() => navigate("/"), 2000))
         .catch((err) => {
           setError(true);
           console.error(`Error on /token: ${err}`);
