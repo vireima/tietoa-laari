@@ -16,8 +16,6 @@ export default function Auth() {
   console.log("auth:", auth);
 
   useEffect(() => {
-    setAuth(null);
-
     if (code !== null) {
       axios
         .get(`https://${config.API_URL}/token?code=${code}`)

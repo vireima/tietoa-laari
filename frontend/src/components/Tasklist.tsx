@@ -1,6 +1,7 @@
 import {
   Anchor,
   Burger,
+  Button,
   Center,
   Container,
   Divider,
@@ -35,6 +36,7 @@ import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
+import useAuth from "../hooks/useAuth";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -93,6 +95,8 @@ export default function Tasklist() {
     useDisclosure(false);
 
   const [isSorted, isReversed, setSorting] = useSorted(tasks);
+
+  const [auth, setAuth] = useAuth();
 
   const select = (id: string) => {
     selected.set(id, true);
@@ -162,6 +166,10 @@ export default function Tasklist() {
             </Anchor>
             lle.
           </Text>
+          <Divider />
+          <Button disabled={!auth} onClick={() => setAuth(null)} w={"10rem"}>
+            Loggaa ulos
+          </Button>
           <Divider />
           <Changelog />
         </Stack>
