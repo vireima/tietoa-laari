@@ -22,6 +22,7 @@ import { CookiesProvider } from "react-cookie";
 import TasklistLayout from "./routes/TasklistLayout";
 import Tasklist from "./components/Tasklist";
 import Secure from "./components/Secure";
+import Auth from "./routes/Auth";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
@@ -89,8 +90,8 @@ const router = createBrowserRouter([
     children: [{ index: true, element: <Tasklist /> }],
   },
   {
-    path: "/sec",
-    element: <Secure />,
+    path: "/auth",
+    element: <Auth />,
     errorElement: <ErrorPage />,
   },
 ]);
