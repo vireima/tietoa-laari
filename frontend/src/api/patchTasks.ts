@@ -27,7 +27,7 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
 
 export async function patchPartialTasks(
   tasks: Partial<ExtendedTask>[],
-  auth: string
+  auth: string | null
 ) {
   const payload = tasks.map((task) => ({
     ...task,
@@ -43,6 +43,7 @@ export async function patchPartialTasks(
       user: vote.user?.id,
     })),
   }));
+
   console.log("Sending payload", payload);
   const response = await axios.patch(
     `https://${config.API_URL}/tasks`,
