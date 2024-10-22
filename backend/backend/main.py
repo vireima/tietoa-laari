@@ -118,6 +118,7 @@ async def add_process_time_header(request: Request, call_next):
             logger.info(
                 f"Incoming request: {request.method} {request.url.path} (query: {request.query_params}) from {host}:{port}."
             )
+            logger.info(f"Headers: {request.headers}")
 
         response: Response = await call_next(request)
 
