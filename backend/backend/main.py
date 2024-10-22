@@ -136,8 +136,8 @@ async def root():
 from slack_sdk.errors import SlackApiError
 
 
-@app.get("/secure")
-async def secure(code: str):
+@app.get("/token")
+async def token(code: str):
     try:
         return await slack_client.auth(code=code)
     except SlackApiError:
