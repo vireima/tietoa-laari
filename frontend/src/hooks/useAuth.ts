@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { DateTime } from "ts-luxon";
 
 export default function useAuth() {
-  const [cookies, setCookie] = useCookies(["auth"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
   const [auth, setAuth] = useState<string | null>(null);
 
   useEffect(() => {
     if (!cookies.auth) {
-      setCookie("auth", true);
+      if (auth === null) removeCookie("auth");
+      else setCookie("auth", auth);
     }
   }, [auth, cookies, setCookie]);
 
