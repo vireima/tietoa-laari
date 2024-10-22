@@ -3,16 +3,19 @@ import { useCookies } from "react-cookie";
 
 export default function useAuth() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
-  const [auth, setAuth] = useState<string | null>(null);
+  const [auth, setAuth_] = useState<string | null>(cookies.auth ?? null);
 
-  useEffect(() => {
-    if (!cookies.auth) {
-      if (auth === null) {
-        console.log("Removing auth cookie");
-        removeCookie("auth");
-      } else setCookie("auth", auth);
+  const setAuth = (state: string | null) => {
+    setAuth_(state);
+
+    if (state === null) {
+      console.log("removing auth cookie");
+      removeCookie("auth");
+    } else {
+      console.log("setting auth cookie: ", state);
+      setCookie("auth", auth);
     }
-  }, [auth, cookies, setCookie]);
+  };
 
   const ret: [string | null, typeof setAuth] = [auth, setAuth];
   return ret;
