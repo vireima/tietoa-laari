@@ -27,7 +27,7 @@ export default async function getChannels({ queryKey }: any) {
   const [_key, auth] = queryKey;
 
   const response = await axios.get(`https://${config.API_URL}/channels`, {
-    headers: { Authorization: `Bearer: ${auth}` },
+    headers: { Authorization: `Bearer ${auth}` },
   });
   return response.data as Channel[];
 }

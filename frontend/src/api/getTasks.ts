@@ -9,7 +9,7 @@ export default async function getTasks({ queryKey }: any) {
 
   const response = await axios.get(
     `https://${config.API_URL}/tasks?include_archived=true`,
-    { headers: { Authorization: `Bearer: ${auth}` } }
+    { headers: { Authorization: `Bearer ${auth}` } }
   );
   return response.data as InputTask[];
 }
