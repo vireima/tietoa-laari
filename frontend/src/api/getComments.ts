@@ -5,7 +5,10 @@ import { ExtendedTask } from "../types/Task";
 import { InputComment } from "../types/Comment";
 import config from "../config";
 
-export default async function getTasks(task: ExtendedTask, auth: string) {
+export default async function getTasks(
+  task: ExtendedTask,
+  auth: string | null
+) {
   if (!task.channel) return [];
 
   const response = await axios.get(
