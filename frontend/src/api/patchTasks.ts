@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ExtendedTask, InputTask } from "../types/Task";
 import config from "../config";
+import useAuth from "../hooks/useAuth";
 
 export default async function patchTasks(tasks: ExtendedTask[]) {
   const payload = tasks.map((task) => ({
@@ -42,7 +43,8 @@ export async function patchPartialTasks(tasks: Partial<ExtendedTask>[]) {
   console.log("Sending payload", payload);
   const response = await axios.patch(
     `https://${config.API_URL}/tasks`,
-    payload
+    payload,
+    { headers: { Authorization: `Bearer: ${useAuth()}` } }
   );
   console.log("Got response", response);
   return response.data as InputTask[];
