@@ -13,7 +13,7 @@ export default function Auth() {
   const code = search.get("code");
   const [error, setError] = useState(false);
 
-  console.log("auth:", auth);
+  console.log("auth (Auth.tsx):", auth);
 
   useEffect(() => {
     if (code !== null) {
@@ -25,7 +25,7 @@ export default function Auth() {
           setAuth(response.data);
           setError(false);
         })
-        .then(() => setTimeout(() => navigate("/"), 2000))
+        // .then(() => setTimeout(() => navigate("/"), 2000))
         .catch((err) => {
           setError(true);
           console.error(`Error on /token: ${err}`);
