@@ -48,7 +48,7 @@ export async function patchPartialTasks(
   const response = await axios.patch(
     `https://${config.API_URL}/tasks`,
     payload,
-    { headers: { Authorization: `Bearer: ${auth}` } }
+    { headers: { Authorization: `Bearer ${auth}` } }
   );
   console.log("Got response", response);
   return response.data as InputTask[];

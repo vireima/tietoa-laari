@@ -6,7 +6,7 @@ export default async function getUsers({ queryKey }: any) {
   const [_key, auth] = queryKey;
 
   const response = await axios.get(`https://${config.API_URL}/users`, {
-    headers: { Authorization: `Bearer: ${auth}` },
+    headers: { Authorization: `Bearer ${auth}` },
   });
   return response.data as User[];
 }

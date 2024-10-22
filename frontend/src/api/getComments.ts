@@ -13,7 +13,7 @@ export default async function getTasks(
 
   const response = await axios.get(
     `https://${config.API_URL}/tasks/${task.channel.id}/${task.ts}/comments`,
-    { headers: { Authorization: `Bearer: ${auth}` } }
+    { headers: { Authorization: `Bearer ${auth}` } }
   );
   return response.data as InputComment[];
 }
