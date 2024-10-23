@@ -1,4 +1,4 @@
-import { Box } from "@mantine/core";
+import { Center, Loader, Paper, Title, Text, Stack } from "@mantine/core";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -25,7 +25,7 @@ export default function Auth() {
           setAuth(response.data);
           setError(false);
         })
-        // .then(() => setTimeout(() => navigate("/"), 2000))
+        .then(() => navigate("/"))
         .catch((err) => {
           setError(true);
           console.error(`Error on /token: ${err}`);
@@ -33,5 +33,15 @@ export default function Auth() {
     }
   }, [code]);
 
-  return <Box>{!code || error ? <SignIn /> : "Authing..."}</Box>;
+  return (
+    <Paper p="xl" shadow="lg" m="5%">
+      <Center>
+        <Stack>
+          <Title>Laari</Title>
+          <Text>Kirjaudu sisään Slack-tunnuksilla:</Text>
+          {!code || error ? <SignIn /> : <Loader type="dots" />}
+        </Stack>
+      </Center>
+    </Paper>
+  );
 }

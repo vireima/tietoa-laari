@@ -142,8 +142,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def require_auth():
     async def dependency(token: Annotated[str, Depends(oauth2_scheme)]):
         logger.debug(f"decode_token(); token = {token}")
-        if not await slack_client.test_token(token):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            token_ok = await slack_client.test_token(token)
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalid token"
+            )
+        else:
+            if not token_ok:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     return depends(Depends(dependency))
 
