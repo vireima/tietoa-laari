@@ -5,6 +5,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from backend import models
 from backend.config import settings
+from backend.security import decrypt, encrypt
 
 
 class Slack:
@@ -24,10 +25,7 @@ class Slack:
 
         user_models = [models.SlackUserModel(**user) for user in users]
 
-        # DEBUG
-        logger.debug(f"Found user: {[u for u in user_models if u.id == 'U048USFG5B2']}")
-
-        return [user for user in user_models if not (user.deleted or user.is_bot)]
+        return [user for user in user_models if not (user.deleted)]
 
     @AsyncTTL(time_to_live=60 * 5)
     async def channels(self) -> list[models.SlackChannelModel]:
@@ -67,6 +65,47 @@ class Slack:
             logger.warning(str(err))
 
         return [models.SlackReplyModel(**reply) for reply in replies]
+
+    async def auth(self, code: str):
+        oauth_response = await self.client.oauth_v2_access(
+            client_id=settings.slack_client_id,
+            client_secret=settings.slack_client_secret,
+            code=code,
+            redirect_uri=settings.slack_redirect_uri,
+        )
+
+        logger.debug(oauth_response)
+        access_token = oauth_response.get("authed_user")["access_token"]
+
+        return encrypt(access_token)
+
+    async def test_token(self, token: str):
+        # decrypt() raises TypeError/ValueError on incorrect tokens
+        decrypted = decrypt(token)
+
+        logger.debug(f"test_token(); token={decrypted}")
+
+        try:
+            test_response = await self.client.openid_connect_userInfo(token=decrypted)
+
+        except SlackApiError as err:
+            logger.warning(err)
+            return False
+
+        else:
+            logger.debug(f"testing token, response: {test_response}")
+
+            if not test_response["ok"]:
+                logger.warning(f"auth test response failed: {test_response}")
+                return False
+
+            if test_response["https://slack.com/team_id"] != "T1FB2571R":
+                logger.warning(
+                    f"auth test failed, wrong team: {test_response["team_id"]}"
+                )
+                return False
+
+            return True
 
 
 slack_client = Slack()

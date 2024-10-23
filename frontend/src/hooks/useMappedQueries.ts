@@ -5,5 +5,10 @@ export default function useMappedQueries() {
   const usersMap = new Map(usersQuery.data?.map((user) => [user.id, user]));
   const channelsMap = new Map(channelsQuery.data?.map((ch) => [ch.id, ch]));
 
-  return { usersMap, channelsMap };
+  return {
+    usersMap,
+    channelsMap,
+    usersStatus: { isPending: usersQuery.isPending },
+    channelsStatus: { isPending: channelsQuery.isPending },
+  };
 }

@@ -4,14 +4,18 @@ import random
 import string
 import sys
 import time
+from typing import Annotated
 
 import emoji_data_python
 import orjson
-from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from fastapi.security import OAuth2PasswordBearer
+from fastapi_decorators import depends
 from loguru import logger
 from multimethod import multimethod
+from slack_sdk.errors import SlackApiError
 from starlette.responses import Response
 
 from backend import models
@@ -20,6 +24,7 @@ from backend.slack import slack_client
 from backend.slite import make_slite_page
 
 app = FastAPI(debug=True, default_response_class=ORJSONResponse)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -105,6 +110,9 @@ async def add_process_time_header(request: Request, call_next):
             logger.info(
                 f"Incoming request: {request.method} {request.url.path} (query: {request.query_params}) from {host}:{port}."
             )
+            logger.info(
+                f"Headers: {{ origin: {request.headers.get("origin", "")}, authorization: {request.headers.get("authorization", "")} }}"
+            )
 
         response: Response = await call_next(request)
 
@@ -120,40 +128,83 @@ async def root():
     return {"details": "Root!"}
 
 
-@logger.catch
+@app.get("/token")
+async def token(code: str):
+    try:
+        return await slack_client.auth(code=code)
+    except SlackApiError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+def require_auth():
+    async def dependency(token: Annotated[str, Depends(oauth2_scheme)]):
+        logger.debug(f"decode_token(); token = {token}")
+
+        try:
+            token_ok = await slack_client.test_token(token)
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalid token"
+            )
+        else:
+            if not token_ok:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    return depends(Depends(dependency))
+
+
+async def decode_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    logger.debug(f"decode_token(); token = {token}")
+    if not await slack_client.test_token(token):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+@app.get("/secured")
+@require_auth()
+async def secured():
+    return f"Tätä ei saa joutua vääriin käsiin: {token}"
+
+
 @app.get("/tasks")
+@require_auth()
 async def get_tasks(include_archived: bool = False):
     return await db.query(include_archived=include_archived)
 
 
-@logger.catch
 @app.get("/tasks/{channel}")
-async def get_tasks_by_channel(channel: str, include_archived: bool = False):
+@require_auth()
+async def get_tasks_by_channel(
+    channel: str,
+    include_archived: bool = False,
+):
     return await db.query(channel=channel, include_archived=include_archived)
 
 
-@logger.catch
 @app.get("/tasks/{channel}/{ts}")
+@require_auth()
 async def get_task(channel: str, ts: str):
     return await db.query(channel=channel, ts=ts)
 
 
-@logger.catch
 @app.get("/tasks/{channel}/{ts}/comments")
+@require_auth()
 async def get_task_comments(channel: str, ts: str):
     return await slack_client.comments(channel, ts)
 
 
-@logger.catch
 @app.delete("/tasks/{task_id}")
+@require_auth()
 async def delete_task(task_id: str):
     cached = await db.delete(task_id)
     # await update_slite()
     return cached
 
 
-@logger.catch
 @app.patch("/tasks")
+@require_auth()
 async def patch_tasks(tasks: list[models.TaskUpdateModel]):
     await db.patch(tasks)
     # await update_slite()
@@ -161,32 +212,34 @@ async def patch_tasks(tasks: list[models.TaskUpdateModel]):
     return await db.query([str(task.id) for task in tasks])
 
 
-@logger.catch
 @app.delete("/tasks")
+@require_auth()
 async def delete_tasks(tasks: list[models.TaskUpdateModel]):
     cached = await db.delete(tasks)
     # await update_slite()
     return cached
 
 
-@logger.catch
 @app.get("/users")
+@require_auth()
 async def get_users():
     return await slack_client.users()
 
 
 @app.get("/duplicates")
+@require_auth()
 async def get_duplicates():
     return await db.duplicates()
 
 
 @app.delete("/duplicates")
+@require_auth()
 async def delete_duplicates():
     return await db.purge()
 
 
-@logger.catch
 @app.get("/channels")
+@require_auth()
 async def get_channels():
     """
     Get information about all the public channels the bot houses.
@@ -194,13 +247,18 @@ async def get_channels():
     return await slack_client.channels()
 
 
-@logger.catch
 @app.get("/channels/{channel_id}")
+@require_auth()
 async def get_channel(channel_id: str):
     """
     Get channel information by id.
     """
     return await slack_client.channel(channel_id)
+
+
+###########################
+# Slack events API routes #
+###########################
 
 
 @logger.catch

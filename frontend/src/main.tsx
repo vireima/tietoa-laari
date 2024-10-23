@@ -11,9 +11,15 @@ import {
   MantineProvider,
   ThemeIcon,
 } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "@mantine/notifications/styles.css";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 // import TaskAccordion from "./routes/TaskAccordion";
 import config from "./config";
@@ -21,6 +27,7 @@ import { CookiesProvider } from "react-cookie";
 // import SingleTask from "./routes/SingleTask";
 import TasklistLayout from "./routes/TasklistLayout";
 import Tasklist from "./components/Tasklist";
+import Login from "./routes/Login";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
@@ -87,6 +94,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [{ index: true, element: <Tasklist /> }],
   },
+  {
+    path: "/login",
+    element: <Login />,
+    errorElement: <ErrorPage />,
+  },
 ]);
 
 console.log("ENV", process.env.NODE_ENV);
@@ -96,6 +108,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
+        <Notifications />
         <CookiesProvider defaultSetOptions={{ path: "/" }}>
           <RouterProvider router={router} />
         </CookiesProvider>

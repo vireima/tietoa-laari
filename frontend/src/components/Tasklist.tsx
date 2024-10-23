@@ -1,6 +1,7 @@
 import {
   Anchor,
   Burger,
+  Button,
   Center,
   Container,
   Divider,
@@ -35,6 +36,8 @@ import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
+import useAuth from "../hooks/useAuth";
+import { notifications } from "@mantine/notifications";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -93,6 +96,8 @@ export default function Tasklist() {
     useDisclosure(false);
 
   const [isSorted, isReversed, setSorting] = useSorted(tasks);
+
+  const [auth, setAuth] = useAuth();
 
   const select = (id: string) => {
     selected.set(id, true);
@@ -154,14 +159,15 @@ export default function Tasklist() {
           </List>
           <Text>
             Teknisissä asioissa laita idea Laariin tai pistä viesti{" "}
-            <Anchor
-              href="slack://user?team=T1FB2571R&id=DCHJRD96D"
-              underline="always"
-            >
+            <Anchor href="slack://user?team=T1FB2571R&id=DCHJRD96D">
               @ville
             </Anchor>
             lle.
           </Text>
+          <Divider />
+          <Button disabled={!auth} onClick={() => setAuth(null)} w={"10rem"}>
+            Kirjaudu ulos
+          </Button>
           <Divider />
           <Changelog />
         </Stack>

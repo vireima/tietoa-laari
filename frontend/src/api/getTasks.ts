@@ -2,9 +2,14 @@ import axios from "axios";
 import { InputTask } from "../types/Task";
 import config from "../config";
 
-export default async function getTasks() {
+export default async function getTasks({ queryKey }: any) {
+  const [_key, auth] = queryKey;
+
+  console.log("FETCH:", { headers: { Authorization: `Bearer: ${auth}` } });
+
   const response = await axios.get(
-    `https://${config.API_URL}/tasks?include_archived=true`
+    `https://${config.API_URL}/tasks?include_archived=true`,
+    { headers: { Authorization: `Bearer ${auth}` } }
   );
   return response.data as InputTask[];
 }

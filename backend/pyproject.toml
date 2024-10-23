@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.115.0"
+fastapi = {extras = ["standard"], version = "^0.115.2"}
 uvicorn = "^0.29.0"
 pydantic-settings = "^2.2.1"
 loguru = "^0.7.2"
@@ -22,6 +22,9 @@ async-cache = "^1.1.1"
 emoji = "^2.12.1"
 emoji-data-python = "^1.5.0"
 motor = "^3.6.0"
+starlette-oauth2-api = "^0.2.6"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+fastapi-decorators = "^1.0.6"
 
 
 [tool.poetry.group.dev.dependencies]
