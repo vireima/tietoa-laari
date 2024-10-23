@@ -5,8 +5,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from backend import models
 from backend.config import settings
-
-from backend.security import encrypt, decrypt
+from backend.security import decrypt, encrypt
 
 
 class Slack:
@@ -81,12 +80,19 @@ class Slack:
         return encrypt(access_token)
 
     async def test_token(self, token: str):
+        # decrypt() raises TypeError/ValueError on incorrect tokens
         decrypted = decrypt(token)
 
         logger.debug(f"test_token(); token={decrypted}")
+
         try:
             test_response = await self.client.openid_connect_userInfo(token=decrypted)
 
+        except SlackApiError as err:
+            logger.warning(err)
+            return False
+
+        else:
             logger.debug(f"testing token, response: {test_response}")
 
             if not test_response["ok"]:
@@ -100,9 +106,6 @@ class Slack:
                 return False
 
             return True
-        except SlackApiError as err:
-            logger.warning(err)
-            return False
 
 
 slack_client = Slack()

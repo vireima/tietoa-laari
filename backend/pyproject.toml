@@ -24,6 +24,7 @@ emoji-data-python = "^1.5.0"
 motor = "^3.6.0"
 starlette-oauth2-api = "^0.2.6"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+fastapi-decorators = "^1.0.6"
 
 
 [tool.poetry.group.dev.dependencies]

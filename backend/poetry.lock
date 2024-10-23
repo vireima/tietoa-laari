@@ -963,6 +963,16 @@ uvicorn = {version = ">=0.15.0", extras = ["standard"]}
 standard = ["uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
+name = "fastapi-decorators"
+version = "1.0.6"
+description = "Add dependencies to your endpoints with the @depends decorator."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "fastapi_decorators-1.0.6.tar.gz", hash = "sha256:8b2f69d984068058efe2d9811f0544d273bf2c62989862e5188e8d3eca74fef2"},
+]
+
+[[package]]
 name = "fastjsonschema"
 version = "2.20.0"
 description = "Fastest Python implementation of JSON schema"
@@ -3883,4 +3893,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6fccf1c897bc5460ba49a25f525c663703e0d4281b56af700d538fd76bccf256"
+content-hash = "00a8fce7b9f3cf5c5800e12fff79b9ca9ddd577447d2d285057800d33b3a8231"

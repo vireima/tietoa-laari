@@ -37,6 +37,7 @@ import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
 import useAuth from "../hooks/useAuth";
+import { notifications } from "@mantine/notifications";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -106,6 +107,7 @@ export default function Tasklist() {
   };
 
   console.log("tasks:", tasks);
+  notifications.show({ title: "Notific!", message: "Testing!" });
 
   return (
     <Center>
