@@ -11,16 +11,19 @@ export default function useQueries() {
     queryKey: ["tasks", auth],
     queryFn: getTasks,
     staleTime: 1000 * 60 * 1,
+    retry: false,
   });
   const usersQuery = useQuery({
     queryKey: ["users", auth],
     queryFn: getUsers,
     staleTime: 1000 * 60 * 5,
+    retry: false,
   });
   const channelsQuery = useQuery({
     queryKey: ["channels", auth],
     queryFn: getChannels,
     staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 
   return { tasksQuery, usersQuery, channelsQuery };

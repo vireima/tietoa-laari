@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import config from "../config";
-import SignIn from "../components/SignIn";
+import SlackSignIn from "../components/SlackSignIn";
 
-export default function Auth() {
+export default function Login() {
   const [search] = useSearchParams();
   const navigate = useNavigate();
   const [auth, setAuth] = useAuth();
@@ -39,7 +39,7 @@ export default function Auth() {
         <Stack>
           <Title>Laari</Title>
           <Text>Kirjaudu sisään Slack-tunnuksilla:</Text>
-          {!code || error ? <SignIn /> : <Loader type="dots" />}
+          {!code || error ? <SlackSignIn /> : <Loader type="dots" />}
         </Stack>
       </Center>
     </Paper>
