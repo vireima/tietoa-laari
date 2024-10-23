@@ -1,6 +1,4 @@
-import { Box, HoverCard, HoverCardProps, Popover } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { PropsWithChildren } from "react";
+import { HoverCard, HoverCardProps } from "@mantine/core";
 
 interface TooltipProps extends HoverCardProps {
   tooltip: React.ReactNode;
@@ -12,10 +10,8 @@ export default function Tooltip({
   ...others
 }: TooltipProps) {
   return (
-    <HoverCard withArrow arrowSize={12} {...others}>
-      <HoverCard.Target>
-        <Box>{children}</Box>
-      </HoverCard.Target>
+    <HoverCard withArrow arrowSize={12} {...others} closeDelay={20}>
+      <HoverCard.Target>{children}</HoverCard.Target>
       <HoverCard.Dropdown>{tooltip}</HoverCard.Dropdown>
     </HoverCard>
   );

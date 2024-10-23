@@ -3,6 +3,16 @@ import { Timeline, Text } from "@mantine/core";
 export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
+      <Timeline.Item title="v1.0.2 Tietoturvaa">
+        <Text c="dimmed">
+          Isona asiana autentikaatio Slackin tunnuksien kautta, Laari ei enää
+          julki internettiin. Lisäksi hieman parempaa viestien muotoiluiden
+          tukemista.
+        </Text>
+        <Text size="xs" mt={4}>
+          23.10.2024
+        </Text>
+      </Timeline.Item>
       <Timeline.Item title="v1.0.1 Ensimmäiset päivitykset">
         <Text c="dimmed">
           Tämä dokumentaatio, linkit Slack-kanaville, viestien

@@ -34,14 +34,12 @@ export default function Login() {
   }, [code]);
 
   return (
-    <Paper p="xl" shadow="lg" m="5%">
-      <Center>
-        <Stack>
-          <Title>Laari</Title>
-          <Text>Kirjaudu sisään Slack-tunnuksilla:</Text>
-          {!code || error ? <SlackSignIn /> : <Loader type="dots" />}
-        </Stack>
-      </Center>
-    </Paper>
+    <Center h="80vh">
+      <Stack>
+        <Title>Laari</Title>
+        <Text>Kirjaudu sisään Slack-tunnuksilla:</Text>
+        {!code || error ? <SlackSignIn /> : <Loader type="dots" />}
+      </Stack>
+    </Center>
   );
 }
