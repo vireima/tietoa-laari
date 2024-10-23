@@ -19,6 +19,9 @@ import { useElementSize, useTimeout } from "@mantine/hooks";
 import { useState } from "react";
 import Tooltip from "./Tooltip";
 import MarkdownFormattedText from "./MarkdownFormattedText";
+import FormattedText from "./FormattedText";
+import UserTag from "./Users/UserTag";
+import ChannelTag from "./Channels/ChannelTag";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
   task: ExtendedTask;
@@ -39,11 +42,16 @@ export default function TasklistItem({
           onOpen(task);
         }}
       >
-        <Spoiler showLabel="" hideLabel="" expanded={opened} maxHeight={25}>
+        <Spoiler
+          showLabel=""
+          hideLabel=""
+          expanded={opened}
+          maxHeight={25}
+          style={{ textOverflow: "ellipsis" }}
+        >
           <Stack>
-            <Text {...(opened ? {} : { truncate: "end" })}>
-              <MarkdownFormattedText text={task.description} />
-            </Text>
+            <FormattedText text={task.description} />
+            {/* <MarkdownFormattedText text={task.description} /> */}
 
             <Group>
               <Anchor
@@ -73,15 +81,17 @@ export default function TasklistItem({
                 })}
               </Text>
               <Text c="dimmed" size="sm">
-                Ehdottaja: @{task.author?.profile.display_name}
+                Ehdottaja: <UserTag user={task.author} />
               </Text>
               {task.assignees.length ? (
-                <Text c="dimmed" size="sm">
-                  Työryhmä:{" "}
-                  {task.assignees
-                    .map((user) => "@" + user?.profile.display_name)
-                    .join(", ")}
-                </Text>
+                <Group gap={"xs"}>
+                  <Text c="dimmed" size="sm">
+                    Työryhmä:
+                  </Text>
+                  {task.assignees.map((user, index) => (
+                    <UserTag user={user} key={index} c="dimmed" size="sm" />
+                  ))}
+                </Group>
               ) : (
                 <></>
               )}
@@ -100,7 +110,7 @@ export default function TasklistItem({
         {task.created.toLocaleString()}
       </Table.Td>
       <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
-        #{task.channel?.name}
+        <ChannelTag channel={task.channel} size="sm" />
       </Table.Td>
       <Table.Td>
         <StatusDropdown task={task} />
@@ -110,8 +120,8 @@ export default function TasklistItem({
           <Tooltip
             tooltip={
               <Stack gap="xs">
-                {task.votes.map((vote) => (
-                  <Text>
+                {task.votes.map((vote, index) => (
+                  <Text key={index}>
                     {`@${vote.user?.profile.display_name}: ${vote.reaction}`}
                   </Text>
                 ))}
