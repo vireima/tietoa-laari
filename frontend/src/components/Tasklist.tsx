@@ -106,9 +106,6 @@ export default function Tasklist() {
     selected.set(id, !(selected.get(id) ?? false));
   };
 
-  console.log("tasks:", tasks);
-  notifications.show({ title: "Notific!", message: "Testing!" });
-
   return (
     <Center>
       <Drawer
@@ -162,17 +159,14 @@ export default function Tasklist() {
           </List>
           <Text>
             Teknisissä asioissa laita idea Laariin tai pistä viesti{" "}
-            <Anchor
-              href="slack://user?team=T1FB2571R&id=DCHJRD96D"
-              underline="always"
-            >
+            <Anchor href="slack://user?team=T1FB2571R&id=DCHJRD96D">
               @ville
             </Anchor>
             lle.
           </Text>
           <Divider />
           <Button disabled={!auth} onClick={() => setAuth(null)} w={"10rem"}>
-            Loggaa ulos
+            Kirjaudu ulos
           </Button>
           <Divider />
           <Changelog />

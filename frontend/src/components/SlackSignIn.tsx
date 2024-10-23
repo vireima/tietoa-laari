@@ -1,8 +1,8 @@
 import { Anchor } from "@mantine/core";
 import config from "../config";
 
-export default function SignIn() {
-  const redirect_uri = `https%3A%2F%2F${config.RAILWAY_PUBLIC_DOMAIN}%2Fauth`;
+export default function SlackSignIn() {
+  const redirect_uri = `https%3A%2F%2F${config.RAILWAY_PUBLIC_DOMAIN}%2Flogin`;
 
   return (
     <Anchor
