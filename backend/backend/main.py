@@ -18,7 +18,7 @@ from multimethod import multimethod
 from slack_sdk.errors import SlackApiError
 from starlette.responses import Response
 
-from backend import models
+from backend import grist, models
 from backend.database import db
 from backend.slack import slack_client
 from backend.slite import make_slite_page
@@ -220,10 +220,39 @@ async def delete_tasks(tasks: list[models.TaskUpdateModel]):
     return cached
 
 
+async def combine_users() -> list[models.UserModel]:
+    slack_users = await slack_client.users()
+    grist_users = grist.fetch_users()
+
+    def find_grist_user(id: str) -> models.GristUserModel | None:
+        for user in grist_users:
+            if user.slack_id == id:
+                return user
+
+        return None
+
+    result_list = []
+
+    for slack_user in slack_users:
+        grist_user = find_grist_user(slack_user.id)
+
+        if grist_user:
+            result_list.append(
+                models.UserModel(
+                    **slack_user.model_dump(),
+                    **grist_user.model_dump(exclude={"slack_id"}),
+                )
+            )
+        else:
+            result_list.append(models.UserModel(**slack_user.model_dump()))
+
+    return result_list
+
+
 @app.get("/users")
 @require_auth()
-async def get_users():
-    return await slack_client.users()
+async def get_users() -> list[models.UserModel]:
+    return await combine_users()
 
 
 @app.get("/duplicates")
