@@ -11,7 +11,7 @@ from multimethod import multimethod
 from pymongo import UpdateOne
 from pymongo.results import BulkWriteResult
 
-from backend import models
+from backend import grist, models
 from backend.config import settings
 
 
@@ -49,9 +49,17 @@ class Database:
         Insert one task into the database.
         """
         task_dict = task.model_dump()
+
+        # Bump created and modified timestamps
         task_dict.update(
             {"created": arrow.utcnow().datetime, "modified": arrow.utcnow().datetime}
         )
+
+        # Try to initialize the Team of the task by the creators
+        # business unit information, if available
+        grist_user = grist.get_user_by_id(task.author)
+        if grist_user:
+            task_dict.update({"teams": task.teams | {grist_user.unit}})
 
         # Upsert instead of insert to avoid race conditions inserting multiple entries.
         await self.collection.update_one(
