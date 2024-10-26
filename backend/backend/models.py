@@ -214,7 +214,7 @@ class TaskUpdateModel(BaseModel):
     archived: bool | None = None
     tags: set[str] | None = None
     slite: str | None = None
-    team: set[str] | None = None
+    teams: set[str] | None = None
 
     @field_serializer("assignees", "tags", "teams")
     def set_serializer(self, values: set[str] | None):
