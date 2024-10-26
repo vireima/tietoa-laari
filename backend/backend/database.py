@@ -59,7 +59,7 @@ class Database:
         # business unit information, if available
         grist_user = grist.get_user_by_id(task.author)
         if grist_user:
-            task_dict.update({"teams": task.teams | {grist_user.unit}})
+            task_dict.update({"teams": list(task.teams | {grist_user.unit})})
 
         # Upsert instead of insert to avoid race conditions inserting multiple entries.
         await self.collection.update_one(
