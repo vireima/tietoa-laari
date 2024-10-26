@@ -133,7 +133,7 @@ async def token(code: str):
     try:
         return await slack_client.auth(code=code)
     except SlackApiError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from None
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -148,7 +148,7 @@ def require_auth():
         except (TypeError, ValueError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="invalid token"
-            )
+            ) from None
         else:
             if not token_ok:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -222,19 +222,11 @@ async def delete_tasks(tasks: list[models.TaskUpdateModel]):
 
 async def combine_users() -> list[models.UserModel]:
     slack_users = await slack_client.users()
-    grist_users = grist.fetch_users()
-
-    def find_grist_user(id: str) -> models.GristUserModel | None:
-        for user in grist_users:
-            if user.slack_id == id:
-                return user
-
-        return None
 
     result_list = []
 
     for slack_user in slack_users:
-        grist_user = find_grist_user(slack_user.id)
+        grist_user = grist.get_user_by_id(slack_user.id)
 
         if grist_user:
             result_list.append(

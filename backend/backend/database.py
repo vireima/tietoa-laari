@@ -33,7 +33,7 @@ class Database:
         await self.insert_task(
             models.TaskInputModel(
                 author=message.user,
-                assignees=re.findall(r"<@(\w+)>", message.text),
+                assignees=set(re.findall(r"<@(\w+)>", message.text)),
                 channel=message.channel,
                 ts=message.ts,
                 description=message.text,
