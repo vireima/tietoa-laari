@@ -176,7 +176,7 @@ class StatusEnum(str, Enum):
 class TaskInputModel(BaseModel):
     author: str
     assignee: str | None = None
-    assignees: set[str] = Field(default_factory=list)
+    assignees: set[str] = Field(default_factory=set)
     slite: str | None = None
     channel: str
     ts: str
@@ -187,8 +187,8 @@ class TaskInputModel(BaseModel):
     votes: list[Reaction] = Field(default_factory=list)
     status: StatusEnum = StatusEnum.todo
     archived: bool = False
-    tags: set[str] = Field(default_factory=list)
-    teams: set[str] = Field(default_factory=list)
+    tags: set[str] = Field(default_factory=set)
+    teams: set[str] = Field(default_factory=set)
 
 
 class TaskUpdateModel(BaseModel):
