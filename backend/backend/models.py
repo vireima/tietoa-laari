@@ -216,6 +216,10 @@ class TaskUpdateModel(BaseModel):
     slite: str | None = None
     team: set[str] | None = None
 
+    @field_serializer("assignees", "tags", "teams")
+    def set_serializer(self, values: set[str] | None):
+        return sorted(values) if values is not None else None
+
 
 class TaskOutputModel(TaskInputModel):
     id: PyObjectId = Field(alias="_id")
