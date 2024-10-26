@@ -6,7 +6,14 @@ import arrow
 import emoji_data_python
 import pytz
 from bson import ObjectId
-from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    field_serializer,
+)
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
@@ -189,6 +196,10 @@ class TaskInputModel(BaseModel):
     archived: bool = False
     tags: set[str] = Field(default_factory=set)
     teams: set[str] = Field(default_factory=set)
+
+    @field_serializer("assignees", "tags", "teams")
+    def set_serializer(self, values: set[str]):
+        return sorted(values)
 
 
 class TaskUpdateModel(BaseModel):

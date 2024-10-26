@@ -23,7 +23,7 @@ def decrypt(data: str) -> str:
 
     try:
         return SUITE.decrypt(data).decode()
-    except InvalidToken as err:
+    except InvalidToken:
         raise ValueError(f"attempting to decrypt invalid token: {data}") from None
     except TypeError as err:
         # Should not happen, raised when data is not bytes or str
