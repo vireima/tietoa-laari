@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Anchor,
   Burger,
   Button,
@@ -10,6 +11,7 @@ import {
   Group,
   List,
   ListItem,
+  Popover,
   rem,
   Stack,
   Table,
@@ -21,10 +23,11 @@ import {
 } from "@mantine/core";
 import { useFilteredData } from "../hooks/useFilteredData";
 import { useDisclosure, useMap } from "@mantine/hooks";
-import { ExtendedTask } from "../types/Task";
+import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
 import { useState } from "react";
 import {
   IconArrowBigRightLinesFilled,
+  IconCalendarTime,
   IconChevronDown,
   IconChevronUp,
   IconSelector,
@@ -38,6 +41,9 @@ import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
 import useAuth from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
+import { DateTime } from "ts-luxon";
+import DateFilterDialog from "./DateFilterDialog";
+import useQueries from "../hooks/useQueries";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -68,16 +74,22 @@ function Th({ children, reversed, sorted, onSort, ...others }: ThProps) {
   );
 }
 
-function filterData(data: ExtendedTask[], search: string) {
+function filterDataBySearchString(
+  data: TaskWithVisualOverrides[],
+  search: string
+): TaskWithVisualOverrides[] {
   if (!search) return data;
 
   const query = search.toLowerCase().trim();
+
+  // Filter data by text query
   return data.filter(
     (item) =>
       item.description.toLowerCase().includes(query) ||
       item.channel?.name?.toLowerCase().includes(query) ||
       item.status.label.toLowerCase().includes(query) ||
       item.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+      item.teams.some((team) => team.toLowerCase().includes(query)) ||
       item.author?.profile.display_name.toLowerCase().includes(query) ||
       item.assignees.some((user) =>
         user?.profile.display_name.toLowerCase().includes(query)
@@ -85,12 +97,32 @@ function filterData(data: ExtendedTask[], search: string) {
   );
 }
 
+function filterDataByModifiedDate(
+  data: TaskWithVisualOverrides[],
+  cutoff_date?: DateTime,
+  fade: boolean = false
+): TaskWithVisualOverrides[] {
+  if (!cutoff_date) return data;
+
+  return fade
+    ? data.map((item) => {
+        if (item.modified < cutoff_date) item.faded = true;
+        return item;
+      })
+    : data.filter((item) => item.modified >= cutoff_date);
+}
+
 export default function Tasklist() {
-  // const { tasksQuery, usersQuery, channelsQuery } = useQueries();
   const { tasks } = useFilteredData();
   const [search, setSearch] = useState("");
-  const searchFilteredTasks = filterData(tasks, search);
-  const selected = useMap<string, boolean>();
+  const [cutoffDate, setCutoffDate] = useState<DateTime | undefined>(undefined);
+  const searchFilteredTasks = filterDataBySearchString(tasks, search);
+  const dateFilteredTasks = filterDataByModifiedDate(
+    searchFilteredTasks,
+    cutoffDate,
+    true
+  );
+  // const selected = useMap<string, boolean>();
   const [opened, setOpened] = useState("");
   const [settingsOpened, { toggle: settingsToggle, close: settingsClose }] =
     useDisclosure(false);
@@ -99,12 +131,12 @@ export default function Tasklist() {
 
   const [auth, setAuth] = useAuth();
 
-  const select = (id: string) => {
-    selected.set(id, true);
-  };
-  const toggle = (id: string) => {
-    selected.set(id, !(selected.get(id) ?? false));
-  };
+  // const select = (id: string) => {
+  //   selected.set(id, true);
+  // };
+  // const toggle = (id: string) => {
+  //   selected.set(id, !(selected.get(id) ?? false));
+  // };
 
   return (
     <Center>
@@ -184,13 +216,14 @@ export default function Tasklist() {
               setSearch(event.currentTarget.value);
             }}
           />
+          <DateFilterDialog onChange={setCutoffDate} date={cutoffDate} />
         </Flex>
 
         <Table
           stickyHeader
           highlightOnHover
           layout="fixed"
-          verticalSpacing="sm"
+          verticalSpacing="xs"
         >
           <Table.Thead>
             <Table.Tr style={{ fontWeight: 700 }}>
@@ -198,7 +231,7 @@ export default function Tasklist() {
                 reversed={isReversed("description")}
                 sorted={isSorted("description")}
                 onSort={() => setSorting("description")}
-                w="60%"
+                w="68%"
               >
                 Ajatus
               </Th>
@@ -207,16 +240,17 @@ export default function Tasklist() {
                 reversed={isReversed("created")}
                 sorted={isSorted("created")}
                 onSort={() => setSorting("created")}
+                w={rem(135)}
               >
                 Luotu
               </Th>
               <Th
                 visibleFrom="md"
-                reversed={isReversed("channel")}
-                sorted={isSorted("channel")}
-                onSort={() => setSorting("channel")}
+                reversed={isReversed("teams")}
+                sorted={isSorted("teams")}
+                onSort={() => setSorting("teams")}
               >
-                Kanava
+                Tiimi
               </Th>
 
               <Th
@@ -242,7 +276,7 @@ export default function Tasklist() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {searchFilteredTasks.map((task) => (
+            {dateFilteredTasks.map((task) => (
               <TasklistItem
                 key={task._id}
                 task={task}

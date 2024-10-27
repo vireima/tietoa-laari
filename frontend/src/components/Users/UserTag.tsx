@@ -17,12 +17,12 @@ interface UserTagProps extends TextProps {
 }
 
 export default function UserTag({ user, ...others }: UserTagProps) {
+  const { usersMap, usersStatus } = useMappedQueries();
+
   if (!user) {
-    console.error("empty user: ", user);
+    console.debug("empty user: ", user);
     return <></>;
   }
-
-  const { usersMap, usersStatus } = useMappedQueries();
 
   const userData = typeof user === "string" ? usersMap.get(user) : user;
 
