@@ -28,6 +28,8 @@ import { CookiesProvider } from "react-cookie";
 import TasklistLayout from "./routes/TasklistLayout";
 import Tasklist from "./components/Tasklist";
 import Login from "./routes/Login";
+import "dayjs/locale/fi";
+import { DatesProvider } from "@mantine/dates";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
@@ -109,9 +111,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
         <Notifications />
-        <CookiesProvider defaultSetOptions={{ path: "/" }}>
-          <RouterProvider router={router} />
-        </CookiesProvider>
+        <DatesProvider settings={{ locale: "fi" }}>
+          <CookiesProvider defaultSetOptions={{ path: "/" }}>
+            <RouterProvider router={router} />
+          </CookiesProvider>
+        </DatesProvider>
       </MantineProvider>
       <ReactQueryDevtools client={queryClient} />
     </QueryClientProvider>

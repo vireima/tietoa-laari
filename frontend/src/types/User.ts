@@ -13,4 +13,8 @@ export default interface User {
     image_512: string;
   };
   is_bot: boolean;
+  first_name: string;
+  last_name: string;
+  unit: string;
+  guid: string;
 }

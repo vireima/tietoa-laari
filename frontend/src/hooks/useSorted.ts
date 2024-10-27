@@ -37,6 +37,29 @@ function cmpChannel(a: ExtendedTask, b: ExtendedTask) {
   return a.channel.name.localeCompare(b.channel.name);
 }
 
+function cmpTeams(a: ExtendedTask, b: ExtendedTask) {
+  // 10 - 7 > 0 7.comp(10) pos
+  // a < b pos
+  // b > a neg
+  const a_teams = new Set(...a.teams);
+  const b_teams = new Set(...b.teams);
+
+  // Compare set differences, ie. ignore tags/teams common to both a and b
+  const a_dif_b_sorted = Array.from(a_teams.difference(b_teams)).sort((x, y) =>
+    x.localeCompare(y)
+  );
+  const b_dif_a_sorted = Array.from(b_teams.difference(a_teams)).sort((x, y) =>
+    x.localeCompare(y)
+  );
+
+  // If lenghts differ, more is more
+  if (a_dif_b_sorted.length !== b_dif_a_sorted.length)
+    return b_dif_a_sorted.length - a_dif_b_sorted.length;
+
+  // Otherwise lexical sorting
+  return a_dif_b_sorted.join().localeCompare(b_dif_a_sorted.join());
+}
+
 // function sortTasks(
 //   tasks: ExtendedTask[],
 //   cmp: (a: ExtendedTask, b: ExtendedTask) => number,
@@ -63,6 +86,7 @@ function sortTasks(tasks: ExtendedTask[], sortDirections: SortDirection[]) {
     ["votes", cmpVotes],
     ["description", cmpDescription],
     ["channel", cmpChannel],
+    ["teams", cmpTeams],
   ]);
 
   // Iterate the array backwards

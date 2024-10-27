@@ -28,6 +28,7 @@ export interface InputTask {
   tags: string[];
   slite: string | undefined;
   archived: boolean;
+  teams: string[];
   _id: string;
 }
 
@@ -46,5 +47,6 @@ export interface ExtendedTask {
   tags: string[];
   slite?: string;
   archived: boolean;
+  teams: string[];
   _id: string;
 }
