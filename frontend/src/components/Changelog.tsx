@@ -3,6 +3,17 @@ import { Timeline, Text } from "@mantine/core";
 export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
+      <Timeline.Item title="v1.0.3 Tiimit">
+        <Text c="dimmed">
+          Ehdotukselle voi asettaa yhden tai useamman tiimin, ne ovat
+          vapaavalintaisia litteroita. Oletustiimi täytetään ehdotuksen
+          asettajan yksikön perusteella. Lisäksi filtteröinti muokkausajan
+          mukaan sekä käyttöliittymäpäivityksiä.
+        </Text>
+        <Text size="xs" mt={4}>
+          27.10.2024
+        </Text>
+      </Timeline.Item>
       <Timeline.Item title="v1.0.2 Tietoturvaa">
         <Text c="dimmed">
           Isona asiana autentikaatio Slackin tunnuksien kautta, Laari ei enää

@@ -204,7 +204,7 @@ export default function Tasklist() {
           <Changelog />
         </Stack>
       </Drawer>
-      <Stack maw={{ base: "100%", sm: "80%" }}>
+      <Stack maw={{ base: "100%", md: "80%" }}>
         <Flex wrap={"nowrap"} justify={"flex-start"} align={"center"}>
           <Burger opened={settingsOpened} onClick={settingsToggle}></Burger>
           <TextInput
@@ -231,7 +231,8 @@ export default function Tasklist() {
                 reversed={isReversed("description")}
                 sorted={isSorted("description")}
                 onSort={() => setSorting("description")}
-                w="68%"
+                miw="68%"
+                // w="68%"
               >
                 Ajatus
               </Th>
@@ -249,6 +250,7 @@ export default function Tasklist() {
                 reversed={isReversed("teams")}
                 sorted={isSorted("teams")}
                 onSort={() => setSorting("teams")}
+                w={rem(170)}
               >
                 Tiimi
               </Th>
