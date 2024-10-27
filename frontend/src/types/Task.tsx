@@ -50,3 +50,8 @@ export interface ExtendedTask {
   teams: string[];
   _id: string;
 }
+
+export interface TaskWithVisualOverrides extends ExtendedTask {
+  hidden?: boolean;
+  faded?: boolean;
+}
