@@ -6,7 +6,14 @@ import arrow
 import emoji_data_python
 import pytz
 from bson import ObjectId
-from pydantic import AnyHttpUrl, BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    field_serializer,
+)
 
 TZ_UTC = pytz.timezone("UTC")
 TZ_LOCAL = pytz.timezone("Europe/Helsinki")
@@ -176,7 +183,7 @@ class StatusEnum(str, Enum):
 class TaskInputModel(BaseModel):
     author: str
     assignee: str | None = None
-    assignees: list[str] = Field(default_factory=list)
+    assignees: set[str] = Field(default_factory=set)
     slite: str | None = None
     channel: str
     ts: str
@@ -187,21 +194,31 @@ class TaskInputModel(BaseModel):
     votes: list[Reaction] = Field(default_factory=list)
     status: StatusEnum = StatusEnum.todo
     archived: bool = False
-    tags: list[str] = Field(default_factory=list)
+    tags: set[str] = Field(default_factory=set)
+    teams: set[str] = Field(default_factory=set)
+
+    @field_serializer("assignees", "tags", "teams")
+    def set_serializer(self, values: set[str]):
+        return sorted(values)
 
 
 class TaskUpdateModel(BaseModel):
     id: PyObjectId = Field(alias="_id")
     assignee: str | None = None
-    assignees: list[str] | None = None
+    assignees: set[str] | None = None
     description: EmojiDescription | None = None
     priority: int | None = None
     modified: DatetimeUTC | None = None
     votes: list[Reaction] | None = None
     status: StatusEnum | None = None
     archived: bool | None = None
-    tags: list[str] | None = None
+    tags: set[str] | None = None
     slite: str | None = None
+    teams: set[str] | None = None
+
+    @field_serializer("assignees", "tags", "teams")
+    def set_serializer(self, values: set[str] | None):
+        return sorted(values) if values is not None else None
 
 
 class TaskOutputModel(TaskInputModel):
@@ -251,3 +268,20 @@ class SlackReplyModel(BaseModel):
     text: EmojiDescription
     thread_ts: str | None = None
     ts: str
+
+
+# Grist models
+class GristUserModel(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    first_name: str = Field(alias="firstName")
+    last_name: str = Field(alias="lastName")
+    unit: str
+    guid: str
+    slack_id: str = Field(alias="Slack_User_ID")
+
+
+class UserModel(SlackUserModel):
+    first_name: str = ""
+    last_name: str = ""
+    unit: str = ""
+    guid: str = ""

@@ -1,4 +1,10 @@
-import { Anchor, Text } from "@mantine/core";
+import {
+  Anchor,
+  HighlightProps,
+  Text,
+  Highlight,
+  TextProps,
+} from "@mantine/core";
 import UserTag from "./Users/UserTag";
 import useMappedQueries from "../hooks/useMappedQueries";
 import User from "../types/User";
@@ -87,7 +93,11 @@ function parseSlackFormatting(
   return arr;
 }
 
-export default function FormattedText({ text }: { text: string }) {
+interface FormattedTextProps extends TextProps {
+  text: string;
+}
+
+export default function FormattedText({ text, ...others }: FormattedTextProps) {
   const { usersMap } = useMappedQueries();
   // console.log(parse(text, parsers, 0));
 
@@ -104,7 +114,7 @@ export default function FormattedText({ text }: { text: string }) {
 
   // console.log(arr.join("|"));
   return (
-    <Text>
+    <Text {...others}>
       {parseSlackFormatting(text, usersMap).map((elem, index) =>
         React.cloneElement(elem, { key: index })
       )}

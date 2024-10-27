@@ -1,32 +1,18 @@
-import {
-  Anchor,
-  Box,
-  Collapse,
-  Divider,
-  Group,
-  Popover,
-  rem,
-  Spoiler,
-  Stack,
-  Table,
-  Text,
-} from "@mantine/core";
-import { ExtendedTask } from "../types/Task";
-import { IconArrowRightBar, IconThumbUpFilled } from "@tabler/icons-react";
+import { Anchor, Box, Group, Spoiler, Stack, Table, Text } from "@mantine/core";
+import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
+import { IconThumbUpFilled } from "@tabler/icons-react";
 import StatusDropdown from "./StatusDropdown";
-import classes from "../styles/Tasklist.module.css";
-import { useElementSize, useTimeout } from "@mantine/hooks";
-import { useState } from "react";
 import Tooltip from "./Tooltip";
-import MarkdownFormattedText from "./MarkdownFormattedText";
 import FormattedText from "./FormattedText";
 import UserTag from "./Users/UserTag";
-import ChannelTag from "./Channels/ChannelTag";
+import { TeamTags } from "./TeamTag";
+import { DateTime } from "ts-luxon";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
-  task: ExtendedTask;
+  task: TaskWithVisualOverrides;
   selected: boolean;
   opened: boolean;
+  highlight?: string;
   onOpen: (task: ExtendedTask) => void;
 }
 
@@ -36,7 +22,7 @@ export default function TasklistItem({
   onOpen,
 }: TasklistItemProps) {
   return (
-    <Table.Tr>
+    <Table.Tr {...(task.faded ? { opacity: 0.2 } : {})}>
       <Table.Td
         onClick={() => {
           onOpen(task);
@@ -47,13 +33,12 @@ export default function TasklistItem({
           hideLabel=""
           expanded={opened}
           maxHeight={25}
-          style={{ textOverflow: "ellipsis" }}
+          m={0}
         >
           <Stack>
             <FormattedText text={task.description} />
-            {/* <MarkdownFormattedText text={task.description} /> */}
 
-            <Group>
+            <Group gap={"xs"}>
               <Anchor
                 // c="dimmed"
                 size="sm"
@@ -62,6 +47,17 @@ export default function TasklistItem({
               >
                 ↦ Slack-linkki
               </Anchor>
+              {task.slite ? (
+                <Anchor
+                  size="sm"
+                  href={`https://tietoa.slite.com/api/s/${task.slite}`}
+                  target="_blank"
+                >
+                  ↦ Slite-linkki
+                </Anchor>
+              ) : (
+                <></>
+              )}
               <Text c="dimmed" size="sm">
                 Luotu:{" "}
                 {task.created.toLocaleString({
@@ -95,23 +91,21 @@ export default function TasklistItem({
               ) : (
                 <></>
               )}
-              {task.slite ? (
-                <Anchor href={`https://tietoa.slite.com/api/s/${task.slite}`}>
-                  Wiki
-                </Anchor>
-              ) : (
-                <></>
-              )}
             </Group>
           </Stack>
         </Spoiler>
       </Table.Td>
-      <Table.Td style={{ verticalAlign: "top" }} visibleFrom="md">
-        {task.created.toLocaleString()}
+      <Table.Td visibleFrom="md">
+        <Tooltip tooltip={task.created.toLocaleString(DateTime.DATETIME_FULL)}>
+          <Text size="sm">{task.created.toRelative()}</Text>
+        </Tooltip>
       </Table.Td>
       <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
-        <ChannelTag channel={task.channel} size="sm" />
+        <TeamTags task={task} />
       </Table.Td>
+      {/* <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
+        <ChannelTag channel={task.channel} size="sm" />
+      </Table.Td> */}
       <Table.Td>
         <StatusDropdown task={task} />
       </Table.Td>

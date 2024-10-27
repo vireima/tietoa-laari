@@ -18,7 +18,7 @@ from multimethod import multimethod
 from slack_sdk.errors import SlackApiError
 from starlette.responses import Response
 
-from backend import models
+from backend import grist, models
 from backend.database import db
 from backend.slack import slack_client
 from backend.slite import make_slite_page
@@ -133,7 +133,7 @@ async def token(code: str):
     try:
         return await slack_client.auth(code=code)
     except SlackApiError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from None
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -148,7 +148,7 @@ def require_auth():
         except (TypeError, ValueError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="invalid token"
-            )
+            ) from None
         else:
             if not token_ok:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -220,10 +220,31 @@ async def delete_tasks(tasks: list[models.TaskUpdateModel]):
     return cached
 
 
+async def combine_users() -> list[models.UserModel]:
+    slack_users = await slack_client.users()
+
+    result_list = []
+
+    for slack_user in slack_users:
+        grist_user = grist.get_user_by_id(slack_user.id)
+
+        if grist_user:
+            result_list.append(
+                models.UserModel(
+                    **slack_user.model_dump(),
+                    **grist_user.model_dump(exclude={"slack_id"}),
+                )
+            )
+        else:
+            result_list.append(models.UserModel(**slack_user.model_dump()))
+
+    return result_list
+
+
 @app.get("/users")
 @require_auth()
-async def get_users():
-    return await slack_client.users()
+async def get_users() -> list[models.UserModel]:
+    return await combine_users()
 
 
 @app.get("/duplicates")

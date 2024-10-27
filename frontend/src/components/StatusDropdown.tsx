@@ -41,7 +41,7 @@ export default function StatusDropdown({ task }: StatusDropdownProps) {
   }
 
   return (
-    <Tooltip tooltip={task.status.label} position="top">
+    <Tooltip tooltip={task.status.label} position="right">
       <Container fluid={true}>
         <Menu>
           <Menu.Target>

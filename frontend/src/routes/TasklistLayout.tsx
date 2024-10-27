@@ -1,29 +1,11 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useDisclosure, useHotkeys } from "@mantine/hooks";
-import Header from "../components/Header";
-import FilterDrawer from "../components/FilterDrawer";
-import {
-  Box,
-  Button,
-  Text,
-  Stack,
-  Loader,
-  Center,
-  Alert,
-  Anchor,
-} from "@mantine/core";
+import { Box, Text, Loader, Center, Alert, Anchor } from "@mantine/core";
 import useQueries from "../hooks/useQueries";
 import useAuth from "../hooks/useAuth";
-import { notifications, useNotifications } from "@mantine/notifications";
-import {
-  IconAlertSmall,
-  IconExclamationCircle,
-  IconExclamationCircleFilled,
-} from "@tabler/icons-react";
+import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { useEffect } from "react";
 
 export default function TasklistLayout() {
-  // const notificationsStore = useNotifications();
   const navigate = useNavigate();
   const { tasksQuery, usersQuery, channelsQuery } = useQueries();
 
@@ -34,37 +16,6 @@ export default function TasklistLayout() {
       navigate("/login");
     }
   }, [auth]);
-
-  // useEffect(() => {
-  //   if (tasksQuery.isError || usersQuery.isError || channelsQuery.isError) {
-  //     if (
-  //       !notificationsStore.notifications.find(
-  //         (notification) => notification.id === "error"
-  //       )
-  //     ) {
-  //       notifications.show({
-  //         id: "error",
-  //         title: "Ehdotusten haku epännistui",
-  //         color: "red",
-  //         icon: <IconAlertSmall />,
-  //         message: (
-  //           <Stack gap="xs">
-  //             <Text>{tasksQuery.error?.message}</Text>
-  //             <Button
-  //               color="red"
-  //               onClick={() => {
-  //                 navigate("/login");
-  //                 notifications.clean();
-  //               }}
-  //             >
-  //               Kirjaudu sisään
-  //             </Button>
-  //           </Stack>
-  //         ),
-  //       });
-  //     }
-  //   }
-  // }, [tasksQuery.isError, usersQuery.isError, channelsQuery.isError]);
 
   return (
     <Box>
