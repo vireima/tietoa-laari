@@ -5,7 +5,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from backend import models
 from backend.config import settings
-from backend.security import decrypt, encrypt
+from backend.security import decrypt, encrypt, jwt_decode, jwt_encode
 
 
 class Slack:
@@ -79,21 +79,18 @@ class Slack:
 
         logger.debug(oauth_response)
         access_token = oauth_response.get("authed_user")["access_token"]
+        slack_id_token = oauth_response.get("authed_user")["id"]
 
-        return encrypt(access_token)
+        return jwt_encode(client_id=slack_id_token, at_hash=encrypt(access_token))
 
-    async def test_token(self, token: str) -> bool:
+    @AsyncTTL(time_to_live=60 * 60 * 12)
+    async def verify_access_token(self, token: str) -> bool:
         """
-        Return True if token is authed, False otherwise.
-        Raises TypeError if token is not string, and ValueError on otherwise malformed tokens.
+        Verifies Slack access token. Values are cached so as to not query Slack servers
+        too often.
         """
-        # decrypt() raises TypeError/ValueError on incorrect tokens
-        decrypted = decrypt(token)
-
-        logger.debug(f"test_token(); token={decrypted}")
-
         try:
-            test_response = await self.client.openid_connect_userInfo(token=decrypted)
+            test_response = await self.client.openid_connect_userInfo(token=token)
 
         except SlackApiError as err:
             logger.warning(err)
@@ -113,6 +110,20 @@ class Slack:
                 return False
 
             return True
+
+    async def test_token(self, token: str) -> bool:
+        """
+        Return True if token is authed, False otherwise.
+        Raises TypeError if token is not string, and ValueError on otherwise malformed tokens.
+        """
+        # raises jwt errors on incorrect sign, expiration, wrong issuer etc
+        decoded = jwt_decode(token=token)
+
+        # decrypt() raises TypeError/ValueError on incorrect tokens
+        decrypted = decrypt(decoded["at_hash"])
+
+        # returns (cached) True/False
+        return self.verify_access_token(decrypted)
 
 
 slack_client = Slack()
