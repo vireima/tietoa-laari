@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi_decorators import depends
+from jose.exceptions import ExpiredSignatureError, JOSEError
 from loguru import logger
 from multimethod import multimethod
 from slack_sdk.errors import SlackApiError
@@ -145,9 +146,18 @@ def require_auth():
 
         try:
             token_ok = await slack_client.test_token(token)
-        except (TypeError, ValueError):
+
+        except ExpiredSignatureError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="expired signature"
+            ) from None
+        except JOSEError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="invalid token"
+            ) from None
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="invalid access token"
             ) from None
         else:
             if not token_ok:
