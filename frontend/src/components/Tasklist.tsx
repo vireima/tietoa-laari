@@ -1,17 +1,14 @@
 import {
-  ActionIcon,
   Anchor,
   Burger,
   Button,
   Center,
-  Container,
   Divider,
   Drawer,
   Flex,
   Group,
   List,
   ListItem,
-  Popover,
   rem,
   Stack,
   Table,
@@ -22,12 +19,11 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useFilteredData } from "../hooks/useFilteredData";
-import { useDisclosure, useMap } from "@mantine/hooks";
-import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
+import { useDisclosure } from "@mantine/hooks";
+import { TaskWithVisualOverrides } from "../types/Task";
 import { useState } from "react";
 import {
   IconArrowBigRightLinesFilled,
-  IconCalendarTime,
   IconChevronDown,
   IconChevronUp,
   IconSelector,
@@ -35,15 +31,14 @@ import {
 } from "@tabler/icons-react";
 import classes from "../styles/Tasklist.module.css";
 import useSorted from "../hooks/useSorted";
-import StatusDropdown from "./StatusDropdown";
 import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
 import useAuth from "../hooks/useAuth";
-import { notifications } from "@mantine/notifications";
 import { DateTime } from "ts-luxon";
 import DateFilterDialog from "./DateFilterDialog";
-import useQueries from "../hooks/useQueries";
+import LightDarkModeButton from "./LightDarkModeButton";
+import TasklistItems from "./TasklistItems";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -115,19 +110,25 @@ function filterDataByModifiedDate(
 export default function Tasklist() {
   const { tasks } = useFilteredData();
   const [search, setSearch] = useState("");
+  const [opened, setOpened] = useState("");
   const [cutoffDate, setCutoffDate] = useState<DateTime | undefined>(undefined);
+
+  // const selected = useMap<string, boolean>();
+
+  const [settingsOpened, { toggle: settingsToggle, close: settingsClose }] =
+    useDisclosure(false);
+
+  const [isSorted, isReversed, setSorting] = useSorted(tasks);
+
   const searchFilteredTasks = filterDataBySearchString(tasks, search);
   const dateFilteredTasks = filterDataByModifiedDate(
     searchFilteredTasks,
     cutoffDate,
     true
-  );
-  // const selected = useMap<string, boolean>();
-  const [opened, setOpened] = useState("");
-  const [settingsOpened, { toggle: settingsToggle, close: settingsClose }] =
-    useDisclosure(false);
-
-  const [isSorted, isReversed, setSorting] = useSorted(tasks);
+  ).map((t) => {
+    t.opened = t._id === opened;
+    return t;
+  });
 
   const [auth, setAuth] = useAuth();
 
@@ -144,10 +145,11 @@ export default function Tasklist() {
         opened={settingsOpened}
         onClose={settingsClose}
         position="bottom"
-        title={<Title>Laari</Title>}
+        title={"Laari"}
         overlayProps={{ backgroundOpacity: 0.15 }}
         padding={"xl"}
         size={"xl"}
+        styles={{ title: { fontWeight: 700, fontSize: rem(35) } }}
       >
         <Stack>
           <Text>
@@ -216,6 +218,7 @@ export default function Tasklist() {
               setSearch(event.currentTarget.value);
             }}
           />
+          <LightDarkModeButton />
           <DateFilterDialog onChange={setCutoffDate} date={cutoffDate} />
         </Flex>
 
@@ -277,7 +280,13 @@ export default function Tasklist() {
               </Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>
+          <TasklistItems
+            tasks={dateFilteredTasks}
+            onOpen={(openedTask) =>
+              setOpened(opened === openedTask._id ? "" : openedTask._id)
+            }
+          />
+          {/* <Table.Tbody>
             {dateFilteredTasks.map((task) => (
               <TasklistItem
                 key={task._id}
@@ -289,7 +298,7 @@ export default function Tasklist() {
                 }
               />
             ))}
-          </Table.Tbody>
+          </Table.Tbody> */}
         </Table>
       </Stack>
     </Center>

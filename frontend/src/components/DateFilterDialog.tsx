@@ -25,7 +25,7 @@ export default function DateFilterDialog({
     <Popover shadow="lg">
       <Popover.Target>
         <ActionIcon variant="transparent">
-          <IconCalendarTime stroke={1.6} />
+          <IconCalendarTime stroke={1.5} />
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>

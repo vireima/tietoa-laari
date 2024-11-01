@@ -1,4 +1,6 @@
 import { useCookies } from "react-cookie";
+import * as jose from "jose";
+import { IDToken } from "../types/IDToken";
 
 export default function useAuth() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
@@ -7,17 +9,15 @@ export default function useAuth() {
     if (state === null) {
       removeCookie("auth");
     } else {
-      setCookie("auth", state);
+      const id_token = jose.decodeJwt<IDToken>(state);
+
+      setCookie("auth", state, {
+        secure: true,
+        expires: new Date(id_token.exp * 1000),
+      });
     }
   };
 
   const ret: [string | null, typeof setAuth] = [cookies.auth ?? null, setAuth];
   return ret;
 }
-
-// export default async function getTasks() {
-//     const response = await axios.get(
-//       `https://${config.API_URL}/tasks?include_archived=true`
-//     );
-//     return response.data as InputTask[];
-//   }

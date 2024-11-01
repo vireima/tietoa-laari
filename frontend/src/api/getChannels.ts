@@ -1,8 +1,6 @@
 import axios from "axios";
-import { InputTask } from "../types/Task";
 import Channel from "../types/Channel";
 import config from "../config";
-import useAuth from "../hooks/useAuth";
 
 // export default async function getChannels(tasks: InputTask[] | undefined) {
 //   if (!tasks) return [];
