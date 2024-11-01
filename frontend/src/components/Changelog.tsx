@@ -3,6 +3,15 @@ import { Timeline, Text } from "@mantine/core";
 export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
+      <Timeline.Item title="v1.0.4 Autentikaatio">
+        <Text c="dimmed">
+          Autentikaatiopäivitys taustalle, tunnistusevästeet nyt JWT-muotoisia.
+          Yö- ja päiväteemat. Sorttausbugi korjattu.
+        </Text>
+        <Text size="xs" mt={4}>
+          1.11.2024
+        </Text>
+      </Timeline.Item>
       <Timeline.Item title="v1.0.3 Tiimit">
         <Text c="dimmed">
           Ehdotukselle voi asettaa yhden tai useamman tiimin, ne ovat
