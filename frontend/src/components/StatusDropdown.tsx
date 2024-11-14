@@ -13,15 +13,19 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { patchPartialTasks } from "../api/patchTasks";
 import { ExtendedTask } from "../types/Task";
 import Tooltip from "./Tooltip";
+import useAuth from "../hooks/useAuth";
 
 interface StatusDropdownProps {
   task: ExtendedTask;
 }
 
 export default function StatusDropdown({ task }: StatusDropdownProps) {
+  const [auth, setAuth] = useAuth();
+
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: patchPartialTasks,
+    mutationFn: (tasks: Partial<ExtendedTask>[]) =>
+      patchPartialTasks(tasks, auth),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
@@ -37,7 +41,7 @@ export default function StatusDropdown({ task }: StatusDropdownProps) {
   }
 
   return (
-    <Tooltip tooltip={task.status.label} position="top">
+    <Tooltip tooltip={task.status.label} position="right">
       <Container fluid={true}>
         <Menu>
           <Menu.Target>

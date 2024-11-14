@@ -1,24 +1,23 @@
-import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { DateTime } from "ts-luxon";
+import * as jose from "jose";
+import { IDToken } from "../types/IDToken";
 
 export default function useAuth() {
-  const [cookies, setCookie] = useCookies(["auth"]);
-  const [auth, setAuth] = useState<string | null>(null);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
 
-  useEffect(() => {
-    if (!cookies.auth) {
-      setCookie("auth", true);
+  const setAuth = (state: string | null) => {
+    if (state === null) {
+      removeCookie("auth");
+    } else {
+      const id_token = jose.decodeJwt<IDToken>(state);
+
+      setCookie("auth", state, {
+        secure: true,
+        expires: new Date(id_token.exp * 1000),
+      });
     }
-  }, [auth, cookies, setCookie]);
+  };
 
-  const ret: [string | null, typeof setAuth] = [auth, setAuth];
+  const ret: [string | null, typeof setAuth] = [cookies.auth ?? null, setAuth];
   return ret;
 }
-
-// export default async function getTasks() {
-//     const response = await axios.get(
-//       `https://${config.API_URL}/tasks?include_archived=true`
-//     );
-//     return response.data as InputTask[];
-//   }

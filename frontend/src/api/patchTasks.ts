@@ -1,7 +1,6 @@
 import axios from "axios";
 import { ExtendedTask, InputTask } from "../types/Task";
 import config from "../config";
-import useAuth from "../hooks/useAuth";
 
 export default async function patchTasks(tasks: ExtendedTask[]) {
   const payload = tasks.map((task) => ({
@@ -25,7 +24,10 @@ export default async function patchTasks(tasks: ExtendedTask[]) {
   return response.data as InputTask[];
 }
 
-export async function patchPartialTasks(tasks: Partial<ExtendedTask>[]) {
+export async function patchPartialTasks(
+  tasks: Partial<ExtendedTask>[],
+  auth: string | null
+) {
   const payload = tasks.map((task) => ({
     ...task,
     description: task.description,
@@ -40,11 +42,12 @@ export async function patchPartialTasks(tasks: Partial<ExtendedTask>[]) {
       user: vote.user?.id,
     })),
   }));
+
   console.log("Sending payload", payload);
   const response = await axios.patch(
     `https://${config.API_URL}/tasks`,
     payload,
-    { headers: { Authorization: `Bearer: ${useAuth()}` } }
+    { headers: { Authorization: `Bearer ${auth}` } }
   );
   console.log("Got response", response);
   return response.data as InputTask[];
