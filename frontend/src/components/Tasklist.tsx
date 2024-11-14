@@ -15,11 +15,10 @@ import {
   TableThProps,
   Text,
   TextInput,
-  Title,
   UnstyledButton,
 } from "@mantine/core";
 import { useFilteredData } from "../hooks/useFilteredData";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useListState } from "@mantine/hooks";
 import { TaskWithVisualOverrides } from "../types/Task";
 import { useState } from "react";
 import {
@@ -31,7 +30,6 @@ import {
 } from "@tabler/icons-react";
 import classes from "../styles/Tasklist.module.css";
 import useSorted from "../hooks/useSorted";
-import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
 import useAuth from "../hooks/useAuth";
@@ -39,6 +37,10 @@ import { DateTime } from "ts-luxon";
 import DateFilterDialog from "./DateFilterDialog";
 import LightDarkModeButton from "./LightDarkModeButton";
 import TasklistItems from "./TasklistItems";
+import { apply_filter } from "../api/apply_filter";
+import { Filter } from "./Filtering/Filter";
+import { FilterBar } from "./Filtering/FilterBar";
+import { AddNewFilter } from "./Filtering/AddNewFilter";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -111,7 +113,6 @@ export default function Tasklist() {
   const { tasks } = useFilteredData();
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState("");
-  const [cutoffDate, setCutoffDate] = useState<DateTime | undefined>(undefined);
 
   // const selected = useMap<string, boolean>();
 
@@ -121,23 +122,33 @@ export default function Tasklist() {
   const [isSorted, isReversed, setSorting] = useSorted(tasks);
 
   const searchFilteredTasks = filterDataBySearchString(tasks, search);
-  const dateFilteredTasks = filterDataByModifiedDate(
-    searchFilteredTasks,
-    cutoffDate,
-    true
-  ).map((t) => {
-    t.opened = t._id === opened;
-    return t;
-  });
+  // const dateFilteredTasks = filterDataByModifiedDate(
+  //   searchFilteredTasks,
+  //   cutoffDate,
+  //   true
+  // ).map((t) => {
+  //   t.opened = t._id === opened;
+  //   return t;
+  // });
+
+  const filters: Filter<TaskWithVisualOverrides>[] = [];
+
+  const [currentFilters, setCurrentFilters] = useListState(filters);
+  const [quantifier, setQuantifier] = useState<"and" | "or">("and");
+  const freeFilteredTasks =
+    currentFilters.length > 0
+      ? apply_filter(
+          { type: quantifier, operands: currentFilters },
+          searchFilteredTasks
+        )
+      : searchFilteredTasks;
 
   const [auth, setAuth] = useAuth();
 
-  // const select = (id: string) => {
-  //   selected.set(id, true);
-  // };
-  // const toggle = (id: string) => {
-  //   selected.set(id, !(selected.get(id) ?? false));
-  // };
+  // Open opened tasks :)
+  freeFilteredTasks.forEach(
+    (task) => (task.opened = opened.includes(task._id))
+  );
 
   return (
     <Center>
@@ -218,9 +229,18 @@ export default function Tasklist() {
               setSearch(event.currentTarget.value);
             }}
           />
+          <AddNewFilter tasks={tasks} handlers={setCurrentFilters} />
           <LightDarkModeButton />
-          <DateFilterDialog onChange={setCutoffDate} date={cutoffDate} />
         </Flex>
+        <FilterBar
+          all_tasks={tasks}
+          filtered_tasks={freeFilteredTasks}
+          filters={currentFilters}
+          handlers={setCurrentFilters}
+          quantifier={quantifier}
+          onQuantifierChange={setQuantifier}
+          // onChange={setCurrentFilters}
+        />
 
         <Table
           stickyHeader
@@ -246,7 +266,7 @@ export default function Tasklist() {
                 onSort={() => setSorting("created")}
                 w={rem(135)}
               >
-                Luotu
+                Ehdotettu
               </Th>
               <Th
                 visibleFrom="md"
@@ -281,7 +301,7 @@ export default function Tasklist() {
             </Table.Tr>
           </Table.Thead>
           <TasklistItems
-            tasks={dateFilteredTasks}
+            tasks={freeFilteredTasks}
             onOpen={(openedTask) =>
               setOpened(opened === openedTask._id ? "" : openedTask._id)
             }
