@@ -3,6 +3,36 @@ import { Timeline, Text } from "@mantine/core";
 export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
+      <Timeline.Item title="v1.0.4 Autentikaatio">
+        <Text c="dimmed">
+          Autentikaatiopäivitys taustalle, tunnistusevästeet nyt JWT-muotoisia.
+          Yö- ja päiväteemat. Sorttausbugi korjattu.
+        </Text>
+        <Text size="xs" mt={4}>
+          1.11.2024
+        </Text>
+      </Timeline.Item>
+      <Timeline.Item title="v1.0.3 Tiimit">
+        <Text c="dimmed">
+          Ehdotukselle voi asettaa yhden tai useamman tiimin, ne ovat
+          vapaavalintaisia litteroita. Oletustiimi täytetään ehdotuksen
+          asettajan yksikön perusteella. Lisäksi filtteröinti muokkausajan
+          mukaan sekä käyttöliittymäpäivityksiä.
+        </Text>
+        <Text size="xs" mt={4}>
+          27.10.2024
+        </Text>
+      </Timeline.Item>
+      <Timeline.Item title="v1.0.2 Tietoturvaa">
+        <Text c="dimmed">
+          Isona asiana autentikaatio Slackin tunnuksien kautta, Laari ei enää
+          julki internettiin. Lisäksi hieman parempaa viestien muotoiluiden
+          tukemista.
+        </Text>
+        <Text size="xs" mt={4}>
+          23.10.2024
+        </Text>
+      </Timeline.Item>
       <Timeline.Item title="v1.0.1 Ensimmäiset päivitykset">
         <Text c="dimmed">
           Tämä dokumentaatio, linkit Slack-kanaville, viestien

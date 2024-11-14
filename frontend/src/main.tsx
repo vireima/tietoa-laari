@@ -10,10 +10,17 @@ import {
   // MantineColorsTuple,
   MantineProvider,
   ThemeIcon,
+  virtualColor,
 } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "@mantine/notifications/styles.css";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 // import TaskAccordion from "./routes/TaskAccordion";
 import config from "./config";
@@ -21,7 +28,9 @@ import { CookiesProvider } from "react-cookie";
 // import SingleTask from "./routes/SingleTask";
 import TasklistLayout from "./routes/TasklistLayout";
 import Tasklist from "./components/Tasklist";
-import Secure from "./components/Secure";
+import Login from "./routes/Login";
+import "dayjs/locale/fi";
+import { DatesProvider } from "@mantine/dates";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
@@ -38,7 +47,15 @@ import Secure from "./components/Secure";
 
 const theme = createTheme({
   colors: {
-    primary: colorsTuple("#35424c"),
+    primary: virtualColor({
+      name: "primary",
+      dark: "primaryDark",
+      light: "primaryLight",
+      // light: "#35424c",
+      //light: colorsTuple("#35424c")
+    }),
+    primaryDark: colorsTuple("#ddd"),
+    primaryLight: colorsTuple("#35424c"),
   },
   primaryColor: "primary",
   primaryShade: 9,
@@ -89,8 +106,8 @@ const router = createBrowserRouter([
     children: [{ index: true, element: <Tasklist /> }],
   },
   {
-    path: "/sec",
-    element: <Secure />,
+    path: "/login",
+    element: <Login />,
     errorElement: <ErrorPage />,
   },
 ]);
@@ -101,10 +118,13 @@ console.log("API_URL", config.API_URL);
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
-        <CookiesProvider defaultSetOptions={{ path: "/" }}>
-          <RouterProvider router={router} />
-        </CookiesProvider>
+      <MantineProvider defaultColorScheme="auto" theme={theme}>
+        <Notifications />
+        <DatesProvider settings={{ locale: "fi" }}>
+          <CookiesProvider defaultSetOptions={{ path: "/" }}>
+            <RouterProvider router={router} />
+          </CookiesProvider>
+        </DatesProvider>
       </MantineProvider>
       <ReactQueryDevtools client={queryClient} />
     </QueryClientProvider>

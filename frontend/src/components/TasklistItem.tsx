@@ -1,51 +1,59 @@
 import {
   Anchor,
   Box,
-  Collapse,
-  Divider,
   Group,
-  Popover,
-  rem,
+  Indicator,
   Spoiler,
   Stack,
   Table,
   Text,
 } from "@mantine/core";
-import { ExtendedTask } from "../types/Task";
-import { IconArrowRightBar, IconThumbUpFilled } from "@tabler/icons-react";
+import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
+import { IconThumbUpFilled } from "@tabler/icons-react";
 import StatusDropdown from "./StatusDropdown";
-import classes from "../styles/Tasklist.module.css";
-import { useElementSize, useTimeout } from "@mantine/hooks";
-import { useState } from "react";
 import Tooltip from "./Tooltip";
-import MarkdownFormattedText from "./MarkdownFormattedText";
+import FormattedText from "./FormattedText";
+import UserTag from "./Users/UserTag";
+import { TeamTags } from "./TeamTag";
+import { DateTime } from "ts-luxon";
+import useAuthenticatedID from "../hooks/useAuthenticatedID";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
-  task: ExtendedTask;
+  task: TaskWithVisualOverrides;
   selected: boolean;
-  opened: boolean;
+  // opened: boolean;
+  highlight?: string;
   onOpen: (task: ExtendedTask) => void;
 }
 
 export default function TasklistItem({
   task,
-  opened,
+  // opened,
   onOpen,
 }: TasklistItemProps) {
+  const current_user = useAuthenticatedID();
+
   return (
-    <Table.Tr>
+    <Table.Tr
+      {...(task.faded ? { opacity: 0.2 } : {})}
+      // bg={current_user?.id === task.author?.id ? "lime.1" : undefined}
+    >
       <Table.Td
         onClick={() => {
           onOpen(task);
         }}
       >
-        <Spoiler showLabel="" hideLabel="" expanded={opened} maxHeight={25}>
+        <Spoiler
+          showLabel=""
+          hideLabel=""
+          expanded={task.opened}
+          maxHeight={25}
+          m={0}
+        >
           <Stack>
-            <Text {...(opened ? {} : { truncate: "end" })}>
-              <MarkdownFormattedText text={task.description} />
-            </Text>
+            <FormattedText text={task.description} />
 
-            <Group>
+            <Group gap={"xs"}>
               <Anchor
                 // c="dimmed"
                 size="sm"
@@ -54,6 +62,17 @@ export default function TasklistItem({
               >
                 ↦ Slack-linkki
               </Anchor>
+              {task.slite ? (
+                <Anchor
+                  size="sm"
+                  href={`https://tietoa.slite.com/api/s/${task.slite}`}
+                  target="_blank"
+                >
+                  ↦ Slite-linkki
+                </Anchor>
+              ) : (
+                <></>
+              )}
               <Text c="dimmed" size="sm">
                 Luotu:{" "}
                 {task.created.toLocaleString({
@@ -73,22 +92,17 @@ export default function TasklistItem({
                 })}
               </Text>
               <Text c="dimmed" size="sm">
-                Ehdottaja: @{task.author?.profile.display_name}
+                Ehdottaja: <UserTag user={task.author} />
               </Text>
               {task.assignees.length ? (
-                <Text c="dimmed" size="sm">
-                  Työryhmä:{" "}
-                  {task.assignees
-                    .map((user) => "@" + user?.profile.display_name)
-                    .join(", ")}
-                </Text>
-              ) : (
-                <></>
-              )}
-              {task.slite ? (
-                <Anchor href={`https://tietoa.slite.com/api/s/${task.slite}`}>
-                  Wiki
-                </Anchor>
+                <Group gap={"xs"}>
+                  <Text c="dimmed" size="sm">
+                    Työryhmä:
+                  </Text>
+                  {task.assignees.map((user, index) => (
+                    <UserTag user={user} key={index} c="dimmed" size="sm" />
+                  ))}
+                </Group>
               ) : (
                 <></>
               )}
@@ -96,12 +110,17 @@ export default function TasklistItem({
           </Stack>
         </Spoiler>
       </Table.Td>
-      <Table.Td style={{ verticalAlign: "top" }} visibleFrom="md">
-        {task.created.toLocaleString()}
+      <Table.Td visibleFrom="md">
+        <Tooltip tooltip={task.created.toLocaleString(DateTime.DATETIME_FULL)}>
+          <Text size="sm">{task.created.toRelative()}</Text>
+        </Tooltip>
       </Table.Td>
       <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
-        #{task.channel?.name}
+        <TeamTags task={task} />
       </Table.Td>
+      {/* <Table.Td visibleFrom="md" style={{ whiteSpace: "nowrap" }}>
+        <ChannelTag channel={task.channel} size="sm" />
+      </Table.Td> */}
       <Table.Td>
         <StatusDropdown task={task} />
       </Table.Td>
@@ -110,8 +129,8 @@ export default function TasklistItem({
           <Tooltip
             tooltip={
               <Stack gap="xs">
-                {task.votes.map((vote) => (
-                  <Text>
+                {task.votes.map((vote, index) => (
+                  <Text key={index}>
                     {`@${vote.user?.profile.display_name}: ${vote.reaction}`}
                   </Text>
                 ))}

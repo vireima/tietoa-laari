@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     slite_api_key: str
     slite_note_id: str
     frontend_url: str
+    grist_api_url: str
+    grist_api_key: str
+    grist_user_doc_id: str
+    grist_user_table_id: str
+    fernet_key: bytes
+    rsa_pem_private_key: str
+    rsa_pem_public_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="allow"
