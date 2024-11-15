@@ -112,11 +112,6 @@ const router = createBrowserRouter([
     element: <Login />,
     errorElement: <ErrorPage />,
   },
-  {
-    path: "/dev",
-    element: <FiltersDevNeo />,
-    errorElement: <ErrorPage />,
-  },
 ]);
 
 console.log("ENV", process.env.NODE_ENV);
