@@ -31,6 +31,8 @@ import Tasklist from "./components/Tasklist";
 import Login from "./routes/Login";
 import "dayjs/locale/fi";
 import { DatesProvider } from "@mantine/dates";
+import FilteringDev from "./routes/FilteringDev";
+import FiltersDevNeo from "./routes/FiltersDevNeo";
 
 // const primary: MantineColorsTuple = [
 //   "#C0CED3",
