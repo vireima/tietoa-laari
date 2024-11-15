@@ -1,4 +1,13 @@
-import { Anchor, Box, Group, Spoiler, Stack, Table, Text } from "@mantine/core";
+import {
+  Anchor,
+  Box,
+  Group,
+  Indicator,
+  Spoiler,
+  Stack,
+  Table,
+  Text,
+} from "@mantine/core";
 import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
 import { IconThumbUpFilled } from "@tabler/icons-react";
 import StatusDropdown from "./StatusDropdown";
@@ -7,22 +16,28 @@ import FormattedText from "./FormattedText";
 import UserTag from "./Users/UserTag";
 import { TeamTags } from "./TeamTag";
 import { DateTime } from "ts-luxon";
+import useAuthenticatedID from "../hooks/useAuthenticatedID";
 
 interface TasklistItemProps extends React.ComponentPropsWithoutRef<"button"> {
   task: TaskWithVisualOverrides;
   selected: boolean;
-  opened: boolean;
+  // opened: boolean;
   highlight?: string;
   onOpen: (task: ExtendedTask) => void;
 }
 
 export default function TasklistItem({
   task,
-  opened,
+  // opened,
   onOpen,
 }: TasklistItemProps) {
+  const current_user = useAuthenticatedID();
+
   return (
-    <Table.Tr {...(task.faded ? { opacity: 0.2 } : {})}>
+    <Table.Tr
+      {...(task.faded ? { opacity: 0.2 } : {})}
+      // bg={current_user?.id === task.author?.id ? "lime.1" : undefined}
+    >
       <Table.Td
         onClick={() => {
           onOpen(task);
@@ -31,7 +46,7 @@ export default function TasklistItem({
         <Spoiler
           showLabel=""
           hideLabel=""
-          expanded={opened}
+          expanded={task.opened}
           maxHeight={25}
           m={0}
         >

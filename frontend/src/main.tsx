@@ -10,6 +10,7 @@ import {
   // MantineColorsTuple,
   MantineProvider,
   ThemeIcon,
+  virtualColor,
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
@@ -46,7 +47,15 @@ import { DatesProvider } from "@mantine/dates";
 
 const theme = createTheme({
   colors: {
-    primary: colorsTuple("#35424c"),
+    primary: virtualColor({
+      name: "primary",
+      dark: "primaryDark",
+      light: "primaryLight",
+      // light: "#35424c",
+      //light: colorsTuple("#35424c")
+    }),
+    primaryDark: colorsTuple("#ddd"),
+    primaryLight: colorsTuple("#35424c"),
   },
   primaryColor: "primary",
   primaryShade: 9,
@@ -109,7 +118,7 @@ console.log("API_URL", config.API_URL);
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
+      <MantineProvider defaultColorScheme="auto" theme={theme}>
         <Notifications />
         <DatesProvider settings={{ locale: "fi" }}>
           <CookiesProvider defaultSetOptions={{ path: "/" }}>

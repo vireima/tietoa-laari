@@ -52,6 +52,7 @@ export interface ExtendedTask {
 }
 
 export interface TaskWithVisualOverrides extends ExtendedTask {
+  opened?: boolean;
   hidden?: boolean;
   faded?: boolean;
 }

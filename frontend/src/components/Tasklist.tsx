@@ -1,33 +1,28 @@
 import {
-  ActionIcon,
   Anchor,
   Burger,
   Button,
   Center,
-  Container,
   Divider,
   Drawer,
   Flex,
   Group,
   List,
   ListItem,
-  Popover,
   rem,
   Stack,
   Table,
   TableThProps,
   Text,
   TextInput,
-  Title,
   UnstyledButton,
 } from "@mantine/core";
 import { useFilteredData } from "../hooks/useFilteredData";
-import { useDisclosure, useMap } from "@mantine/hooks";
-import { ExtendedTask, TaskWithVisualOverrides } from "../types/Task";
+import { useDisclosure, useListState } from "@mantine/hooks";
+import { TaskWithVisualOverrides } from "../types/Task";
 import { useState } from "react";
 import {
   IconArrowBigRightLinesFilled,
-  IconCalendarTime,
   IconChevronDown,
   IconChevronUp,
   IconSelector,
@@ -35,15 +30,17 @@ import {
 } from "@tabler/icons-react";
 import classes from "../styles/Tasklist.module.css";
 import useSorted from "../hooks/useSorted";
-import StatusDropdown from "./StatusDropdown";
-import TasklistItem from "./TasklistItem";
 import Tooltip from "./Tooltip";
 import Changelog from "./Changelog";
 import useAuth from "../hooks/useAuth";
-import { notifications } from "@mantine/notifications";
 import { DateTime } from "ts-luxon";
 import DateFilterDialog from "./DateFilterDialog";
-import useQueries from "../hooks/useQueries";
+import LightDarkModeButton from "./LightDarkModeButton";
+import TasklistItems from "./TasklistItems";
+import { apply_filter } from "../api/apply_filter";
+import { Filter } from "./Filtering/Filter";
+import { FilterBar } from "./Filtering/FilterBar";
+import { AddNewFilter } from "./Filtering/AddNewFilter";
 
 interface ThProps extends TableThProps {
   children: React.ReactNode | string;
@@ -115,28 +112,43 @@ function filterDataByModifiedDate(
 export default function Tasklist() {
   const { tasks } = useFilteredData();
   const [search, setSearch] = useState("");
-  const [cutoffDate, setCutoffDate] = useState<DateTime | undefined>(undefined);
-  const searchFilteredTasks = filterDataBySearchString(tasks, search);
-  const dateFilteredTasks = filterDataByModifiedDate(
-    searchFilteredTasks,
-    cutoffDate,
-    true
-  );
-  // const selected = useMap<string, boolean>();
   const [opened, setOpened] = useState("");
+
+  // const selected = useMap<string, boolean>();
+
   const [settingsOpened, { toggle: settingsToggle, close: settingsClose }] =
     useDisclosure(false);
 
   const [isSorted, isReversed, setSorting] = useSorted(tasks);
 
+  const searchFilteredTasks = filterDataBySearchString(tasks, search);
+  // const dateFilteredTasks = filterDataByModifiedDate(
+  //   searchFilteredTasks,
+  //   cutoffDate,
+  //   true
+  // ).map((t) => {
+  //   t.opened = t._id === opened;
+  //   return t;
+  // });
+
+  const filters: Filter<TaskWithVisualOverrides>[] = [];
+
+  const [currentFilters, setCurrentFilters] = useListState(filters);
+  const [quantifier, setQuantifier] = useState<"and" | "or">("and");
+  const freeFilteredTasks =
+    currentFilters.length > 0
+      ? apply_filter(
+          { type: quantifier, operands: currentFilters },
+          searchFilteredTasks
+        )
+      : searchFilteredTasks;
+
   const [auth, setAuth] = useAuth();
 
-  // const select = (id: string) => {
-  //   selected.set(id, true);
-  // };
-  // const toggle = (id: string) => {
-  //   selected.set(id, !(selected.get(id) ?? false));
-  // };
+  // Open opened tasks :)
+  freeFilteredTasks.forEach(
+    (task) => (task.opened = opened.includes(task._id))
+  );
 
   return (
     <Center>
@@ -144,10 +156,11 @@ export default function Tasklist() {
         opened={settingsOpened}
         onClose={settingsClose}
         position="bottom"
-        title={<Title>Laari</Title>}
+        title={"Laari"}
         overlayProps={{ backgroundOpacity: 0.15 }}
         padding={"xl"}
         size={"xl"}
+        styles={{ title: { fontWeight: 700, fontSize: rem(35) } }}
       >
         <Stack>
           <Text>
@@ -216,8 +229,18 @@ export default function Tasklist() {
               setSearch(event.currentTarget.value);
             }}
           />
-          <DateFilterDialog onChange={setCutoffDate} date={cutoffDate} />
+          <AddNewFilter tasks={tasks} handlers={setCurrentFilters} />
+          <LightDarkModeButton />
         </Flex>
+        <FilterBar
+          all_tasks={tasks}
+          filtered_tasks={freeFilteredTasks}
+          filters={currentFilters}
+          handlers={setCurrentFilters}
+          quantifier={quantifier}
+          onQuantifierChange={setQuantifier}
+          // onChange={setCurrentFilters}
+        />
 
         <Table
           stickyHeader
@@ -243,7 +266,7 @@ export default function Tasklist() {
                 onSort={() => setSorting("created")}
                 w={rem(135)}
               >
-                Luotu
+                Ehdotettu
               </Th>
               <Th
                 visibleFrom="md"
@@ -277,7 +300,13 @@ export default function Tasklist() {
               </Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>
+          <TasklistItems
+            tasks={freeFilteredTasks}
+            onOpen={(openedTask) =>
+              setOpened(opened === openedTask._id ? "" : openedTask._id)
+            }
+          />
+          {/* <Table.Tbody>
             {dateFilteredTasks.map((task) => (
               <TasklistItem
                 key={task._id}
@@ -289,7 +318,7 @@ export default function Tasklist() {
                 }
               />
             ))}
-          </Table.Tbody>
+          </Table.Tbody> */}
         </Table>
       </Stack>
     </Center>

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { ExtendedTask, InputTask } from "../types/Task";
 import config from "../config";
-import useAuth from "../hooks/useAuth";
 
 export default async function patchTasks(tasks: ExtendedTask[]) {
   const payload = tasks.map((task) => ({
