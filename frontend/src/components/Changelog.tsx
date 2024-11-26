@@ -6,7 +6,7 @@ export default function Changelog() {
       <Timeline.Item title="v1.0.5 Ehdotusten suodatus">
         <Text c="dimmed">
           Lisätty suodatustyökalut, luonti- ja muokkauspäivän mukaan sekä
-          tiimeittäin. Lisäksi yö- ja päiväteemat.
+          tiimeittäin. Lisäksi vähemmän kirkas iltateema vaihtoehdoksi.
         </Text>
         <Text size="xs" mt={4}>
           15.11.2024
