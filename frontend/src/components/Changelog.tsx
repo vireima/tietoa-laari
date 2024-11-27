@@ -3,6 +3,12 @@ import { Timeline, Text } from "@mantine/core";
 export default function Changelog() {
   return (
     <Timeline title="Muutosloki">
+      <Timeline.Item title="v1.0.7 ..">
+        <Text c="dimmed">...</Text>
+        <Text size="xs" mt={4}>
+          xx.xx.2024
+        </Text>
+      </Timeline.Item>
       <Timeline.Item title="v1.0.6 Statusten suodatus">
         <Text c="dimmed">
           Lisätty suodatusmahdollisuuksin suodatus statusten mukaan.
